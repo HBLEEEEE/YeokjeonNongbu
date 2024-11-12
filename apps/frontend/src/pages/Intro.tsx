@@ -4,10 +4,16 @@ import IntroTitle from '@/components/IntroTitle';
 
 const Intro: React.FC = () => {
   const navigate = useNavigate();
-  const [isButtonVisible, setIsButtonVisible] = useState(false);
+  const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
+  const [skipAnimations, setskipAnimations] = useState<boolean>(false);
 
   const handleLogin = () => {
     navigate('/main');
+  };
+
+  const handleskipAnimations = () => {
+    setskipAnimations(true);
+    setIsButtonVisible(true);
   };
 
   useEffect(() => {
@@ -19,8 +25,8 @@ const Intro: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative h-screen w-screen">
-      <IntroTitle />
+    <div className="relative h-screen w-screen" onClick={handleskipAnimations}>
+      <IntroTitle skipAnimations={skipAnimations} />
       <div className="bg-intro h-screen w-screen bg-no-repeat bg-center" style={{ backgroundSize: '100% 100%' }}></div>
 
       <button

@@ -1,4 +1,8 @@
-const IntroTitle: React.FC = () => {
+interface IntroTitleProps {
+  skipAnimations: boolean;
+}
+
+const IntroTitle: React.FC<IntroTitleProps> = ({skipAnimations}) => {
   return (
     <div
       className="
@@ -11,7 +15,7 @@ const IntroTitle: React.FC = () => {
       "
     >
       <div
-        className="
+        className={`
           bg-[url('./assets/intro/yeok.png')]
           bg-no-repeat 
           bg-contain
@@ -20,12 +24,15 @@ const IntroTitle: React.FC = () => {
           md:w-[100px] md:h-[140px]
           lg:w-[130px] lg:h-[170px]
           animate-slideDown
-        "
+          opacity-0
+          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          transition-opacity duration-1000
+        `}
         style={{ animationDelay: '0s' }}
       ></div>
 
       <div
-        className="
+        className={`
           bg-[url('./assets/intro/jeon.png')]
           bg-no-repeat 
           bg-contain
@@ -35,12 +42,14 @@ const IntroTitle: React.FC = () => {
           lg:w-[130px] lg:h-[170px]
           animate-slideDown
           opacity-0
-        "
+          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          transition-opacity duration-1000
+        `}
         style={{ animationDelay: '1s' }}
       ></div>
 
       <div
-        className="
+        className={`
           bg-[url('./assets/intro/nong.png')]
           bg-no-repeat 
           bg-contain
@@ -50,12 +59,14 @@ const IntroTitle: React.FC = () => {
           lg:w-[130px] lg:h-[170px]
           animate-slideDown
           opacity-0
-        "
+          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          transition-opacity duration-1000
+        `}
         style={{ animationDelay: '2s' }}
       ></div>
 
       <div
-        className="
+        className={`
           bg-[url('./assets/intro/bu.png')]
           bg-no-repeat 
           bg-contain
@@ -65,7 +76,9 @@ const IntroTitle: React.FC = () => {
           lg:w-[110px] lg:h-[170px]
           animate-slideDown
           opacity-0
-        "
+          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          transition-opacity duration-1000
+        `}
         style={{ animationDelay: '3s' }}
       ></div>
     </div>
