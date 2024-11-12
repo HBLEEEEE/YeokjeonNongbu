@@ -3,7 +3,7 @@ name: CI/CD for Ncloud Deployment
 on:
   push:
     branches:
-      - main  # 메인 브랜치에 푸시될 때마다 트리거
+      - main # 메인 브랜치에 푸시될 때마다 트리거
 
 jobs:
   build:
