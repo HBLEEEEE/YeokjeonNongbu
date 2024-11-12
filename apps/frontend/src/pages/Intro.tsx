@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import IntroTitle from '@/constants/IntroTitle';
+import IntroTitle from '@/components/IntroTitle';
 
 const Intro: React.FC = () => {
   const navigate = useNavigate();
