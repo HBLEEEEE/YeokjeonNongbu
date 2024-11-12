@@ -1,8 +1,8 @@
-name: "PR merge on time v3.2 by crong"
+name: 'PR merge on time v3.2 by crong'
 
 on:
   schedule:
-    - cron: "0 15 * * 1-5"
+    - cron: '0 15 * * 1-5'
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -13,12 +13,12 @@ permissions:
 
 jobs:
   merge:
-    name: "Auto Merge on time"
-    runs-on: "ubuntu-latest"
+    name: 'Auto Merge on time'
+    runs-on: 'ubuntu-latest'
 
     steps:
-      - name: "Merge pull request"
-        uses: "actions/github-script@v6"
+      - name: 'Merge pull request'
+        uses: 'actions/github-script@v6'
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
