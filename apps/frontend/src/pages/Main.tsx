@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 
 const Main = () => {
-    return (
-      <div>
-        <Header></Header>
-        <h1>메인 페이지</h1>
-        <nav>
+  return (
+    <div>
+      <Header></Header>
+      <h1>메인 페이지</h1>
+      <nav>
         <ul>
           <li>
             <Link to="/lottery">복권 페이지</Link>
@@ -22,9 +22,8 @@ const Main = () => {
           </li>
         </ul>
       </nav>
-      </div>
-    );
-  };
-  
-  export default Main;
-  
+    </div>
+  );
+};
+
+export default Main;

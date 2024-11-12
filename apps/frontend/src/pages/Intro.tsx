@@ -6,7 +6,7 @@ const Intro = () => {
   const handleLogin = () => {
     navigate('/Main');
   };
-    
+
   return (
     <div>
       <h1>인트로 페이지</h1>
