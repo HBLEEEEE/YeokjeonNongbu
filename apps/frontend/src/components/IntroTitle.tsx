@@ -2,7 +2,7 @@ interface IntroTitleProps {
   skipAnimations: boolean;
 }
 
-const IntroTitle: React.FC<IntroTitleProps> = ({skipAnimations}) => {
+const IntroTitle: React.FC<IntroTitleProps> = ({ skipAnimations }) => {
   return (
     <div
       className="
@@ -23,9 +23,7 @@ const IntroTitle: React.FC<IntroTitleProps> = ({skipAnimations}) => {
           sm:w-[80px] sm:h-[120px]
           md:w-[100px] md:h-[140px]
           lg:w-[130px] lg:h-[170px]
-          animate-slideDown
-          opacity-0
-          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          ${skipAnimations ? 'opacity-100' : 'animate-slideDown opacity-0'}
           transition-opacity duration-1000
         `}
         style={{ animationDelay: '0s' }}
@@ -40,9 +38,7 @@ const IntroTitle: React.FC<IntroTitleProps> = ({skipAnimations}) => {
           sm:w-[80px] sm:h-[120px]
           md:w-[100px] md:h-[140px]
           lg:w-[130px] lg:h-[170px]
-          animate-slideDown
-          opacity-0
-          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          ${skipAnimations ? 'opacity-100' : 'animate-slideDown opacity-0'}
           transition-opacity duration-1000
         `}
         style={{ animationDelay: '1s' }}
@@ -57,9 +53,7 @@ const IntroTitle: React.FC<IntroTitleProps> = ({skipAnimations}) => {
           sm:w-[80px] sm:h-[120px]
           md:w-[100px] md:h-[140px]
           lg:w-[130px] lg:h-[170px]
-          animate-slideDown
-          opacity-0
-          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          ${skipAnimations ? 'opacity-100' : 'animate-slideDown opacity-0'}
           transition-opacity duration-1000
         `}
         style={{ animationDelay: '2s' }}
@@ -74,16 +68,13 @@ const IntroTitle: React.FC<IntroTitleProps> = ({skipAnimations}) => {
           sm:w-[60px] sm:h-[120px]
           md:w-[80px] md:h-[140px]
           lg:w-[110px] lg:h-[170px]
-          animate-slideDown
-          opacity-0
-          ${skipAnimations ? 'opacity-100 animate-none' : 'animate-slideDown'}
+          ${skipAnimations ? 'opacity-100' : 'animate-slideDown opacity-0'}
           transition-opacity duration-1000
         `}
         style={{ animationDelay: '3s' }}
       ></div>
     </div>
-  );  
+  );
 };
-  
+
 export default IntroTitle;
-  
