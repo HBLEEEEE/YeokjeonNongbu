@@ -13,6 +13,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.13.0
         version: 8.13.0(eslint@8.57.1)(typescript@5.6.3)
+      redis:
+        specifier: ^4.7.0
+        version: 4.7.0
       web13:
         specifier: 'file:'
         version: file:(eslint@8.57.1)(typescript@5.6.3)
@@ -38,9 +41,6 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
-      typescript:
-        specifier: ^5.1.3
-        version: 5.6.3
 
 packages:
   '@angular-devkit/core@17.3.11':
@@ -254,6 +254,53 @@ packages:
         integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==
       }
     engines: { node: ^12.20.0 || ^14.18.0 || >=16.0.0 }
+
+  '@redis/bloom@1.2.0':
+    resolution:
+      {
+        integrity: sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg==
+      }
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/client@1.6.0':
+    resolution:
+      {
+        integrity: sha512-aR0uffYI700OEEH4gYnitAnv3vzVGXCFvYfdpu/CJKvk4pHfLPEy/JSZyrpQ+15WhXe1yJRXLtfQ84s4mEXnPg==
+      }
+    engines: { node: '>=14' }
+
+  '@redis/graph@1.1.1':
+    resolution:
+      {
+        integrity: sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw==
+      }
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/json@1.0.7':
+    resolution:
+      {
+        integrity: sha512-6UyXfjVaTBTJtKNG4/9Z8PSpKE6XgSyEb8iwaqDcy+uKrd/DGYHTWkUdnQDyzm727V7p21WUMhsqz5oy65kPcQ==
+      }
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/search@1.2.0':
+    resolution:
+      {
+        integrity: sha512-tYoDBbtqOVigEDMAcTGsRlMycIIjwMCgD8eR2t0NANeQmgK/lvxNAvYyb6bZDD4frHRhIHkJu2TBRvB0ERkOmw==
+      }
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/time-series@1.1.0':
+    resolution:
+      {
+        integrity: sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g==
+      }
+    peerDependencies:
+      '@redis/client': ^1.0.0
 
   '@types/eslint-scope@3.7.7':
     resolution:
@@ -763,6 +810,13 @@ packages:
       }
     engines: { node: '>=0.8' }
 
+  cluster-key-slot@1.1.2:
+    resolution:
+      {
+        integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==
+      }
+    engines: { node: '>=0.10.0' }
+
   color-convert@2.0.1:
     resolution:
       {
@@ -1229,13 +1283,20 @@ packages:
         integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
       }
     engines: { node: ^8.16.0 || ^10.6.0 || >=11.0.0 }
-    os: [darwin]
+    os: [ darwin ]
 
   function-bind@1.1.2:
     resolution:
       {
         integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==
       }
+
+  generic-pool@3.9.0:
+    resolution:
+      {
+        integrity: sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==
+      }
+    engines: { node: '>= 4' }
 
   get-east-asian-width@1.3.0:
     resolution:
@@ -2065,6 +2126,12 @@ packages:
       }
     engines: { node: '>=8.10.0' }
 
+  redis@4.7.0:
+    resolution:
+      {
+        integrity: sha512-zvmkHEAdGMn+hMRXuMBtu4Vo5P6rHQjLoHftu+lBqq8ZTA3RCVC/WzD790bkKKiNFp7d5/9PcSD19fJyyRvOdQ==
+      }
+
   repeat-string@1.6.1:
     resolution:
       {
@@ -2596,6 +2663,12 @@ packages:
         integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
       }
 
+  yallist@4.0.0:
+    resolution:
+      {
+        integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
+      }
+
   yaml@2.5.1:
     resolution:
       {
@@ -2657,7 +2730,7 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.1.1
 
-  '@babel/helper-validator-identifier@7.25.9': {}
+  '@babel/helper-validator-identifier@7.25.9': { }
 
   '@colors/colors@1.5.0':
     optional: true
@@ -2667,7 +2740,7 @@ snapshots:
       eslint: 8.57.1
       eslint-visitor-keys: 3.4.3
 
-  '@eslint-community/regexpp@4.12.1': {}
+  '@eslint-community/regexpp@4.12.1': { }
 
   '@eslint/eslintrc@2.1.4':
     dependencies:
@@ -2683,7 +2756,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@eslint/js@8.57.1': {}
+  '@eslint/js@8.57.1': { }
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -2693,9 +2766,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@humanwhocodes/module-importer@1.0.1': {}
+  '@humanwhocodes/module-importer@1.0.1': { }
 
-  '@humanwhocodes/object-schema@2.0.3': {}
+  '@humanwhocodes/object-schema@2.0.3': { }
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -2712,16 +2785,16 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.0
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@jridgewell/resolve-uri@3.1.2': {}
+  '@jridgewell/resolve-uri@3.1.2': { }
 
-  '@jridgewell/set-array@1.2.1': {}
+  '@jridgewell/set-array@1.2.1': { }
 
   '@jridgewell/source-map@0.3.6':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@jridgewell/sourcemap-codec@1.5.0': {}
+  '@jridgewell/sourcemap-codec@1.5.0': { }
 
   '@jridgewell/trace-mapping@0.3.25':
     dependencies:
@@ -2774,7 +2847,7 @@ snapshots:
       '@nodelib/fs.stat': 2.0.5
       run-parallel: 1.2.0
 
-  '@nodelib/fs.stat@2.0.5': {}
+  '@nodelib/fs.stat@2.0.5': { }
 
   '@nodelib/fs.walk@1.2.8':
     dependencies:
@@ -2784,7 +2857,33 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@pkgr/core@0.1.1': {}
+  '@pkgr/core@0.1.1': { }
+
+  '@redis/bloom@1.2.0(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/client@1.6.0':
+    dependencies:
+      cluster-key-slot: 1.1.2
+      generic-pool: 3.9.0
+      yallist: 4.0.0
+
+  '@redis/graph@1.1.1(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/json@1.0.7(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/search@1.2.0(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/time-series@1.1.0(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
 
   '@types/eslint-scope@3.7.7':
     dependencies:
@@ -2796,9 +2895,9 @@ snapshots:
       '@types/estree': 1.0.6
       '@types/json-schema': 7.0.15
 
-  '@types/estree@1.0.6': {}
+  '@types/estree@1.0.6': { }
 
-  '@types/json-schema@7.0.15': {}
+  '@types/json-schema@7.0.15': { }
 
   '@types/node@22.9.0':
     dependencies:
@@ -2852,7 +2951,7 @@ snapshots:
       - eslint
       - supports-color
 
-  '@typescript-eslint/types@8.13.0': {}
+  '@typescript-eslint/types@8.13.0': { }
 
   '@typescript-eslint/typescript-estree@8.13.0(typescript@5.6.3)':
     dependencies:
@@ -2885,18 +2984,18 @@ snapshots:
       '@typescript-eslint/types': 8.13.0
       eslint-visitor-keys: 3.4.3
 
-  '@ungap/structured-clone@1.2.0': {}
+  '@ungap/structured-clone@1.2.0': { }
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
       '@webassemblyjs/helper-numbers': 1.13.2
       '@webassemblyjs/helper-wasm-bytecode': 1.13.2
 
-  '@webassemblyjs/floating-point-hex-parser@1.13.2': {}
+  '@webassemblyjs/floating-point-hex-parser@1.13.2': { }
 
-  '@webassemblyjs/helper-api-error@1.13.2': {}
+  '@webassemblyjs/helper-api-error@1.13.2': { }
 
-  '@webassemblyjs/helper-buffer@1.14.1': {}
+  '@webassemblyjs/helper-buffer@1.14.1': { }
 
   '@webassemblyjs/helper-numbers@1.13.2':
     dependencies:
@@ -2904,7 +3003,7 @@ snapshots:
       '@webassemblyjs/helper-api-error': 1.13.2
       '@xtuc/long': 4.2.2
 
-  '@webassemblyjs/helper-wasm-bytecode@1.13.2': {}
+  '@webassemblyjs/helper-wasm-bytecode@1.13.2': { }
 
   '@webassemblyjs/helper-wasm-section@1.14.1':
     dependencies:
@@ -2921,7 +3020,7 @@ snapshots:
     dependencies:
       '@xtuc/long': 4.2.2
 
-  '@webassemblyjs/utf8@1.13.2': {}
+  '@webassemblyjs/utf8@1.13.2': { }
 
   '@webassemblyjs/wasm-edit@1.14.1':
     dependencies:
@@ -2963,15 +3062,15 @@ snapshots:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
 
-  '@xtuc/ieee754@1.2.0': {}
+  '@xtuc/ieee754@1.2.0': { }
 
-  '@xtuc/long@4.2.2': {}
+  '@xtuc/long@4.2.2': { }
 
   acorn-jsx@5.3.2(acorn@8.14.0):
     dependencies:
       acorn: 8.14.0
 
-  acorn@8.14.0: {}
+  acorn@8.14.0: { }
 
   ajv-formats@2.1.1(ajv@8.12.0):
     optionalDependencies:
@@ -2995,7 +3094,7 @@ snapshots:
       require-from-string: 2.0.2
       uri-js: 4.4.1
 
-  ansi-colors@4.1.3: {}
+  ansi-colors@4.1.3: { }
 
   ansi-escapes@4.3.2:
     dependencies:
@@ -3005,30 +3104,30 @@ snapshots:
     dependencies:
       environment: 1.1.0
 
-  ansi-regex@5.0.1: {}
+  ansi-regex@5.0.1: { }
 
-  ansi-regex@6.1.0: {}
+  ansi-regex@6.1.0: { }
 
   ansi-styles@4.3.0:
     dependencies:
       color-convert: 2.0.1
 
-  ansi-styles@6.2.1: {}
+  ansi-styles@6.2.1: { }
 
   anymatch@3.1.3:
     dependencies:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  argparse@2.0.1: {}
+  argparse@2.0.1: { }
 
-  array-timsort@1.0.3: {}
+  array-timsort@1.0.3: { }
 
-  balanced-match@1.0.2: {}
+  balanced-match@1.0.2: { }
 
-  base64-js@1.5.1: {}
+  base64-js@1.5.1: { }
 
-  binary-extensions@2.3.0: {}
+  binary-extensions@2.3.0: { }
 
   bl@4.1.0:
     dependencies:
@@ -3056,7 +3155,7 @@ snapshots:
       node-releases: 2.0.18
       update-browserslist-db: 1.1.1(browserslist@4.24.2)
 
-  buffer-from@1.1.2: {}
+  buffer-from@1.1.2: { }
 
   buffer@5.7.1:
     dependencies:
@@ -3071,18 +3170,18 @@ snapshots:
       get-intrinsic: 1.2.4
       set-function-length: 1.2.2
 
-  callsites@3.1.0: {}
+  callsites@3.1.0: { }
 
-  caniuse-lite@1.0.30001680: {}
+  caniuse-lite@1.0.30001680: { }
 
   chalk@4.1.2:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
-  chalk@5.3.0: {}
+  chalk@5.3.0: { }
 
-  chardet@0.7.0: {}
+  chardet@0.7.0: { }
 
   chokidar@3.6.0:
     dependencies:
@@ -3096,7 +3195,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  chrome-trace-event@1.0.4: {}
+  chrome-trace-event@1.0.4: { }
 
   cli-cursor@3.1.0:
     dependencies:
@@ -3106,7 +3205,7 @@ snapshots:
     dependencies:
       restore-cursor: 5.1.0
 
-  cli-spinners@2.9.2: {}
+  cli-spinners@2.9.2: { }
 
   cli-table3@0.6.5:
     dependencies:
@@ -3119,25 +3218,27 @@ snapshots:
       slice-ansi: 5.0.0
       string-width: 7.2.0
 
-  cli-width@3.0.0: {}
+  cli-width@3.0.0: { }
 
-  cli-width@4.1.0: {}
+  cli-width@4.1.0: { }
 
-  clone@1.0.4: {}
+  clone@1.0.4: { }
+
+  cluster-key-slot@1.1.2: { }
 
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
 
-  color-name@1.1.4: {}
+  color-name@1.1.4: { }
 
-  colorette@2.0.20: {}
+  colorette@2.0.20: { }
 
-  commander@12.1.0: {}
+  commander@12.1.0: { }
 
-  commander@2.20.3: {}
+  commander@2.20.3: { }
 
-  commander@4.1.1: {}
+  commander@4.1.1: { }
 
   comment-json@4.2.5:
     dependencies:
@@ -3147,9 +3248,9 @@ snapshots:
       has-own-prop: 2.0.0
       repeat-string: 1.6.1
 
-  concat-map@0.0.1: {}
+  concat-map@0.0.1: { }
 
-  core-util-is@1.0.3: {}
+  core-util-is@1.0.3: { }
 
   cosmiconfig@8.3.6(typescript@5.6.3):
     dependencies:
@@ -3170,9 +3271,9 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  deep-is@0.1.4: {}
+  deep-is@0.1.4: { }
 
-  deepmerge@4.3.1: {}
+  deepmerge@4.3.1: { }
 
   defaults@1.0.4:
     dependencies:
@@ -3188,22 +3289,22 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-  eastasianwidth@0.2.0: {}
+  eastasianwidth@0.2.0: { }
 
-  electron-to-chromium@1.5.55: {}
+  electron-to-chromium@1.5.55: { }
 
-  emoji-regex@10.4.0: {}
+  emoji-regex@10.4.0: { }
 
-  emoji-regex@8.0.0: {}
+  emoji-regex@8.0.0: { }
 
-  emoji-regex@9.2.2: {}
+  emoji-regex@9.2.2: { }
 
   enhanced-resolve@5.17.1:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.2.1
 
-  environment@1.1.0: {}
+  environment@1.1.0: { }
 
   error-ex@1.3.2:
     dependencies:
@@ -3213,15 +3314,15 @@ snapshots:
     dependencies:
       get-intrinsic: 1.2.4
 
-  es-errors@1.3.0: {}
+  es-errors@1.3.0: { }
 
-  es-module-lexer@1.5.4: {}
+  es-module-lexer@1.5.4: { }
 
-  escalade@3.2.0: {}
+  escalade@3.2.0: { }
 
-  escape-string-regexp@1.0.5: {}
+  escape-string-regexp@1.0.5: { }
 
-  escape-string-regexp@4.0.0: {}
+  escape-string-regexp@4.0.0: { }
 
   eslint-config-prettier@9.1.0(eslint@8.57.1):
     dependencies:
@@ -3247,7 +3348,7 @@ snapshots:
       esrecurse: 4.3.0
       estraverse: 5.3.0
 
-  eslint-visitor-keys@3.4.3: {}
+  eslint-visitor-keys@3.4.3: { }
 
   eslint@8.57.1:
     dependencies:
@@ -3298,7 +3399,7 @@ snapshots:
       acorn-jsx: 5.3.2(acorn@8.14.0)
       eslint-visitor-keys: 3.4.3
 
-  esprima@4.0.1: {}
+  esprima@4.0.1: { }
 
   esquery@1.6.0:
     dependencies:
@@ -3308,15 +3409,15 @@ snapshots:
     dependencies:
       estraverse: 5.3.0
 
-  estraverse@4.3.0: {}
+  estraverse@4.3.0: { }
 
-  estraverse@5.3.0: {}
+  estraverse@5.3.0: { }
 
-  esutils@2.0.3: {}
+  esutils@2.0.3: { }
 
-  eventemitter3@5.0.1: {}
+  eventemitter3@5.0.1: { }
 
-  events@3.3.0: {}
+  events@3.3.0: { }
 
   execa@8.0.1:
     dependencies:
@@ -3336,9 +3437,9 @@ snapshots:
       iconv-lite: 0.4.24
       tmp: 0.0.33
 
-  fast-deep-equal@3.1.3: {}
+  fast-deep-equal@3.1.3: { }
 
-  fast-diff@1.3.0: {}
+  fast-diff@1.3.0: { }
 
   fast-glob@3.3.2:
     dependencies:
@@ -3348,9 +3449,9 @@ snapshots:
       merge2: 1.4.1
       micromatch: 4.0.8
 
-  fast-json-stable-stringify@2.1.0: {}
+  fast-json-stable-stringify@2.1.0: { }
 
-  fast-levenshtein@2.0.6: {}
+  fast-levenshtein@2.0.6: { }
 
   fastq@1.17.1:
     dependencies:
@@ -3379,7 +3480,7 @@ snapshots:
       keyv: 4.5.4
       rimraf: 3.0.2
 
-  flatted@3.3.1: {}
+  flatted@3.3.1: { }
 
   foreground-child@3.3.0:
     dependencies:
@@ -3409,16 +3510,18 @@ snapshots:
       jsonfile: 6.1.0
       universalify: 2.0.1
 
-  fs-monkey@1.0.6: {}
+  fs-monkey@1.0.6: { }
 
-  fs.realpath@1.0.0: {}
+  fs.realpath@1.0.0: { }
 
   fsevents@2.3.3:
     optional: true
 
-  function-bind@1.1.2: {}
+  function-bind@1.1.2: { }
 
-  get-east-asian-width@1.3.0: {}
+  generic-pool@3.9.0: { }
+
+  get-east-asian-width@1.3.0: { }
 
   get-intrinsic@1.2.4:
     dependencies:
@@ -3428,7 +3531,7 @@ snapshots:
       has-symbols: 1.0.3
       hasown: 2.0.2
 
-  get-stream@8.0.1: {}
+  get-stream@8.0.1: { }
 
   glob-parent@5.1.2:
     dependencies:
@@ -3438,7 +3541,7 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob-to-regexp@0.4.1: {}
+  glob-to-regexp@0.4.1: { }
 
   glob@10.4.2:
     dependencies:
@@ -3466,51 +3569,51 @@ snapshots:
     dependencies:
       get-intrinsic: 1.2.4
 
-  graceful-fs@4.2.11: {}
+  graceful-fs@4.2.11: { }
 
-  graphemer@1.4.0: {}
+  graphemer@1.4.0: { }
 
-  has-flag@4.0.0: {}
+  has-flag@4.0.0: { }
 
-  has-own-prop@2.0.0: {}
+  has-own-prop@2.0.0: { }
 
   has-property-descriptors@1.0.2:
     dependencies:
       es-define-property: 1.0.0
 
-  has-proto@1.0.3: {}
+  has-proto@1.0.3: { }
 
-  has-symbols@1.0.3: {}
+  has-symbols@1.0.3: { }
 
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
 
-  human-signals@5.0.0: {}
+  human-signals@5.0.0: { }
 
-  husky@9.1.6: {}
+  husky@9.1.6: { }
 
   iconv-lite@0.4.24:
     dependencies:
       safer-buffer: 2.1.2
 
-  ieee754@1.2.1: {}
+  ieee754@1.2.1: { }
 
-  ignore@5.3.2: {}
+  ignore@5.3.2: { }
 
   import-fresh@3.3.0:
     dependencies:
       parent-module: 1.0.1
       resolve-from: 4.0.0
 
-  imurmurhash@0.1.4: {}
+  imurmurhash@0.1.4: { }
 
   inflight@1.0.6:
     dependencies:
       once: 1.4.0
       wrappy: 1.0.2
 
-  inherits@2.0.4: {}
+  inherits@2.0.4: { }
 
   inquirer@8.2.6:
     dependencies:
@@ -3548,17 +3651,17 @@ snapshots:
       strip-ansi: 6.0.1
       wrap-ansi: 6.2.0
 
-  is-arrayish@0.2.1: {}
+  is-arrayish@0.2.1: { }
 
   is-binary-path@2.1.0:
     dependencies:
       binary-extensions: 2.3.0
 
-  is-extglob@2.1.1: {}
+  is-extglob@2.1.1: { }
 
-  is-fullwidth-code-point@3.0.0: {}
+  is-fullwidth-code-point@3.0.0: { }
 
-  is-fullwidth-code-point@4.0.0: {}
+  is-fullwidth-code-point@4.0.0: { }
 
   is-fullwidth-code-point@5.0.0:
     dependencies:
@@ -3568,17 +3671,17 @@ snapshots:
     dependencies:
       is-extglob: 2.1.1
 
-  is-interactive@1.0.0: {}
+  is-interactive@1.0.0: { }
 
-  is-number@7.0.0: {}
+  is-number@7.0.0: { }
 
-  is-path-inside@3.0.3: {}
+  is-path-inside@3.0.3: { }
 
-  is-stream@3.0.0: {}
+  is-stream@3.0.0: { }
 
-  is-unicode-supported@0.1.0: {}
+  is-unicode-supported@0.1.0: { }
 
-  isexe@2.0.0: {}
+  isexe@2.0.0: { }
 
   jackspeak@3.4.3:
     dependencies:
@@ -3592,27 +3695,27 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  js-tokens@4.0.0: {}
+  js-tokens@4.0.0: { }
 
   js-yaml@4.1.0:
     dependencies:
       argparse: 2.0.1
 
-  json-buffer@3.0.1: {}
+  json-buffer@3.0.1: { }
 
-  json-parse-even-better-errors@2.3.1: {}
+  json-parse-even-better-errors@2.3.1: { }
 
-  json-schema-traverse@0.4.1: {}
+  json-schema-traverse@0.4.1: { }
 
-  json-schema-traverse@1.0.0: {}
+  json-schema-traverse@1.0.0: { }
 
-  json-stable-stringify-without-jsonify@1.0.1: {}
+  json-stable-stringify-without-jsonify@1.0.1: { }
 
-  json5@2.2.3: {}
+  json5@2.2.3: { }
 
-  jsonc-parser@3.2.1: {}
+  jsonc-parser@3.2.1: { }
 
-  jsonc-parser@3.3.1: {}
+  jsonc-parser@3.3.1: { }
 
   jsonfile@6.1.0:
     dependencies:
@@ -3629,9 +3732,9 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  lilconfig@3.1.2: {}
+  lilconfig@3.1.2: { }
 
-  lines-and-columns@1.2.4: {}
+  lines-and-columns@1.2.4: { }
 
   lint-staged@15.2.10:
     dependencies:
@@ -3657,15 +3760,15 @@ snapshots:
       rfdc: 1.4.1
       wrap-ansi: 9.0.0
 
-  loader-runner@4.3.0: {}
+  loader-runner@4.3.0: { }
 
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
 
-  lodash.merge@4.6.2: {}
+  lodash.merge@4.6.2: { }
 
-  lodash@4.17.21: {}
+  lodash@4.17.21: { }
 
   log-symbols@4.1.0:
     dependencies:
@@ -3680,7 +3783,7 @@ snapshots:
       strip-ansi: 7.1.0
       wrap-ansi: 9.0.0
 
-  lru-cache@10.4.3: {}
+  lru-cache@10.4.3: { }
 
   magic-string@0.30.8:
     dependencies:
@@ -3690,26 +3793,26 @@ snapshots:
     dependencies:
       fs-monkey: 1.0.6
 
-  merge-stream@2.0.0: {}
+  merge-stream@2.0.0: { }
 
-  merge2@1.4.1: {}
+  merge2@1.4.1: { }
 
   micromatch@4.0.8:
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
 
-  mime-db@1.52.0: {}
+  mime-db@1.52.0: { }
 
   mime-types@2.1.35:
     dependencies:
       mime-db: 1.52.0
 
-  mimic-fn@2.1.0: {}
+  mimic-fn@2.1.0: { }
 
-  mimic-fn@4.0.0: {}
+  mimic-fn@4.0.0: { }
 
-  mimic-function@5.0.1: {}
+  mimic-function@5.0.1: { }
 
   minimatch@3.1.2:
     dependencies:
@@ -3719,29 +3822,29 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.1
 
-  minimist@1.2.8: {}
+  minimist@1.2.8: { }
 
-  minipass@7.1.2: {}
+  minipass@7.1.2: { }
 
-  ms@2.1.3: {}
+  ms@2.1.3: { }
 
-  mute-stream@0.0.8: {}
+  mute-stream@0.0.8: { }
 
-  mute-stream@1.0.0: {}
+  mute-stream@1.0.0: { }
 
-  natural-compare@1.4.0: {}
+  natural-compare@1.4.0: { }
 
-  neo-async@2.6.2: {}
+  neo-async@2.6.2: { }
 
-  node-abort-controller@3.1.1: {}
+  node-abort-controller@3.1.1: { }
 
   node-emoji@1.11.0:
     dependencies:
       lodash: 4.17.21
 
-  node-releases@2.0.18: {}
+  node-releases@2.0.18: { }
 
-  normalize-path@3.0.0: {}
+  normalize-path@3.0.0: { }
 
   npm-run-path@5.3.0:
     dependencies:
@@ -3784,7 +3887,7 @@ snapshots:
       strip-ansi: 6.0.1
       wcwidth: 1.0.1
 
-  os-tmpdir@1.0.2: {}
+  os-tmpdir@1.0.2: { }
 
   p-limit@3.1.0:
     dependencies:
@@ -3794,7 +3897,7 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
-  package-json-from-dist@1.0.1: {}
+  package-json-from-dist@1.0.1: { }
 
   parent-module@1.0.1:
     dependencies:
@@ -3807,42 +3910,42 @@ snapshots:
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
-  path-exists@4.0.0: {}
+  path-exists@4.0.0: { }
 
-  path-is-absolute@1.0.1: {}
+  path-is-absolute@1.0.1: { }
 
-  path-key@3.1.1: {}
+  path-key@3.1.1: { }
 
-  path-key@4.0.0: {}
+  path-key@4.0.0: { }
 
   path-scurry@1.11.1:
     dependencies:
       lru-cache: 10.4.3
       minipass: 7.1.2
 
-  path-type@4.0.0: {}
+  path-type@4.0.0: { }
 
-  picocolors@1.1.1: {}
+  picocolors@1.1.1: { }
 
-  picomatch@2.3.1: {}
+  picomatch@2.3.1: { }
 
-  picomatch@4.0.1: {}
+  picomatch@4.0.1: { }
 
-  pidtree@0.6.0: {}
+  pidtree@0.6.0: { }
 
-  pluralize@8.0.0: {}
+  pluralize@8.0.0: { }
 
-  prelude-ls@1.2.1: {}
+  prelude-ls@1.2.1: { }
 
   prettier-linter-helpers@1.0.0:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier@3.3.3: {}
+  prettier@3.3.3: { }
 
-  punycode@2.3.1: {}
+  punycode@2.3.1: { }
 
-  queue-microtask@1.2.3: {}
+  queue-microtask@1.2.3: { }
 
   randombytes@2.1.0:
     dependencies:
@@ -3858,11 +3961,20 @@ snapshots:
     dependencies:
       picomatch: 2.3.1
 
-  repeat-string@1.6.1: {}
+  redis@4.7.0:
+    dependencies:
+      '@redis/bloom': 1.2.0(@redis/client@1.6.0)
+      '@redis/client': 1.6.0
+      '@redis/graph': 1.1.1(@redis/client@1.6.0)
+      '@redis/json': 1.0.7(@redis/client@1.6.0)
+      '@redis/search': 1.2.0(@redis/client@1.6.0)
+      '@redis/time-series': 1.1.0(@redis/client@1.6.0)
 
-  require-from-string@2.0.2: {}
+  repeat-string@1.6.1: { }
 
-  resolve-from@4.0.0: {}
+  require-from-string@2.0.2: { }
+
+  resolve-from@4.0.0: { }
 
   restore-cursor@3.1.0:
     dependencies:
@@ -3874,17 +3986,17 @@ snapshots:
       onetime: 7.0.0
       signal-exit: 4.1.0
 
-  reusify@1.0.4: {}
+  reusify@1.0.4: { }
 
-  rfdc@1.4.1: {}
+  rfdc@1.4.1: { }
 
   rimraf@3.0.2:
     dependencies:
       glob: 7.2.3
 
-  run-async@2.4.1: {}
+  run-async@2.4.1: { }
 
-  run-async@3.0.0: {}
+  run-async@3.0.0: { }
 
   run-parallel@1.2.0:
     dependencies:
@@ -3894,9 +4006,9 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  safe-buffer@5.2.1: {}
+  safe-buffer@5.2.1: { }
 
-  safer-buffer@2.1.2: {}
+  safer-buffer@2.1.2: { }
 
   schema-utils@3.3.0:
     dependencies:
@@ -3904,7 +4016,7 @@ snapshots:
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
 
-  semver@7.6.3: {}
+  semver@7.6.3: { }
 
   serialize-javascript@6.0.2:
     dependencies:
@@ -3923,11 +4035,11 @@ snapshots:
     dependencies:
       shebang-regex: 3.0.0
 
-  shebang-regex@3.0.0: {}
+  shebang-regex@3.0.0: { }
 
-  signal-exit@3.0.7: {}
+  signal-exit@3.0.7: { }
 
-  signal-exit@4.1.0: {}
+  signal-exit@4.1.0: { }
 
   slice-ansi@5.0.0:
     dependencies:
@@ -3944,11 +4056,11 @@ snapshots:
       buffer-from: 1.1.2
       source-map: 0.6.1
 
-  source-map@0.6.1: {}
+  source-map@0.6.1: { }
 
-  source-map@0.7.4: {}
+  source-map@0.7.4: { }
 
-  string-argv@0.3.2: {}
+  string-argv@0.3.2: { }
 
   string-width@4.2.3:
     dependencies:
@@ -3980,11 +4092,11 @@ snapshots:
     dependencies:
       ansi-regex: 6.1.0
 
-  strip-bom@3.0.0: {}
+  strip-bom@3.0.0: { }
 
-  strip-final-newline@3.0.0: {}
+  strip-final-newline@3.0.0: { }
 
-  strip-json-comments@3.1.1: {}
+  strip-json-comments@3.1.1: { }
 
   supports-color@7.2.0:
     dependencies:
@@ -3994,14 +4106,14 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  symbol-observable@4.0.0: {}
+  symbol-observable@4.0.0: { }
 
   synckit@0.9.2:
     dependencies:
       '@pkgr/core': 0.1.1
       tslib: 2.8.1
 
-  tapable@2.2.1: {}
+  tapable@2.2.1: { }
 
   terser-webpack-plugin@5.3.10(webpack@5.96.1):
     dependencies:
@@ -4019,9 +4131,9 @@ snapshots:
       commander: 2.20.3
       source-map-support: 0.5.21
 
-  text-table@0.2.0: {}
+  text-table@0.2.0: { }
 
-  through@2.3.8: {}
+  through@2.3.8: { }
 
   tmp@0.0.33:
     dependencies:
@@ -4031,7 +4143,7 @@ snapshots:
     dependencies:
       is-number: 7.0.0
 
-  tree-kill@1.2.2: {}
+  tree-kill@1.2.2: { }
 
   ts-api-utils@1.4.0(typescript@5.6.3):
     dependencies:
@@ -4049,21 +4161,21 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tslib@2.8.1: {}
+  tslib@2.8.1: { }
 
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
 
-  type-fest@0.20.2: {}
+  type-fest@0.20.2: { }
 
-  type-fest@0.21.3: {}
+  type-fest@0.21.3: { }
 
-  typescript@5.6.3: {}
+  typescript@5.6.3: { }
 
-  undici-types@6.19.8: {}
+  undici-types@6.19.8: { }
 
-  universalify@2.0.1: {}
+  universalify@2.0.1: { }
 
   update-browserslist-db@1.1.1(browserslist@4.24.2):
     dependencies:
@@ -4075,7 +4187,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  util-deprecate@1.0.2: {}
+  util-deprecate@1.0.2: { }
 
   watchpack@2.4.2:
     dependencies:
@@ -4095,9 +4207,9 @@ snapshots:
       - supports-color
       - typescript
 
-  webpack-node-externals@3.0.0: {}
+  webpack-node-externals@3.0.0: { }
 
-  webpack-sources@3.2.3: {}
+  webpack-sources@3.2.3: { }
 
   webpack@5.96.1:
     dependencies:
@@ -4133,7 +4245,7 @@ snapshots:
     dependencies:
       isexe: 2.0.0
 
-  word-wrap@1.2.5: {}
+  word-wrap@1.2.5: { }
 
   wrap-ansi@6.2.0:
     dependencies:
@@ -4159,10 +4271,12 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.1.0
 
-  wrappy@1.0.2: {}
+  wrappy@1.0.2: { }
 
-  yaml@2.5.1: {}
+  yallist@4.0.0: { }
 
-  yargs-parser@21.1.1: {}
+  yaml@2.5.1: { }
 
-  yocto-queue@0.1.0: {}
+  yargs-parser@21.1.1: { }
+
+  yocto-queue@0.1.0: { }
