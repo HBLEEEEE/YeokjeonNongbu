@@ -34,7 +34,7 @@ const Intro: React.FC = () => {
 
       <button
         className={`
-          bg-[url('./assets/intro/start.png')] 
+          bg-start
           cursor-pointer 
           absolute 
           bg-no-repeat 

@@ -2,12 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import AlarmModal from './AlarmModal';
 import BarModal from './BarModal';
-
-export interface Alarm {
-  id: number;
-  message: string;
-  price: string;
-}
+import { Alarm } from '@/types';
 
 const Header: React.FC = () => {
   const [alarms, setAlarms] = useState<Alarm[]>([
@@ -37,15 +32,15 @@ const Header: React.FC = () => {
       <div className="flex items-center gap-8">
         <Link to="/main">
           <div
-            className="bg-[url('./assets/header/home.png')] bg-no-repeat bg-contain w-[50px] h-[50px]"
+            className="bg-home bg-no-repeat bg-contain w-[50px] h-[50px]"
           ></div>
         </Link>
 
-        <section className="flex items-center justify-center bg-[#FFFEF6] text-lg font-semibold border-4 border-[#FFBDBD] rounded-[20px] p-3 mx-4 min-w-[200px] max-w-[400px]">
+        <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
           <p>농부왕</p>
         </section>
 
-        <section className="flex items-center justify-center bg-[#FFFEF6] text-lg font-semibold border-4 border-[#FFBDBD] rounded-[20px] p-3 mx-4 min-w-[200px] max-w-[400px]">
+        <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
           <p>￦ 932,517,456</p>
         </section>
       </div>
@@ -53,12 +48,12 @@ const Header: React.FC = () => {
       <div className="flex items-center gap-8">
         <div
           onClick={toggleAlarmModal}
-          className="bg-[url('./assets/header/alarm.png')] bg-no-repeat bg-contain w-[50px] h-[50px] cursor-pointer"
+          className="bg-alarm bg-no-repeat bg-contain w-[50px] h-[50px] cursor-pointer"
         ></div>
 
         <div
           onClick={toggleBarModal}
-          className="bg-[url('./assets/header/hamburgerBar.png')] bg-no-repeat bg-contain w-[50px] h-[50px] cursor-pointer select-none"
+          className="bg-sideBar bg-no-repeat bg-contain w-[50px] h-[50px] cursor-pointer select-none"
         />
       </div>
 
