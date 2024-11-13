@@ -1,30 +1,44 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Intro from '@/pages/Intro';
+import Main from '@/pages/Main';
+import Lottery from '@/pages/Lottery';
+import MyPage from '@/pages/MyPage';
+import Ranking from '@/pages/Ranking';
+import CropMarket from '@/pages/CropMarket';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
-function App() {
-  const [count, setCount] = useState(0);
-
+const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount(count => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+      <Header />
+      {children}
+      <Footer />
     </>
+  );
+};
+
+const routes = [
+  { path: '/', element: <Intro /> },
+  ...[
+    { path: '/main', element: <Main /> },
+    { path: '/lottery', element: <Lottery /> },
+    { path: '/mypage', element: <MyPage /> },
+    { path: '/ranking', element: <Ranking /> },
+    { path: '/cropmarket', element: <CropMarket /> }
+  ].map(route => ({
+    ...route,
+    element: <Layout>{route.element}</Layout>
+  }))
+];
+
+const router = createBrowserRouter(routes);
+
+function App() {
+  return (
+    <div className="bg-bg-color min-h-screen">
+      <RouterProvider router={router} />
+    </div>
   );
 }
 
