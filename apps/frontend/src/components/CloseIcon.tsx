@@ -1,7 +1,12 @@
-const CloseIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+interface CloseIconProps {
+  onClick: () => void;
+  className?: string;
+}
+
+const CloseIcon: React.FC<CloseIconProps> = ({ onClick, className }) => (
   <svg
     onClick={onClick}
-    className="cursor-pointer"
+    className={`cursor-pointer ${className}`}
     width="20"
     height="20"
     viewBox="0 0 20 20"
