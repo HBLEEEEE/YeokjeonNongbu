@@ -26,7 +26,7 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, cle
                   className="flex items-center w-full border-b border-light-pink py-3 px-2"
                 >
                   <img src="/coin.png" alt="coin" className="w-10 h-10 mr-4" />
-                  <div className="text-brown-dark text-center text-xs font-semibold">
+                  <div className="text-brown-medium text-center text-xs font-semibold">
                     <p>{alarm.message}</p>
                     <p>가격은 {alarm.price}입니다.</p>
                   </div>
@@ -42,7 +42,7 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, cle
           </>
         )}
         {alarms.length === 0 && (
-          <p className="text-center text-xs text-brown-dark mt-4 mb-2">
+          <p className="text-center text-xs text-brown-medium mt-4 mb-2">
             알림 내역이 존재하지 않습니다.
           </p>
         )}
