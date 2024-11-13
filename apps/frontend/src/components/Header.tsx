@@ -6,11 +6,11 @@ import { Alarm } from '@/types';
 
 const Header: React.FC = () => {
   const [alarms, setAlarms] = useState<Alarm[]>([
-    { id: 1, message: "당근 4개를 구매하셨습니다.", price: "10,000원" },
-    { id: 2, message: "당근 2개를 구매하셨습니다.", price: "5,000원" },
-    { id: 3, message: "당근 2개를 판매하셨습니다.", price: "5,000원" },
-    { id: 4, message: "당근 2개를 구매하셨습니다.", price: "5,000원" },
-    { id: 5, message: "당근 2개를 판매하셨습니다.", price: "5,000원" },
+    { id: 1, message: '당근 4개를 구매하셨습니다.', price: '10,000원' },
+    { id: 2, message: '당근 2개를 구매하셨습니다.', price: '5,000원' },
+    { id: 3, message: '당근 2개를 판매하셨습니다.', price: '5,000원' },
+    { id: 4, message: '당근 2개를 구매하셨습니다.', price: '5,000원' },
+    { id: 5, message: '당근 2개를 판매하셨습니다.', price: '5,000원' }
   ]);
   const [isAlarmOpen, setIsAlarmOpen] = useState<boolean>(false);
   const [isBarOpen, setIsBarOpen] = useState<boolean>(false);
@@ -31,9 +31,7 @@ const Header: React.FC = () => {
     <header className="fixed top-[30px] left-0 w-full flex items-center justify-between px-16">
       <div className="flex items-center gap-8">
         <Link to="/main">
-          <div
-            className="bg-home bg-no-repeat bg-contain w-[50px] h-[50px]"
-          ></div>
+          <div className="bg-home bg-no-repeat bg-contain w-[50px] h-[50px]"></div>
         </Link>
 
         <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
