@@ -9,20 +9,20 @@ module.exports = {
       },
       keyframes: {
         slideDown: {
-          '0%': { 
+          '0%': {
             transform: 'translateY(-100%)',
-            opacity: '0',
+            opacity: '0'
           },
-          '100%': { 
+          '100%': {
             transform: 'translateY(0)',
-            opacity: '1', 
-          },
-        },
+            opacity: '1'
+          }
+        }
       },
       animation: {
-        slideDown: 'slideDown 1s ease-out forwards',
+        slideDown: 'slideDown 1s ease-out forwards'
       }
-    },
+    }
   },
   plugins: []
 };

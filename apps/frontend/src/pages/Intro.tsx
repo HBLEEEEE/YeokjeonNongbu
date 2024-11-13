@@ -19,7 +19,7 @@ const Intro: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsButtonVisible(true);
-    }, 4000); 
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -27,7 +27,10 @@ const Intro: React.FC = () => {
   return (
     <div className="relative h-screen w-screen" onClick={handleskipAnimations}>
       <IntroTitle skipAnimations={skipAnimations} />
-      <div className="bg-intro h-screen w-screen bg-no-repeat bg-center" style={{ backgroundSize: '100% 100%' }}></div>
+      <div
+        className="bg-intro h-screen w-screen bg-no-repeat bg-center"
+        style={{ backgroundSize: '100% 100%' }}
+      ></div>
 
       <button
         className={`
