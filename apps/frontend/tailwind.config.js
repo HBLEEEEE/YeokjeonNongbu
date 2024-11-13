@@ -1,5 +1,3 @@
-/** @type {import('tailwindcss').Config} */
-
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
@@ -20,9 +18,20 @@ module.exports = {
         }
       },
       animation: {
-        slideDown: 'slideDown 1s ease-out forwards'
-      }
-    }
+        slideDown: 'slideDown 1s ease-out forwards',
+      },
+      boxShadow: {
+        'text': '-3px 0px 2px #FF7B7B, 0px 3px 2px #FF7B7B, 3px 0px 2px #FF7B7B, 0px -3px 2px #FF7B7B',
+      },
+    },
   },
-  plugins: []
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.text-shadow': {
+          textShadow: '-3px 0px 2px #FF7B7B, 0px 3px 2px #FF7B7B, 3px 0px 2px #FF7B7B, 0px -3px 2px #FF7B7B',
+        },
+      });
+    },
+  ]
 };
