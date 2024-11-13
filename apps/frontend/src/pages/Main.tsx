@@ -1,30 +1,53 @@
 import { Link } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 const Main: React.FC = () => {
+  const amount: number = 100000000;
+
+  const getStepImage = () => {
+    if (amount < 1000000) {
+      return '/step1.png';
+    } else if (amount < 10000000) {
+      return '/step2.png';
+    } else if (amount < 50000000) {
+      return '/step3.png';
+    } else {
+      return '/step4.png';
+    }
+  };
+
   return (
-    <div>
-      <Header></Header>
-      <h1>메인 페이지</h1>
-      <nav>
-        <ul>
+    <main className="flex flex-col justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center bg-no-repeat bg-contain bg-center w-[370px] h-[360px]" style={{ backgroundImage: `url(${getStepImage()})` }}>
+      </div>
+      <nav className="flex justify-center mt-8">
+        <ul className="flex list-none gap-24">
           <li>
-            <Link to="/lottery">복권 페이지</Link>
+            <Link to="/cropmarket" className="flex flex-col items-center">
+              <div className="bg-[url('./assets/main/cropMarket.png')] bg-no-repeat bg-contain w-[90px] h-[90px]" />
+              <p className="text-base font-bold text-[#FEFEFE] text-shadow">작물시장</p>
+            </Link>
           </li>
           <li>
-            <Link to="/mypage">마이페이지</Link>
+            <Link to="/mypage" className="flex flex-col items-center">
+              <div className="bg-[url('./assets/main/myPage.png')] bg-no-repeat bg-contain w-[90px] h-[90px]" />
+              <p className="text-base font-bold text-[#FEFEFE] text-shadow">마이페이지</p>
+            </Link>
           </li>
           <li>
-            <Link to="/ranking">랭킹 페이지</Link>
+            <Link to="/ranking" className="flex flex-col items-center">
+              <div className="bg-[url('./assets/main/ranking.png')] bg-no-repeat bg-contain w-[80px] h-[100px]" />
+              <p className="text-base font-bold text-[#FEFEFE] text-shadow">랭킹</p>
+            </Link>
           </li>
           <li>
-            <Link to="/cropmarket">작물시장 페이지</Link>
+            <Link to="/lottery" className="flex flex-col items-center">
+              <div className="bg-[url('./assets/main/lottery.png')] bg-no-repeat bg-contain w-[90px] h-[90px]" />
+              <p className="text-base font-bold text-[#FEFEFE] text-shadow">복권</p>
+            </Link>
           </li>
         </ul>
       </nav>
-      <Footer></Footer>
-    </div>
+    </main>
   );
 };
 
