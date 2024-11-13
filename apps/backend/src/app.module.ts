@@ -3,9 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RedisModule } from './redis/redis.module';
 import { MarketModule } from './market/market.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [RedisModule, MarketModule],
+  imports: [RedisModule, MarketModule, OrderModule],
   controllers: [AppController],
   providers: [AppService]
 })
