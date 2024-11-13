@@ -1,5 +1,4 @@
 import { Pool } from 'pg';
-// import dotenv from 'dotenv';
 import 'dotenv/config';
 
 const user = process.env.BACKEND_POSTGRE_USERNAME;

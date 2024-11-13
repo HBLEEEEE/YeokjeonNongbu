@@ -3,12 +3,13 @@ import { mailRepository } from './mail.repository';
 
 @Injectable()
 export class MailService {
-  getHello(): string {
-    return 'Hello World!';
+  async getMailsByMemberId(memberId: number): Promise<any> {
+    const response = await mailRepository.getUnreadMailByMemberId(memberId);
+    return response;
   }
 
-  async GetMailsByMemberId(memberId: number): Promise<any> {
-    const response = await mailRepository.getMailByMemberID(memberId);
+  async checkUnreadMailByMemberId(memberId: number): Promise<any> {
+    const response = await mailRepository.checkUnreadMailByMemberId(memberId);
     return response;
   }
 }

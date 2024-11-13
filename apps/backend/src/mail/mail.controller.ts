@@ -5,8 +5,13 @@ import { MailService } from './mail.service';
 export class MailController {
   constructor(private readonly mailService: MailService) {}
 
+  @Get('check/:memberId')
+  checkUnreadMailByMemberId(@Param('memberId') memberId: number): any {
+    return this.mailService.checkUnreadMailByMemberId(memberId);
+  }
+
   @Get(':memberId')
-  getMailsByMemberId(@Param('memberId')memberId: number): any {
-    return this.mailService.GetMailsByMemberId(memberId);
+  getMailsByMemberId(@Param('memberId') memberId: number): any {
+    return this.mailService.getMailsByMemberId(memberId);
   }
 }
