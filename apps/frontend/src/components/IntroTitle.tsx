@@ -16,7 +16,7 @@ const IntroTitle: React.FC<IntroTitleProps> = ({ skipAnimations }) => {
     >
       <div
         className={`
-          bg-[url('./assets/intro/yeok.png')]
+          bg-yeok
           bg-no-repeat 
           bg-contain
           w-[60px] h-[100px]
@@ -31,7 +31,7 @@ const IntroTitle: React.FC<IntroTitleProps> = ({ skipAnimations }) => {
 
       <div
         className={`
-          bg-[url('./assets/intro/jeon.png')]
+          bg-jeon
           bg-no-repeat 
           bg-contain
           w-[60px] h-[100px]
@@ -46,7 +46,7 @@ const IntroTitle: React.FC<IntroTitleProps> = ({ skipAnimations }) => {
 
       <div
         className={`
-          bg-[url('./assets/intro/nong.png')]
+          bg-nong
           bg-no-repeat 
           bg-contain
           w-[60px] h-[100px]
@@ -61,7 +61,7 @@ const IntroTitle: React.FC<IntroTitleProps> = ({ skipAnimations }) => {
 
       <div
         className={`
-          bg-[url('./assets/intro/bu.png')]
+          bg-bu
           bg-no-repeat 
           bg-contain
           w-[40px] h-[100px]

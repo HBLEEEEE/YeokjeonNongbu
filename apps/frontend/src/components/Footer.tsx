@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
         left-0
         w-full
         h-[150px]
-        bg-[url('./assets/public/grass.png')]
+        bg-grass
         bg-no-repeat
         bg-cover
         opacity-85
