@@ -2,12 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import AlarmModal from './AlarmModal';
 import BarModal from './BarModal';
-
-export interface Alarm {
-  id: number;
-  message: string;
-  price: string;
-}
+import { Alarm } from '@/types';
 
 const Header: React.FC = () => {
   const [alarms, setAlarms] = useState<Alarm[]>([

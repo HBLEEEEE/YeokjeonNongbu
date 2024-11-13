@@ -1,5 +1,5 @@
-import { Alarm } from './Header';
 import CloseIcon from './CloseIcon';
+import { Alarm } from '@/types';
 
 interface AlarmModalProps {
   alarms: Alarm[];
