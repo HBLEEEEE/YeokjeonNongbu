@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
-const Main = () => {
+const Main: React.FC = () => {
   return (
     <div>
       <Header></Header>
@@ -22,6 +23,7 @@ const Main = () => {
           </li>
         </ul>
       </nav>
+      <Footer></Footer>
     </div>
   );
 };
