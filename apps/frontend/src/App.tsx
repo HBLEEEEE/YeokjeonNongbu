@@ -8,59 +8,35 @@ import CropMarket from '@/pages/CropMarket';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-const router = createBrowserRouter([
+const Layout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+  return (
+    <>
+      <Header />
+      {children}
+      <Footer />
+    </>
+  );
+};
+
+const routes = [
   { path: '/', element: <Intro /> },
-  { 
-    path: '/main', 
+  ...[
+    { path: '/main', element: <Main /> },
+    { path: '/lottery', element: <Lottery /> },
+    { path: '/mypage', element: <MyPage /> },
+    { path: '/ranking', element: <Ranking /> },
+    { path: '/cropmarket', element: <CropMarket /> },
+  ].map(route => ({
+    ...route,
     element: (
-      <>
-        <Header />
-        <Main />
-        <Footer />
-      </>
-    ) 
-  },
-  { 
-    path: '/lottery', 
-    element: (
-      <>
-        <Header />
-        <Lottery />
-        <Footer />
-      </>
-    ) 
-  },
-  { 
-    path: '/mypage', 
-    element: (
-      <>
-        <Header />
-        <MyPage />
-        <Footer />
-      </>
-    ) 
-  },
-  { 
-    path: '/ranking', 
-    element: (
-      <>
-        <Header />
-        <Ranking />
-        <Footer />
-      </>
-    ) 
-  },
-  { 
-    path: '/cropmarket', 
-    element: (
-      <>
-        <Header />
-        <CropMarket />
-        <Footer />
-      </>
-    ) 
-  },
-]);
+      <Layout>
+        {route.element}
+      </Layout>
+    ),
+  })),
+];
+
+const router = createBrowserRouter(routes);
 
 function App() {
   return (
