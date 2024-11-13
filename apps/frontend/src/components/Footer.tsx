@@ -12,9 +12,8 @@ const Footer: React.FC = () => {
         bg-cover
         opacity-85
       `}
-    >
-    </footer>
+    ></footer>
   );
 };
 
-export default Footer;  
+export default Footer;

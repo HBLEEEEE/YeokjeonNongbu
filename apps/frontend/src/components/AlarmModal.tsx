@@ -20,8 +20,11 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, cle
         {alarms.length > 0 && (
           <>
             <div className="max-h-[260px] overflow-y-auto mt-4">
-              {alarms.slice(0, 5).map((alarm) => (
-                <div key={alarm.id} className="flex items-center w-full border-b border-light-pink py-3 px-2">
+              {alarms.slice(0, 5).map(alarm => (
+                <div
+                  key={alarm.id}
+                  className="flex items-center w-full border-b border-light-pink py-3 px-2"
+                >
                   <img src="/coin.png" alt="coin" className="w-10 h-10 mr-4" />
                   <div className="text-brown-dark text-center text-xs font-semibold">
                     <p>{alarm.message}</p>
@@ -39,7 +42,9 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, cle
           </>
         )}
         {alarms.length === 0 && (
-          <p className="text-center text-xs text-brown-dark mt-4 mb-2">알림 내역이 존재하지 않습니다.</p>
+          <p className="text-center text-xs text-brown-dark mt-4 mb-2">
+            알림 내역이 존재하지 않습니다.
+          </p>
         )}
       </div>
     </div>

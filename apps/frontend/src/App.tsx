@@ -8,7 +8,7 @@ import CropMarket from '@/pages/CropMarket';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-const Layout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <>
       <Header />
@@ -25,15 +25,11 @@ const routes = [
     { path: '/lottery', element: <Lottery /> },
     { path: '/mypage', element: <MyPage /> },
     { path: '/ranking', element: <Ranking /> },
-    { path: '/cropmarket', element: <CropMarket /> },
+    { path: '/cropmarket', element: <CropMarket /> }
   ].map(route => ({
     ...route,
-    element: (
-      <Layout>
-        {route.element}
-      </Layout>
-    ),
-  })),
+    element: <Layout>{route.element}</Layout>
+  }))
 ];
 
 const router = createBrowserRouter(routes);

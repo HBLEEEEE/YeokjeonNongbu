@@ -17,8 +17,10 @@ const Main: React.FC = () => {
 
   return (
     <main className="flex flex-col justify-center items-center min-h-screen">
-      <div className="flex justify-center items-center bg-no-repeat bg-contain bg-center w-[370px] h-[360px]" style={{ backgroundImage: `url(${getStepImage()})` }}>
-      </div>
+      <div
+        className="flex justify-center items-center bg-no-repeat bg-contain bg-center w-[370px] h-[360px]"
+        style={{ backgroundImage: `url(${getStepImage()})` }}
+      ></div>
       <nav className="flex justify-center mt-8">
         <ul className="flex list-none gap-24">
           <li>
