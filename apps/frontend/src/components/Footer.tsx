@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   const location = useLocation();
@@ -6,7 +6,8 @@ const Footer: React.FC = () => {
 
   return (
     <footer>
-      <div className={`
+      <div
+        className={`
         fixed
         bottom-0
         left-0
@@ -16,10 +17,12 @@ const Footer: React.FC = () => {
         bg-no-repeat
         bg-cover
         z-[2]
-      `}></div>
-      {path === "/lottery" && (
+      `}
+      ></div>
+      {path === '/lottery' && (
         <>
-          <div className={`
+          <div
+            className={`
             fixed
             bottom-0
             left-[30px]
@@ -29,8 +32,10 @@ const Footer: React.FC = () => {
             bg-no-repeat
             bg-cover
             rotate-[4deg]
-          `}></div>
-          <div className={`
+          `}
+          ></div>
+          <div
+            className={`
             fixed
             bottom-0
             right-[30px]
@@ -39,10 +44,11 @@ const Footer: React.FC = () => {
             bg-giftBox
             bg-no-repeat
             bg-cover
-          `}></div>
+          `}
+          ></div>
         </>
       )}
-    </footer>  
+    </footer>
   );
 };
 
