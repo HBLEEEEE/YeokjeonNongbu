@@ -1,18 +1,18 @@
-import { Rank } from "@/types";
+import { Rank } from '@/types';
 
 const rank: Rank[] = [
-  { rank: 1, name: "김철수", assets: 500000 },
-  { rank: 2, name: "이영희", assets: 400000 },
-  { rank: 3, name: "박지민", assets: 350000 },
-  { rank: 4, name: "정상우", assets: 300000 },
-  { rank: 5, name: "최은지", assets: 250000 },
+  { rank: 1, name: '김철수', assets: 500000 },
+  { rank: 2, name: '이영희', assets: 400000 },
+  { rank: 3, name: '박지민', assets: 350000 },
+  { rank: 4, name: '정상우', assets: 300000 },
+  { rank: 5, name: '최은지', assets: 250000 }
 ];
 
 const Ranking: React.FC = () => {
   return (
     <main className="flex flex-row justify-center items-center min-h-screen gap-24 select-none">
       <section className="flex flex-col gap-4 z-[10]">
-        {rank.map((user) => (
+        {rank.map(user => (
           <article
             className="flex flex-col items-center bg-light-beige border-4 border-light-pink rounded-2xl p-2 w-[350px]"
             key={user.rank}
@@ -41,9 +41,7 @@ const Ranking: React.FC = () => {
       </section>
 
       <section className="flex flex-col gap-4 z-[10]">
-        <article
-          className="flex flex-col text-center items-center bg-light-beige border-4 border-light-pink rounded-2xl w-[350px] gap-8 p-8"
-        >
+        <article className="flex flex-col text-center items-center bg-light-beige border-4 border-light-pink rounded-2xl w-[350px] gap-8 p-8">
           <div>
             <p className="text-xl font-medium">내등수</p>
             <p className="text-2xl font-bold text-red-soft">10000</p>
