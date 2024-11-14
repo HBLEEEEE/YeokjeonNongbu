@@ -9,7 +9,7 @@ interface AlarmModalProps {
 }
 
 const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, clearAllAlarms }) => {
-  if (!isOpen) return null;
+  if (!isOpen) return;
 
   return (
     <div className="fixed top-12 right-24 mt-12 mr-6 select-none">
