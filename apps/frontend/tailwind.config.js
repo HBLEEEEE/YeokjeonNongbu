@@ -45,7 +45,9 @@ module.exports = {
         cropmarket: "url('./assets/main/cropMarket.png')",
         mypage: "url('./assets/main/myPage.png')",
         ranking: "url('./assets/main/ranking.png')",
-        lottery: "url('./assets/main/lottery.png')"
+        lottery: "url('./assets/main/lottery.png')",
+        giftBox: "url('./assets/lottery/giftBox.png')",
+        veggieBox: "url('./assets/lottery/veggieBox.png')"
       },
       keyframes: {
         slideDown: {
