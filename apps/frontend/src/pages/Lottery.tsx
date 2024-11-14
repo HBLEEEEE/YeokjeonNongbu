@@ -7,7 +7,14 @@ import useLotteryCanvas from '@/utils/useLotteryCanvas';
 
 const Lottery: React.FC = () => {
   const { isModalOpen, openModal, handleCancel, handleConfirm } = useLotteryModal();
-  const { isCanvasVisible, isScratching, canvasRef, resetLottery, setIsCanvasVisible, setIsScratching } = useLotteryCanvas();
+  const {
+    isCanvasVisible,
+    isScratching,
+    canvasRef,
+    resetLottery,
+    setIsCanvasVisible,
+    setIsScratching
+  } = useLotteryCanvas();
 
   const canvasOpen = () => {
     setIsCanvasVisible(true);

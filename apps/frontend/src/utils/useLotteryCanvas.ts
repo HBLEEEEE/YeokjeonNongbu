@@ -61,30 +61,34 @@ const useLotteryCanvas = () => {
     initCanvas(context);
 
     const handleDrawing = (event: MouseEvent) => {
-        if (!isDrawing.current) return;
+      if (!isDrawing.current) return;
 
-        const rect = canvas.getBoundingClientRect();
-        const offsetX = event.clientX - rect.left;
-        const offsetY = event.clientY - rect.top;
-  
-        context.save();
-        context.globalCompositeOperation = 'destination-out';
-        context.beginPath();
-        context.arc(offsetX, offsetY, ERASE_RADIUS, 0, 2 * Math.PI, false);
-        context.fill();
-        context.restore();
-  
-        erasedCount.current += 1;
-  
-        if (erasedCount.current >= thresholdOfEraseCount) {
-          clearCanvas(context);
-          isDrawing.current = false;
-          setIsScratching(false);
-        }
-      };
+      const rect = canvas.getBoundingClientRect();
+      const offsetX = event.clientX - rect.left;
+      const offsetY = event.clientY - rect.top;
 
-    const handleDrawingStart = () => { isDrawing.current = true; };
-    const handleDrawingEnd = () => { isDrawing.current = false; };
+      context.save();
+      context.globalCompositeOperation = 'destination-out';
+      context.beginPath();
+      context.arc(offsetX, offsetY, ERASE_RADIUS, 0, 2 * Math.PI, false);
+      context.fill();
+      context.restore();
+
+      erasedCount.current += 1;
+
+      if (erasedCount.current >= thresholdOfEraseCount) {
+        clearCanvas(context);
+        isDrawing.current = false;
+        setIsScratching(false);
+      }
+    };
+
+    const handleDrawingStart = () => {
+      isDrawing.current = true;
+    };
+    const handleDrawingEnd = () => {
+      isDrawing.current = false;
+    };
 
     canvas.addEventListener('mousedown', handleDrawingStart);
     canvas.addEventListener('mousemove', handleDrawing);
@@ -99,7 +103,14 @@ const useLotteryCanvas = () => {
     };
   }, [isCanvasVisible]);
 
-  return { isCanvasVisible, isScratching, canvasRef, setIsCanvasVisible, setIsScratching, resetLottery };
+  return {
+    isCanvasVisible,
+    isScratching,
+    canvasRef,
+    setIsCanvasVisible,
+    setIsScratching,
+    resetLottery
+  };
 };
 
 export default useLotteryCanvas;

@@ -11,7 +11,7 @@ const LotteryButtons: React.FC<LotteryButtonsProps> = ({
   isScratching,
   isCanvasVisible,
   openModal,
-  resetLottery,
+  resetLottery
 }) => (
   <>
     {!isScratching && !isCanvasVisible && (
