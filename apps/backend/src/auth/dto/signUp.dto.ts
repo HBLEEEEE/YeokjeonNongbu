@@ -14,7 +14,7 @@ export class SignUpDto {
   password: string;
 
   @ApiProperty({
-    description: '사용자의 닉이름',
+    description: '사용자의 닉네임',
     example: '닉네임'
   })
   nickname: string;
