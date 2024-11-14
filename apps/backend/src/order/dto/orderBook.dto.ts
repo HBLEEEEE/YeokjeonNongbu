@@ -1,6 +1,6 @@
 export interface OrderBookDto {
-  orderId: string;
-  cropId: string;
+  orderId: number;
+  cropId: number;
   orderType: 'buy' | 'sell';
   price: number;
   unfilledQuantity: number;

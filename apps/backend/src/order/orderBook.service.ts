@@ -24,7 +24,7 @@ export class OrderBookService {
     return orders.map((order: string) => this.deserializeOrder(order));
   }
 
-  async removeOrder(cropId: number, orderId: string, orderType: 'buy' | 'sell'): Promise<void> {
+  async removeOrder(cropId: number, orderId: number, orderType: 'buy' | 'sell'): Promise<void> {
     const orderKey = `orderBook:${cropId}:${orderType}`;
     const orders = await this.redisClient.zRange(orderKey, 0, -1);
 
@@ -35,26 +35,24 @@ export class OrderBookService {
   }
 
   async updateOrder(
-    cropId: string,
+    cropId: number,
     orderType: 'buy' | 'sell',
-    orderId: string,
+    orderId: number,
     filledQuantity: number
   ): Promise<void> {
-    const orderKey = `orderBook:${cropId}:${orderType}`;
-    const orders = await this.redisClient.zRange(orderKey, 0, -1);
+    const orders =
+      orderType === 'buy' ? await this.getBuyOrders(cropId) : await this.getSellOrders(cropId);
+    const targetOrder = orders.find(order => order.orderId === orderId);
 
-    const updatedOrders = orders.map((order: string) => {
-      const parsedOrder = JSON.parse(order) as OrderBookDto;
-      if (parsedOrder.orderId === orderId) {
-        parsedOrder.unfilledQuantity -= filledQuantity; // 남은 수량 감소
-      }
-      return this.serializeOrder(parsedOrder);
-    });
+    if (!targetOrder) {
+      throw new Error(`주문번호 ${orderId}는 존재하지 않습니다.`);
+    }
 
-    await this.redisClient.del(orderKey);
-    for (const updatedOrder of updatedOrders) {
-      const parsedOrder = this.deserializeOrder(updatedOrder);
-      await this.redisClient.zAdd(orderKey, { score: parsedOrder.price, value: updatedOrder });
+    targetOrder.unfilledQuantity -= filledQuantity;
+    await this.removeOrder(cropId, orderId, orderType);
+
+    if (targetOrder.unfilledQuantity > 0) {
+      await this.addOrder(targetOrder);
     }
   }
 
