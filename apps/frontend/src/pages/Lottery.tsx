@@ -1,8 +1,42 @@
+import React from 'react';
+import LotteryTicket from '@/components/LotteryTicket';
+import LotteryModal from '@/components/LotteryModal';
+import LotteryButtons from '@/components/LotteryButtons';
+import useLotteryModal from '@/utils/useLotteryModal';
+import useLotteryCanvas from '@/utils/useLotteryCanvas';
+
 const Lottery: React.FC = () => {
+  const { isModalOpen, openModal, handleCancel, handleConfirm } = useLotteryModal();
+  const {
+    isCanvasVisible,
+    isScratching,
+    canvasRef,
+    resetLottery,
+    setIsCanvasVisible,
+    setIsScratching
+  } = useLotteryCanvas();
+
+  const canvasOpen = () => {
+    setIsCanvasVisible(true);
+    setIsScratching(true);
+    handleConfirm();
+  };
+
   return (
-    <div>
-      <h1>복권 페이지</h1>
-    </div>
+    <main className="flex flex-col justify-center items-center min-h-screen gap-8 font-sans select-none">
+      <LotteryTicket isCanvasVisible={isCanvasVisible} canvasRef={canvasRef} />
+
+      <div className="relative h-[50px]">
+        <LotteryButtons
+          isScratching={isScratching}
+          isCanvasVisible={isCanvasVisible}
+          openModal={openModal}
+          resetLottery={resetLottery}
+        />
+      </div>
+
+      {isModalOpen && <LotteryModal handleCancel={handleCancel} canvasOpen={canvasOpen} />}
+    </main>
   );
 };
 

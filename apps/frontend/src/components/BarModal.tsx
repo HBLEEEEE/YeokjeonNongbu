@@ -6,7 +6,7 @@ interface barProps {
 }
 
 const BarModal: React.FC<barProps> = ({ isOpen, closeModal }) => {
-  if (!isOpen) return null;
+  if (!isOpen) return;
 
   return (
     <div className="fixed top-12 right-4 mt-12 mr-6 z-50">

@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import Intro from '@/pages/Intro';
 import Main from '@/pages/Main';
 import Lottery from '@/pages/Lottery';
@@ -8,11 +9,24 @@ import CropMarket from '@/pages/CropMarket';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
+interface LayoutProps {
+  path: string;
+  children: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ path, children }) => {
   return (
     <>
       <Header />
-      {children}
+      <motion.div
+        key={path}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        {children}
+      </motion.div>
       <Footer />
     </>
   );
@@ -28,7 +42,7 @@ const routes = [
     { path: '/cropmarket', element: <CropMarket /> }
   ].map(route => ({
     ...route,
-    element: <Layout>{route.element}</Layout>
+    element: <Layout path={route.path}>{route.element}</Layout>
   }))
 ];
 
@@ -37,7 +51,9 @@ const router = createBrowserRouter(routes);
 function App() {
   return (
     <div className="bg-bg-color min-h-screen">
-      <RouterProvider router={router} />
+      <AnimatePresence>
+        <RouterProvider router={router} />
+      </AnimatePresence>
     </div>
   );
 }
