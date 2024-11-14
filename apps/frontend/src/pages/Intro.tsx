@@ -59,7 +59,7 @@ const Intro: React.FC = () => {
                 }
                 className={modalStep === ModalStep.Login ? 'invisible' : ''}
               />
-              <h2 className="text-xl font-bold mb-4 flex-grow text-center">
+              <h2 className="text-xl font-bold mb-4 flex-grow text-center select-none">
                 {modalStep === ModalStep.Login ? '로그인' : '회원가입'}
               </h2>
               <CloseIcon

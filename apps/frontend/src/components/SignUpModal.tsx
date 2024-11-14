@@ -60,7 +60,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center select-none">
       <img src="/signIn.png" className="max-w-[200px] max-h-[200px] mb-4"></img>
       {step === 1 && (
         <>
