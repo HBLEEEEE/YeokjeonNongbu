@@ -1,5 +1,5 @@
 export interface Rank {
-    rank: number;
-    name: string;
-    assets: number;
+  rank: number;
+  name: string;
+  assets: number;
 }
