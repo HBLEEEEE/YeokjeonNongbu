@@ -1,9 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignUpDto } from './dto/signUp.dto';
+import { SignUpDto, signUpResponseDto } from './dto/signUp.dto';
 import { successhandler, successMessage } from 'src/global/successhandler';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto, LoginResponseDto } from './dto/login.dto';
 
 @Controller('api/auth')
 export class AuthController {
@@ -13,7 +13,8 @@ export class AuthController {
   @ApiOperation({ summary: '회원가입 API' })
   @ApiResponse({
     status: 201,
-    description: '회원가입 성공'
+    description: '회원가입 성공',
+    type: signUpResponseDto
   })
   async signUp(@Body() signUpDto: SignUpDto) {
     await this.authService.signUp(signUpDto);
@@ -24,7 +25,8 @@ export class AuthController {
   @ApiOperation({ summary: '로그인 API' })
   @ApiResponse({
     status: 200,
-    description: '로그인 성공'
+    description: '로그인 성공',
+    type: LoginResponseDto
   })
   async login(@Body() loginDto: LoginDto) {
     const tokens = await this.authService.login(loginDto);

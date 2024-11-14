@@ -19,3 +19,17 @@ export class SignUpDto {
   })
   nickname: string;
 }
+
+export class signUpResponseDto {
+  @ApiProperty({
+    description: '응답 코드',
+    example: 201
+  })
+  code: number;
+
+  @ApiProperty({
+    description: '응답 메세지',
+    example: '회원 가입되었습니다.'
+  })
+  message: string;
+}
