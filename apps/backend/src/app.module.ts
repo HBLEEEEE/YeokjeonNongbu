@@ -4,9 +4,11 @@ import { MailService } from './mail/mail.service';
 import { RedisModule } from './redis/redis.module';
 import { MarketModule } from './market/market.module';
 import { OrderModule } from './order/order.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [RedisModule, MarketModule, OrderModule],
+  imports: [AuthModule, RedisModule, MarketModule, OrderModule, ConfigModule.forRoot()],
   controllers: [MailController],
   providers: [MailService]
 })
