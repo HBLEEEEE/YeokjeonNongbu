@@ -12,7 +12,7 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, cle
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-12 right-24 mt-12 mr-6 z-50">
+    <div className="fixed top-12 right-24 mt-12 mr-6 select-none">
       <div className="flex flex-col items-center bg-light-beige border-4 border-light-pink rounded-2xl p-4 shadow-lg w-[270px]">
         <div className="flex justify-end w-full">
           <CloseIcon onClick={closeModal} />

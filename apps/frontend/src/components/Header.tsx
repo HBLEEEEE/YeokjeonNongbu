@@ -28,7 +28,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-[30px] left-0 w-full flex items-center justify-between px-16">
+    <header className="fixed top-[30px] left-0 w-full flex items-center justify-between px-16 z-[50] select-none">
       <div className="flex items-center gap-8">
         <Link to="/main">
           <div className="bg-home bg-no-repeat bg-contain w-[50px] h-[50px]"></div>

@@ -29,7 +29,7 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
       <img src="/icon.png" className="max-w-[200px] max-h-[200px] mb-4"></img>
 
       <div className="mb-4 flex flex-col items-center">
-        <label htmlFor="email" className="block text-base font-bold text-gray-700">
+        <label htmlFor="email" className="block text-base font-bold text-gray-700 select-none">
           이메일
         </label>
         <input
@@ -42,7 +42,7 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
       </div>
 
       <div className="mb-4 flex flex-col items-center">
-        <label htmlFor="password" className="block text-base font-bold text-gray-700">
+        <label htmlFor="password" className="block text-base font-bold text-gray-700 select-none">
           비밀번호
         </label>
         <input
@@ -63,7 +63,7 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
         로그인
       </button>
 
-      <div className="flex items-center w-full text-black text-xs font-semibold my-4">
+      <div className="flex items-center w-full text-black text-xs font-semibold my-4 select-none">
         <span className="flex-grow h-px bg-black mx-4"></span>
         social login
         <span className="flex-grow h-px bg-black mx-4"></span>
