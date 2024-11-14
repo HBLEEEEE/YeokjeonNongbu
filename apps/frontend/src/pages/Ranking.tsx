@@ -13,7 +13,7 @@ const Ranking: React.FC = () => {
     <main className="flex flex-row justify-center items-center min-h-screen gap-24 select-none">
       <section className="flex flex-col gap-4 z-[10]">
         {rank.length === 0 ? (
-          <div  className="flex flex-col items-center bg-light-beige border-4 border-light-pink rounded-2xl p-8 w-[350px]">
+          <div className="flex flex-col items-center bg-light-beige border-4 border-light-pink rounded-2xl p-8 w-[350px]">
             <p className="flex flex-col text-black text-lg font-bold">랭킹 정보가 없습니다.</p>
           </div>
         ) : (
@@ -43,7 +43,6 @@ const Ranking: React.FC = () => {
                   </li>
                 </ul>
               </article>
-
             ))}
           </>
         )}
