@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signUp.dto';
 import { successhandler, successMessage } from 'src/global/successhandler';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('api/auth')
 export class AuthController {
@@ -15,7 +16,18 @@ export class AuthController {
     description: '회원가입 성공'
   })
   async signUp(@Body() signUpDto: SignUpDto) {
-    await this.authService.singUp(signUpDto);
-    return successhandler(successMessage.GET_MEMBER_SUCCESS);
+    await this.authService.signUp(signUpDto);
+    return successhandler(successMessage.SIGNUP_SUCCESS);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: '로그인 API' })
+  @ApiResponse({
+    status: 200,
+    description: '로그인 성공'
+  })
+  async login(@Body() loginDto: LoginDto) {
+    await this.authService.login(loginDto);
+    return successhandler(successMessage.LOGIN_SUCCESS);
   }
 }
