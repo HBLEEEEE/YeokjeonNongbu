@@ -1,9 +1,9 @@
 interface LotteryModalProps {
   handleCancel: () => void;
-  handleConfirm: () => void;
+  canvasOpen: () => void;
 }
 
-const LotteryModal: React.FC<LotteryModalProps> = ({ handleCancel, handleConfirm }) => {
+const LotteryModal: React.FC<LotteryModalProps> = ({ handleCancel, canvasOpen }) => {
   return (
     <div className="fixed inset-0 flex justify-center items-center">
       <div className="flex flex-col items-center text-center bg-light-yellow bg-opacity-90 p-6 rounded-lg shadow-lg">
@@ -17,7 +17,7 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ handleCancel, handleConfirm
             취소
           </button>
           <button
-            onClick={handleConfirm}
+            onClick={canvasOpen}
             className="p-2 bg-brown-dark text-light-grey rounded-lg min-w-[200px] min-h-[45px]"
           >
             확인
