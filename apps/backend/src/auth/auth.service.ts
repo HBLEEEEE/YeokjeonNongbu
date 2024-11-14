@@ -4,10 +4,14 @@ import { SignUpDto } from './dto/signUp.dto';
 import * as bcrypt from 'bcrypt';
 import { authQueries } from './auth.queries';
 import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly jwtService: JwtService
+  ) {}
 
   async signUp(signUpDto: SignUpDto) {
     const { email, password, nickname } = signUpDto;
@@ -49,6 +53,9 @@ export class AuthService {
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
     }
 
-    return;
+    const payload = { email, nickname: member.rows[0].nickname };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    return { accessToken, refreshToken };
   }
 }

@@ -27,7 +27,7 @@ export class AuthController {
     description: '로그인 성공'
   })
   async login(@Body() loginDto: LoginDto) {
-    await this.authService.login(loginDto);
-    return successhandler(successMessage.LOGIN_SUCCESS);
+    const tokens = await this.authService.login(loginDto);
+    return successhandler(successMessage.LOGIN_SUCCESS, tokens);
   }
 }
