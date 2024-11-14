@@ -12,32 +12,41 @@ const Ranking: React.FC = () => {
   return (
     <main className="flex flex-row justify-center items-center min-h-screen gap-24 select-none">
       <section className="flex flex-col gap-4 z-[10]">
-        {rank.map(user => (
-          <article
-            className="flex flex-col items-center bg-light-beige border-4 border-light-pink rounded-2xl p-2 w-[350px]"
-            key={user.rank}
-          >
-            <ul className="w-full">
-              <li className="flex items-center w-full py-2 px-4 gap-4">
-                <span className="flex justify-center items-center w-12 h-12 text-red-soft text-2xl font-bold">
-                  {user.rank === 1 ? (
-                    <img src="/first.png" alt="1등" className="w-12 h-12" />
-                  ) : user.rank === 2 ? (
-                    <img src="second.png" alt="2등" className="w-12 h-12" />
-                  ) : user.rank === 3 ? (
-                    <img src="/third.png" alt="3등" className="w-12 h-12" />
-                  ) : (
-                    `${user.rank}`
-                  )}
-                </span>
-                <div className="flex flex-col text-black text-lg font-bold">
-                  <span>{user.name}</span>
-                  <span>￦ {user.assets.toLocaleString()}</span>
-                </div>
-              </li>
-            </ul>
-          </article>
-        ))}
+        {rank.length === 0 ? (
+          <div  className="flex flex-col items-center bg-light-beige border-4 border-light-pink rounded-2xl p-8 w-[350px]">
+            <p className="flex flex-col text-black text-lg font-bold">랭킹 정보가 없습니다.</p>
+          </div>
+        ) : (
+          <>
+            {rank.map(user => (
+              <article
+                className="flex flex-col items-center bg-light-beige border-4 border-light-pink rounded-2xl p-2 w-[350px]"
+                key={user.rank}
+              >
+                <ul className="w-full">
+                  <li className="flex items-center w-full py-2 px-4 gap-4">
+                    <span className="flex justify-center items-center w-12 h-12 text-red-soft text-2xl font-bold">
+                      {user.rank === 1 ? (
+                        <img src="/first.png" alt="1등" className="w-12 h-12" />
+                      ) : user.rank === 2 ? (
+                        <img src="second.png" alt="2등" className="w-12 h-12" />
+                      ) : user.rank === 3 ? (
+                        <img src="/third.png" alt="3등" className="w-12 h-12" />
+                      ) : (
+                        `${user.rank}`
+                      )}
+                    </span>
+                    <div className="flex flex-col text-black text-lg font-bold">
+                      <span>{user.name}</span>
+                      <span>￦ {user.assets.toLocaleString()}</span>
+                    </div>
+                  </li>
+                </ul>
+              </article>
+
+            ))}
+          </>
+        )}
       </section>
 
       <section className="flex flex-col gap-4 z-[10]">
