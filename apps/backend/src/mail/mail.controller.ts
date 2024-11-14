@@ -1,42 +1,88 @@
-// import { Controller, Delete, Get, Param, Res } from '@nestjs/common';
-// import { EventEmitter2 } from '@nestjs/event-emitter';
-// import { MailService } from './mail.service';
-// import { Response } from 'express';
+import { Controller, Delete, Get, Param, Res } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MailService } from './mail.service';
+import { Response } from 'express';
+import { successhandler, successMessage } from 'src/global/successhandler';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { MailCheckResponseDto } from './dto/mailCheck.dto';
 
-// @Controller('mail')
-// export class MailController {
-//   constructor(
-//     private readonly mailService: MailService,
-//     private readonly eventEmitter: EventEmitter2
-//   ) {}
+@Controller('api/mail')
+export class MailController {
+  constructor(
+    private readonly mailService: MailService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
-//   // 여기서 부터는 알림만 다루는 API, 알림을 주는 것과 알림 내용을 주는 것은 별도입니다.
+  @Get('check/:memberId')
+  @ApiOperation({ summary: '알림 연결 요청 API' })
+  @ApiResponse({
+    status: 200,
+    description: 'Alarm response example',
+    type: MailCheckResponseDto
+  })
+  initialCheckAndConnectSse(@Param('memberId') memberId: string, @Res() res: Response) {
+    this.mailService.checkMailAndConnectSse(res, memberId);
+  }
 
-//   // SSE를 연결하고 읽지 않은 알람이 있다면 True를 없다면 false를 반환\
-//   // 알림이 어떻게 작동되는지는 아래 eventEmitter와 mail.service의 OnEvent를 참고해주세요.
-//   @Get('check/:memberId')
-//   initialCheckAndConnectSse(@Param('memberId') memberId: number, @Res() res: Response): void {
-//     this.mailService.checkMailAndConnectSse(res, memberId);
-//   }
+  @Get('call/:memberId')
+  @ApiOperation({ summary: '알림 발생 요청 API' })
+  @ApiResponse({
+    status: 200,
+    description: 'Alarm response example',
+    type: MailCheckResponseDto
+  })
+  triggerAlarm(@Param('memberId') memberId: string) {
+    this.eventEmitter.emit('sendAlarm', memberId);
+  }
 
-//   // SSE가 연결된 곳에 그냥 true를 날리는 개발용 API
-//   @Get('call/:memberId')
-//   triggerAlarm(@Param('memberId') memberId: number): void {
-//     this.eventEmitter.emit('sendAlarm', memberId);
-//   }
-//   // 알림 API 끝
+  @Get(':memberId')
+  @ApiOperation({ summary: '알림 조회 요청 API' })
+  @ApiResponse({
+    status: 200,
+    description: 'Mail retrieval successful',
+    examples: {
+      example1: {
+        summary: 'Successful mail retrieval',
+        value: {
+          code: 200,
+          message: '메일 조회를 완료했습니다.',
+          data: [
+            {
+              mail_id: '1',
+              content: '테스트하는 내용',
+              created_at: '2024-11-11T15:00:00.000Z',
+              read_status: false
+            },
+            {
+              mail_id: '2',
+              content: '테스트하는 내용2',
+              created_at: '2024-11-11T15:00:00.000Z',
+              read_status: false
+            }
+          ]
+        }
+      }
+    }
+  })
+  async getMailsByMemberId(@Param('memberId') memberId: string) {
+    const data = await this.mailService.getMailsByMemberId(memberId);
+    return successhandler(successMessage.GET_MAIL_SUCCESS, data);
+  }
 
-//   // 여기서부터는 알림 내역과 관련된 API입니다.
-
-//   // 알림 내역을 보내는 API, 읽지 않은 알림은 읽음 처리가 됩니다.
-//   @Get(':memberId')
-//   getMailsByMemberId(@Param('memberId') memberId: number): any {
-//     return this.mailService.getMailsByMemberId(memberId);
-//   }
-
-//   // 특정 멤버의 전체 알림 기록 삭제
-//   @Delete(':memberId')
-//   deleteMailsByMemberId(@Param('memberId') memberId: number): any {
-//     return this.mailService.deleteAllMailByMemberId(memberId);
-//   }
-// }
+  @Delete(':memberId')
+  @ApiResponse({
+    status: 200,
+    description: 'Alarm response example',
+    schema: {
+      example: {
+        code: 200,
+        message: '메일 삭제를 완료했습니다.'
+      }
+    }
+  })
+  @ApiOperation({ summary: '알림 삭제 요청 API' })
+  async deleteMailsByMemberId(@Param('memberId') memberId: string) {
+    await this.mailService.deleteAllMailByMemberId(memberId);
+    return successhandler(successMessage.DELETE_MAIL_SUCCESS);
+  }
+}
