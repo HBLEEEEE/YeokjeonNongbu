@@ -19,7 +19,8 @@ module.exports = {
         'pure-red': '#FF0000',
 
         // 갈색 계열
-        'brown-dark': '#754F44',
+        'brown-dark': '#534646',
+        'brown-medium': '#754F44',
         'brown-light': '#A9644C',
 
         // 회색 계열
