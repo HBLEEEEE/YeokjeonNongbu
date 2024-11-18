@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import AlarmModal from './AlarmModal';
 import BarModal from './BarModal';
-import { Alarm } from '@/types';
+import { Alarm } from '@/types/Index';
 
 const Header: React.FC = () => {
   const [alarms, setAlarms] = useState<Alarm[]>([

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ModalStep } from '@/constants/modalConstants';
+import { ModalStep } from '@/constants/ModalConstants';
 
 interface SignUpModalProps {
   step: number;

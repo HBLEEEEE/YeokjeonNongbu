@@ -1,4 +1,4 @@
-import { Crop } from '@/types';
+import { Crop } from '@/types/Index';
 
 interface CropListProps {
   crops: Crop[];

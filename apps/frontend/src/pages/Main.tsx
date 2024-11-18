@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { getStepImage } from '@/utils/getFarmImg';
+import { getStepImage } from '@/utils/GetFarmImg';
 
 const Main: React.FC = () => {
   const amount: number = 100000000;

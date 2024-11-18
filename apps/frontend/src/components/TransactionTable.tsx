@@ -1,4 +1,4 @@
-import { Transaction } from '@/types';
+import { Transaction } from '@/types/Index';
 
 interface TransactionTableProps {
   displayedTransactions: Transaction[];

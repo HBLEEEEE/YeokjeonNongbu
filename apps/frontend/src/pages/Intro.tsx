@@ -4,7 +4,7 @@ import LoginModal from '@/components/LoginModal';
 import SignUpModal from '@/components/SignUpModal';
 import CloseIcon from '@/components/CloseIcon';
 import BackIcon from '@/components/BackIcon';
-import { ModalStep } from '@/constants/modalConstants';
+import { ModalStep } from '@/constants/ModalConstants';
 
 const Intro: React.FC = () => {
   const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);

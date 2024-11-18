@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Transaction, ApiCrop, Crop } from '@/types';
-import { getStepImage } from '@/utils/getFarmImg';
+import { Transaction, ApiCrop, Crop } from '@/types/Index';
+import { getStepImage } from '@/utils/GetFarmImg';
 import Profile from '@/components/Profile';
 import CropList from '@/components/CropList';
 import TransactionTable from '@/components/TransactionTable';

@@ -1,4 +1,4 @@
-import { Rank } from '@/types';
+import { Rank } from '@/types/Index';
 
 const rank: Rank[] = [
   { rank: 1, name: '김철수', assets: 500000 },

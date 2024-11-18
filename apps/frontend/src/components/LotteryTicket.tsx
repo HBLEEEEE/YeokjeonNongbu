@@ -1,5 +1,5 @@
 import LotteryIcon from './LotteryIcon';
-import { WIDTH, HEIGHT } from '@/constants/lotteryConstants';
+import { WIDTH, HEIGHT } from '@/constants/LotteryConstants';
 
 interface LotteryTicketProps {
   isCanvasVisible: boolean;
