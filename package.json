@@ -5,20 +5,27 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "npx husky install",
-    "lint": "eslint --fix . && prettier --write ."
+    "prepare": "husky",
+    "lint": "eslint --cache --fix .",
+    "format": "prettier --cache --write ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@nestjs/cli": "^10.4.7",
-    "eslint": "^8.0.0",
+    "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-define-config": "^2.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "husky": "^9.0.11",
+    "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "lint-staged": {
     "frontend/**/*.{js,ts,jsx,tsx}": [
@@ -31,10 +38,10 @@
     ]
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.13.0",
-    "@typescript-eslint/parser": "^8.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.14.0",
+    "@typescript-eslint/parser": "^8.14.0",
     "g": "^2.0.1",
-    "pnpm": "^9.12.3",
+    "pnpm": "^9.13.2",
     "redis": "^4.7.0",
     "web13": "file:"
   },
