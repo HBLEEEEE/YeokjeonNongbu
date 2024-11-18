@@ -17,7 +17,7 @@ export class MailController {
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @Sse('awsaws')
+  @Sse('check')
   @ApiOperation({ summary: '알림 연결 요청 API' })
   @ApiResponse({
     status: 200,
@@ -28,37 +28,8 @@ export class MailController {
     return this.mailService.connectSseAndInitiate(req, res);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Sse('check/obs')
-  initialCheckAndConnectSseObs(@Req() req: any) {
-    return this.mailService.getSseSubject(req.user.memberId);
-  }
-
-  @Get('call/obs/:memberId')
-  triggerAlarmObs(@Param('memberId') memberId: number) {
-    this.eventEmitter.emit('sendAlarmObs', memberId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('check')
-  @ApiOperation({ summary: '알림 연결 요청 API' })
-  @ApiResponse({
-    status: 200,
-    description: 'Connect Alarm server',
-    type: MailCheckResponseDto
-  })
-  initialCheckAndConnectSse(@Req() req: any, @Res() res: Response) {
-    this.mailService.checkMailAndConnectSse(req, res);
-  }
-
   @Get('call/:memberId')
-  @ApiOperation({ summary: '알림 발생 요청 API' })
-  @ApiResponse({
-    status: 200,
-    description: 'Alarm event occur',
-    type: MailCheckResponseDto
-  })
-  triggerAlarm(@Param('memberId') memberId: number) {
+  triggerAlarmObs(@Param('memberId') memberId: number) {
     this.eventEmitter.emit('sendAlarm', memberId);
   }
 
