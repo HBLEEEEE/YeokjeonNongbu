@@ -8,6 +8,7 @@ import { signUpResponseDecorator } from './decorator/signup.decorator';
 import { loginResponseDecorator } from './decorator/login.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleLoginDto } from './dto/googleLogin.dto';
+import { oauthResponseDecorator } from './decorator/oauth.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -32,7 +33,13 @@ export class AuthController {
   @Get('google')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: '구글 로그인 API' })
-  async googleLogin(@Req() googleLoginDto: GoogleLoginDto) {
+  async googleLogin() {}
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  @oauthResponseDecorator()
+  @ApiOperation({ summary: '구글 로그인 후 리다이렉션 API' })
+  async googleRedirect(@Req() googleLoginDto: GoogleLoginDto) {
     const tokens = await this.authService.googleLogin(googleLoginDto);
     return successhandler(successMessage.LOGIN_SUCCESS, tokens);
   }
