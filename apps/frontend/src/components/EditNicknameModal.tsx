@@ -13,10 +13,7 @@ const EditNicknameModal: React.FC<EditNicknameModalProps> = ({ isOpen, id, setId
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNicknameChange = () => {
-    if (tempId.length === 0) {
-      setErrorMessage('닉네임은 공백일 수 없습니다.');
-      return;
-    } else if (tempId.length < 2) {
+    if (tempId.length < 2) {
       setErrorMessage('닉네임은 최소 2자 이상이어야 합니다.');
       return;
     }
