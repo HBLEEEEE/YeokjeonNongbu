@@ -6,5 +6,6 @@ export const mailQueries = {
     'SELECT mail_id, content, created_at, read_status FROM mails WHERE member_id = $1',
   createMailQuery:
     'INSERT INTO mails(member_id, content, created_at, read_status) VALUES ($1, $2, NOW(), FALSE);',
-  deleteMailQuery: 'DELETE FROM mails WHERE member_id = $1'
+  deleteMailQuery: 'DELETE FROM mails WHERE member_id = $1',
+  getMemberQuery: 'SELECT EXISTS (SELECT 1 FROM mails WHERE member_id = $1) AS result'
 };
