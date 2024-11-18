@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { authQueries } from './auth.queries';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { GoogleLoginDto } from './dto/googleLogin.dto';
 
 @Injectable()
 export class AuthService {
@@ -58,6 +59,24 @@ export class AuthService {
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
     }
 
+    const payload = {
+      memberId: member.rows[0].member_id,
+      email,
+      nickname: member.rows[0].nickname
+    };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    return { accessToken, refreshToken };
+  }
+
+  async googleLogin(googleLoginDto: GoogleLoginDto) {
+    const { email, name } = googleLoginDto;
+    const existingUser = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
+    if (!existingUser) {
+      const hashedPassword = await bcrypt.hash('default', 10);
+      await this.databaseService.query(authQueries.signUpQuery, [email, hashedPassword, name]);
+    }
+    const member = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
     const payload = {
       memberId: member.rows[0].member_id,
       email,

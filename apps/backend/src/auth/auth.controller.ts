@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signUp.dto';
 import { successhandler, successMessage } from 'src/global/successhandler';
@@ -6,6 +6,8 @@ import { ApiOperation } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { signUpResponseDecorator } from './decorator/signup.decorator';
 import { loginResponseDecorator } from './decorator/login.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { GoogleLoginDto } from './dto/googleLogin.dto';
 
 @Controller('api/auth')
 export class AuthController {
@@ -24,6 +26,14 @@ export class AuthController {
   @loginResponseDecorator()
   async login(@Body() loginDto: LoginDto) {
     const tokens = await this.authService.login(loginDto);
+    return successhandler(successMessage.LOGIN_SUCCESS, tokens);
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: '구글 로그인 API' })
+  async googleLogin(@Req() googleLoginDto: GoogleLoginDto) {
+    const tokens = await this.authService.googleLogin(googleLoginDto);
     return successhandler(successMessage.LOGIN_SUCCESS, tokens);
   }
 }
