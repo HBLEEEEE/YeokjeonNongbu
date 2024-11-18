@@ -29,7 +29,7 @@ const Intro: React.FC = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen" onClick={handleSkipAnimations}>
+    <div className="relative h-screen w-screen select-none" onClick={handleSkipAnimations}>
       <IntroTitle skipAnimations={skipAnimations} />
       <div
         className="bg-intro h-screen w-screen bg-no-repeat bg-center"

@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface LotteryButtonsProps {
   isScratching: boolean;
   isCanvasVisible: boolean;

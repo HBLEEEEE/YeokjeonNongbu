@@ -1,4 +1,3 @@
-import React from 'react';
 import LotteryTicket from '@/components/LotteryTicket';
 import LotteryModal from '@/components/LotteryModal';
 import LotteryButtons from '@/components/LotteryButtons';
