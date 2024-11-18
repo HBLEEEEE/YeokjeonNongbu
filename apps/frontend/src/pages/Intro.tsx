@@ -4,7 +4,7 @@ import LoginModal from '@/components/LoginModal';
 import SignUpModal from '@/components/SignUpModal';
 import CloseIcon from '@/components/CloseIcon';
 import BackIcon from '@/components/BackIcon';
-import { ModalStep } from '@/constants/modalConstants';
+import { ModalStep } from '@/constants/ModalConstants';
 
 const Intro: React.FC = () => {
   const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
@@ -29,7 +29,7 @@ const Intro: React.FC = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen" onClick={handleSkipAnimations}>
+    <div className="relative h-screen w-screen select-none" onClick={handleSkipAnimations}>
       <IntroTitle skipAnimations={skipAnimations} />
       <div
         className="bg-intro h-screen w-screen bg-no-repeat bg-center"

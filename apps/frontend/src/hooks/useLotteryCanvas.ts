@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { ERASE_RADIUS, ERASE_DISTANCE, WIDTH, HEIGHT } from '@/constants/lotteryConstants';
+import { ERASE_RADIUS, ERASE_DISTANCE, WIDTH, HEIGHT } from '@/constants/LotteryConstants';
 
 const useLotteryCanvas = () => {
   const [isCanvasVisible, setIsCanvasVisible] = useState(false);

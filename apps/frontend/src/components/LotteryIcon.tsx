@@ -1,10 +1,10 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
-interface LotterySvgProps {
+interface LotteryIconProps {
   children: ReactNode;
 }
 
-const LotterySvg: React.FC<LotterySvgProps> = ({ children }) => {
+const LotteryIcon: React.FC<LotteryIconProps> = ({ children }) => {
   return (
     <svg
       width="860"
@@ -52,4 +52,4 @@ const LotterySvg: React.FC<LotterySvgProps> = ({ children }) => {
   );
 };
 
-export default LotterySvg;
+export default LotteryIcon;

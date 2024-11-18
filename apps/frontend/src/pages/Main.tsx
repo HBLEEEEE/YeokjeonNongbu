@@ -1,25 +1,14 @@
 import { Link } from 'react-router-dom';
+import { getStepImage } from '@/utils/GetFarmImg';
 
 const Main: React.FC = () => {
   const amount: number = 100000000;
 
-  const getStepImage = () => {
-    if (amount < 1000000) {
-      return '/step1.png';
-    } else if (amount < 10000000) {
-      return '/step2.png';
-    } else if (amount < 50000000) {
-      return '/step3.png';
-    } else {
-      return '/step4.png';
-    }
-  };
-
   return (
-    <main className="flex flex-col justify-center items-center min-h-screen">
+    <main className="flex flex-col justify-center items-center select-none min-h-screen">
       <div
         className="flex justify-center items-center bg-no-repeat bg-contain bg-center w-[370px] h-[360px]"
-        style={{ backgroundImage: `url(${getStepImage()})` }}
+        style={{ backgroundImage: `url(${getStepImage(amount)})` }}
       ></div>
       <nav className="flex justify-center mt-8">
         <ul className="flex list-none gap-24">
