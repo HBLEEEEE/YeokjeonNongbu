@@ -1,4 +1,4 @@
-import LotterySvg from './LotterySvg';
+import LotteryIcon from './LotteryIcon';
 import { WIDTH, HEIGHT } from '@/constants/lotteryConstants';
 
 interface LotteryTicketProps {
@@ -9,7 +9,7 @@ interface LotteryTicketProps {
 const LotteryTicket: React.FC<LotteryTicketProps> = ({ isCanvasVisible, canvasRef }) => {
   return (
     <div className="relative flex flex-col items-center justify-center">
-      <LotterySvg>
+      <LotteryIcon>
         {!isCanvasVisible ? (
           <text x="540" y="380" fill="white" fontSize="130" transform="rotate(-8, 110, 230)">
             인생한방!
@@ -19,7 +19,7 @@ const LotteryTicket: React.FC<LotteryTicketProps> = ({ isCanvasVisible, canvasRe
             인생한방!
           </text>
         )}
-      </LotterySvg>
+      </LotteryIcon>
 
       {isCanvasVisible && (
         <div className="absolute top-[20px] left-[280px] w-[500px] h-[270px]">
