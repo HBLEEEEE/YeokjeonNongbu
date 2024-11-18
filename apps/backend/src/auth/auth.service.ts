@@ -25,6 +25,11 @@ export class AuthService {
         HttpStatus.BAD_REQUEST
       );
 
+    const existingUser = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
+    if (existingUser && existingUser.rows.length > 0) {
+      throw new HttpException('중복된 이메일입니다.', HttpStatus.BAD_REQUEST);
+    }
+
     if (!nickname || nickname.length < 2 || nickname.length > 10)
       throw new HttpException('닉네임은 2자에서 10자 사이로 입력해주세요.', HttpStatus.BAD_REQUEST);
     const hashedPassword = await bcrypt.hash(password, 10);

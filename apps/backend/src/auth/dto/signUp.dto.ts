@@ -20,7 +20,7 @@ export class SignUpDto {
   nickname: string;
 }
 
-export class signUpResponseDto {
+export class SignUpSuccessResponseDto {
   @ApiProperty({
     description: '응답 코드',
     example: 201
@@ -30,6 +30,20 @@ export class signUpResponseDto {
   @ApiProperty({
     description: '응답 메세지',
     example: '회원 가입되었습니다.'
+  })
+  message: string;
+}
+
+export class SignUpFailureResponseDto {
+  @ApiProperty({
+    description: '응답 코드',
+    example: 400
+  })
+  code: number;
+
+  @ApiProperty({
+    description: '응답 메세지',
+    example: '유효한 이메일 주소를 입력해주세요.'
   })
   message: string;
 }
