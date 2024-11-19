@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RedisClientType } from 'redis';
 import { OrderBookDto } from './dto/orderBook.dto';
+import { OrderType } from './enums/orderType';
 
 @Injectable()
 export class OrderBookService {
@@ -36,12 +37,14 @@ export class OrderBookService {
 
   async updateOrder(
     cropId: number,
-    orderType: 'buy' | 'sell',
+    orderType: OrderType,
     orderId: number,
     filledQuantity: number
   ): Promise<void> {
     const orders =
-      orderType === 'buy' ? await this.getBuyOrders(cropId) : await this.getSellOrders(cropId);
+      orderType === OrderType.BUY
+        ? await this.getBuyOrders(cropId)
+        : await this.getSellOrders(cropId);
     const targetOrder = orders.find(order => order.orderId === orderId);
 
     if (!targetOrder) {
@@ -57,7 +60,8 @@ export class OrderBookService {
   }
 
   private serializeOrder(order: OrderBookDto): string {
-    return JSON.stringify(order);
+    const time = order.time.toISOString();
+    return JSON.stringify({ ...order, time });
   }
 
   private deserializeOrder(orderData: string): OrderBookDto {
