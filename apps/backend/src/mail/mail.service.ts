@@ -9,8 +9,7 @@ import { map, BehaviorSubject } from 'rxjs';
 @Injectable()
 export class MailService {
   constructor(private readonly databaseService: DatabaseService) {}
-  private connectedClients: Map<string, Response> = new Map();
-  private sseSubject: Map<string, BehaviorSubject<string>> = new Map();
+  private sseSubjects: Map<string, BehaviorSubject<string>> = new Map();
 
   async connectSseAndInitiate(req: any, res: Response) {
     const memberId = req.user.memberId;
@@ -21,18 +20,18 @@ export class MailService {
     };
     const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
 
-    if (!this.sseSubject.has(memberId)) {
+    if (!this.sseSubjects.has(memberId)) {
       const newSubject = new BehaviorSubject<string>(JSON.stringify(body));
-      this.sseSubject.set(memberId, newSubject);
+      this.sseSubjects.set(memberId, newSubject);
     }
 
-    const userSubject = this.sseSubject.get(memberId);
+    const userSubject = this.sseSubjects.get(memberId);
     if (!userSubject) {
-      throw new Error('이거 왜 안되지');
+      throw new Error('유저 서브젝트가 제대로 생성되지 않았습니다.');
     }
 
     res.on('close', () => {
-      this.sseSubject.delete(memberId);
+      this.sseSubjects.delete(memberId);
       res.end();
     });
 
@@ -41,7 +40,7 @@ export class MailService {
 
   @OnEvent('sendAlarmObs')
   handleAlarmEventObs(memberId: string) {
-    const userSubject = this.sseSubject.get(memberId);
+    const userSubject = this.sseSubjects.get(memberId);
 
     if (userSubject) {
       const data = {
@@ -57,7 +56,7 @@ export class MailService {
 
   async getMailsByMemberId(memberId: string) {
     try {
-      const response = await this.databaseService.query(mailQueries.getAllmailQuery, [memberId]);
+      const response = await this.databaseService.query(mailQueries.getAllMailQuery, [memberId]);
       return response.rows;
     } catch (error) {
       throw new HttpException('메일 기록을 가져오는 도중에 에러 발생 : ', error);
