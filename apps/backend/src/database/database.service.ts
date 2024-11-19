@@ -5,6 +5,7 @@ import { Client, QueryResult } from 'pg';
 @Injectable()
 export class DatabaseService implements OnModuleInit {
   private client: Client;
+
   constructor(private configService: ConfigService) {}
 
   onModuleInit() {
@@ -21,7 +22,8 @@ export class DatabaseService implements OnModuleInit {
       .catch((error: Error) => console.error('Failed to connect to PostgreSQL database', error));
   }
 
-  async query(query: string, params: string[] = []): Promise<QueryResult> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async query(query: string, params: any[] = []): Promise<QueryResult> {
     return this.client.query(query, params);
   }
 

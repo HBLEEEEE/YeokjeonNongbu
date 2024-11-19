@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OrderBookService } from './orderBook.service';
+import { OrderType } from './enums/orderType';
 
 @Injectable()
 export class MatchingService {
@@ -24,8 +25,18 @@ export class MatchingService {
 
       //TODO DB 트랜잭션 업데이트,체결 이벤트 발생
 
-      await this.orderBookService.updateOrder(cropId, 'buy', buyOrder.orderId, matchedQuantity);
-      await this.orderBookService.updateOrder(cropId, 'sell', sellOrder.orderId, matchedQuantity);
+      await this.orderBookService.updateOrder(
+        cropId,
+        OrderType.BUY,
+        buyOrder.orderId,
+        matchedQuantity
+      );
+      await this.orderBookService.updateOrder(
+        cropId,
+        OrderType.SELL,
+        sellOrder.orderId,
+        matchedQuantity
+      );
 
       if (sellOrder.unfilledQuantity <= matchedQuantity) {
         sellIndex++;
