@@ -5,7 +5,11 @@ interface SuccessMessage {
 
 export const successMessage = {
   SIGNUP_SUCCESS: { code: 201, message: '회원 가입되었습니다.' },
-  LOGIN_SUCCESS: { code: 200, message: '로그인 되었습니다.' }
+  LOGIN_SUCCESS: { code: 200, message: '로그인 되었습니다.' },
+  GET_MEMBER_SUCCESS: { code: 201, message: '회원 가입되었습니다.' },
+  GET_MAIL_SUCCESS: { code: 200, message: '메일 조회를 완료했습니다.' },
+  DELETE_MAIL_SUCCESS: { code: 200, message: '메일 삭제를 완료했습니다.' },
+  GET_MAIL_ALARM_SUCCESS: { code: 200, message: 'Catch alarm!.' }
 };
 
 export function successhandler<T>(success: SuccessMessage, data: T | null = null) {
