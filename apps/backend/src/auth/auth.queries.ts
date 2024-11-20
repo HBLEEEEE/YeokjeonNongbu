@@ -1,5 +1,6 @@
 export const authQueries = {
   signUpQuery: 'INSERT INTO members (email, password, nickname) VALUES ($1, $2, $3) RETURNING *',
   findByEmailQuery:
-    'SELECT member_id, email, password, nickname FROM members WHERE email = $1 LIMIT 1'
+    'SELECT member_id, email, password, nickname FROM members WHERE email = $1 LIMIT 1',
+  upateMemberQuery: 'UPDATE members SET introduce = $1 WHERE member_id = $2'
 };
