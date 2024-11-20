@@ -79,9 +79,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '유저 소개글 변경 API' })
   @updateIntroduceResponseDecorator()
-  async updateIntrodue(@Req() req: Request, @Body() updateIntroduceDto: UpdateIntroduceDto) {
+  async updateIntroduce(@Req() req: Request, @Body() updateIntroduceDto: UpdateIntroduceDto) {
     const { memberId } = req.user as MemberData;
-    console.log(memberId);
     const { introduce } = updateIntroduceDto;
     await this.authService.updateIntroduce(memberId, introduce);
     return successhandler(successMessage.INTRODUCE_UPDATE_SUCCESS);
