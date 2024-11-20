@@ -1,8 +1,9 @@
 import { Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
 import { LottoService } from './lotto.service';
 import { successhandler, successMessage } from 'src/global/successhandler';
+import { lottoResponseDecorator } from './decorator/lotto.decorator';
 
 @Controller('api/lotto')
 @ApiBearerAuth()
@@ -12,10 +13,7 @@ export class LottoController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: '복권 긁기 요청 API' })
-  @ApiResponse({
-    status: 200,
-    description: 'Connect Alarm server'
-  })
+  @lottoResponseDecorator()
   async buyLotto(@Req() req: any) {
     const memberId = req.user.memberId;
     if (!memberId) {
