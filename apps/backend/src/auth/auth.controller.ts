@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signUp.dto';
 import { successhandler, successMessage } from 'src/global/successhandler';
@@ -13,6 +13,9 @@ import { oauthResponseDecorator } from './decorator/oauth.decorator';
 import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
 import { Request } from 'express';
 import { logoutResponseDecorator } from './decorator/logout.decorator';
+import { UpdateIntroduceDto } from './dto/updateIntroduce.dto';
+import { MemberData } from 'src/global/utils/requestInterface';
+import { updateIntroduceResponseDecorator } from './decorator/updateIntroduce.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -70,5 +73,16 @@ export class AuthController {
   async kakaoRedirect(@Req() kakaoLoginDto: KakaoLoginDto) {
     const tokens = await this.authService.kakaoLogin(kakaoLoginDto);
     return successhandler(successMessage.LOGIN_SUCCESS, tokens);
+  }
+
+  @Patch('introduce')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '유저 소개글 변경 API' })
+  @updateIntroduceResponseDecorator()
+  async updateIntroduce(@Req() req: Request, @Body() updateIntroduceDto: UpdateIntroduceDto) {
+    const { memberId } = req.user as MemberData;
+    const { introduce } = updateIntroduceDto;
+    await this.authService.updateIntroduce(memberId, introduce);
+    return successhandler(successMessage.INTRODUCE_UPDATE_SUCCESS);
   }
 }

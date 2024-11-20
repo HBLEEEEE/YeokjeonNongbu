@@ -58,9 +58,8 @@ export class AuthService {
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
 
     const isPasswordValid = await bcrypt.compare(password, member.rows[0].password);
-    if (!isPasswordValid) {
+    if (!isPasswordValid)
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
-    }
 
     const payload = {
       memberId: member.rows[0].member_id,
@@ -104,13 +103,15 @@ export class AuthService {
     if (!token) throw new HttpException('토큰이 필요합니다.', HttpStatus.BAD_REQUEST);
 
     const decodedToken = this.jwtService.decode(token) as { exp: number };
-    if (!decodedToken || !decodedToken.exp) {
+    if (!decodedToken || !decodedToken.exp)
       throw new HttpException('유효하지 않은 토큰입니다.', HttpStatus.UNAUTHORIZED);
-    }
 
     const remainingTime = decodedToken.exp * 1000 - Date.now();
-    if (remainingTime > 0) {
+    if (remainingTime > 0)
       await this.redisClient.set(`blacklist:${token}`, 'true', { PX: remainingTime });
-    }
+  }
+
+  async updateIntroduce(memberId: number, introduce: string | null) {
+    await this.databaseService.query(authQueries.upateMemberQuery, [introduce, memberId]);
   }
 }
