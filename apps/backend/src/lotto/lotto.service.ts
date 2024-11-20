@@ -8,7 +8,7 @@ import seedrandom = require('seedrandom');
 export class LottoService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async buyLotto(memberId: string) {
+  async buyLotto(memberId: number) {
     const data = await this.databaseService.query(lottoQueries.getMemberCash, [memberId]);
     let memberCash = Number(data.rows[0].available_cash);
     const prize: Record<number, [number, string]> = {
