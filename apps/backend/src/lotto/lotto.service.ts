@@ -46,7 +46,8 @@ export class LottoService {
     }
 
     //최종 결과 데이터 입력하기(회수 카운트, 현금 변화, )
-    await this.databaseService.query(lottoQueries.updateLottoHistory, [prize[rank][1], memberId]);
+    const query = `UPDATE lottos SET ${prize[rank][1]} = ${prize[rank][1]} + 1 WHERE member_id = ($1)`;
+    await this.databaseService.query(query, [memberId]);
     await this.databaseService.query(lottoQueries.setMemberCash, [String(memberCash), memberId]);
 
     //결과 말아서 리턴해주기

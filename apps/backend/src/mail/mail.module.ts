@@ -10,7 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
     DatabaseModule,
     EventEmitterModule.forRoot(),
     JwtModule.register({
-      secret: 'jwt',
+      secret: 'web13',
       signOptions: { expiresIn: '1h' }
     })
   ],

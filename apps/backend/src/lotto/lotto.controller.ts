@@ -15,20 +15,14 @@ export class LottoController {
   @ApiResponse({
     status: 200,
     description: 'Connect Alarm server'
-    // type: MailCheckResponseDto
   })
-  buyLotto(@Req() req: any) {
+  async buyLotto(@Req() req: any) {
     const memberId = req.user.memberId;
-    if (memberId!) {
+    if (!memberId) {
       throw new Error('올바르지 않은 사용자입니다.');
     }
 
-    const result = this.lottoService.buyLotto(memberId);
+    const result = await this.lottoService.buyLotto(memberId);
     return successhandler(successMessage.BUY_LOTTO_SUCCESS, result);
-  }
-
-  @Post('reset')
-  resetLotto() {
-    this.lottoService.resetLotto();
   }
 }
