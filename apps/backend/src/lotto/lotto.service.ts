@@ -21,7 +21,11 @@ export class LottoService {
       throw new Error(`구매자의 자본금이 복권 최소 금액 보다 적습니다. 자본금 : ${memberCash}`);
     }
 
-    const unsoldData = await this.databaseService.query(lottoQueries.findUnsoldPosition);
+    let unsoldData = await this.databaseService.query(lottoQueries.findUnsoldPosition);
+    if (unsoldData.rows.length == 0) {
+      await this.resetLotto();
+      unsoldData = await this.databaseService.query(lottoQueries.findUnsoldPosition);
+    }
     const ticketData = unsoldData.rows[0];
     const rank = ticketData.rank as 1 | 2 | 3 | 4 | 5;
 

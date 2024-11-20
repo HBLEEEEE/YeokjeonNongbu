@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
 import { LottoService } from './lotto.service';
@@ -10,8 +10,8 @@ export class LottoController {
   constructor(private readonly lottoService: LottoService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  @ApiOperation({ summary: '알림 연결 요청 API' })
+  @Post()
+  @ApiOperation({ summary: '복권 긁기 요청 API' })
   @ApiResponse({
     status: 200,
     description: 'Connect Alarm server'
