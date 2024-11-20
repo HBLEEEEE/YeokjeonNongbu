@@ -86,10 +86,12 @@ export class LottoService {
     //위 모든행위를 다시 저장하기
     const updateInningQuery = `UPDATE inning SET ${prize[rank][1]} = $1 WHERE inning_id = $2`;
     const remainCount = ranks[rank - 1].count - 1;
+    // 긁은 복권 저장
     await this.databaseService.query(updateInningQuery, [remainCount, unsoldData.inning_id]);
-
+    // 멤버의 현금 저장
     await this.databaseService.query(lottoQueries.setMemberCash, [memberCash, memberId]);
 
+    // 멤버의 복권 당첨 현황 업데이트
     const updateLottosQuery = `UPDATE lottos SET ${prize[rank][1]} = ${prize[rank][1]} + 1 WHERE member_id = $1`;
     await this.databaseService.query(updateLottosQuery, [memberId]);
 
