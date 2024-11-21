@@ -3,7 +3,7 @@ export const mailQueries = {
     'SELECT EXISTS (SELECT 1 FROM mails WHERE member_id = $1 AND read_status = false LIMIT 1) AS result',
   makeReadedQuery: 'UPDATE mails SET read_status=true WHERE member_id = $1',
   getAllMailQuery:
-    'SELECT mail_id, content, created_at, read_status FROM mails WHERE member_id = $1',
+    'SELECT mail_id, content, created_at, read_status FROM mails WHERE member_id = $1 ORDER BY mail_id DESC LIMIT 50',
   createMailQuery:
     'INSERT INTO mails(member_id, content, created_at, read_status) VALUES ($1, $2, NOW(), FALSE);',
   deleteMailQuery: 'DELETE FROM mails WHERE member_id = $1',

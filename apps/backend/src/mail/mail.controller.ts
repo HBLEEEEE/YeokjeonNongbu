@@ -1,12 +1,13 @@
-import { Controller, Delete, Get, Param, Req, Res, Sse, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Res, Sse, UseGuards } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailService } from './mail.service';
 import { Response } from 'express';
 import { successhandler, successMessage } from 'src/global/successhandler';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { MailCheckResponseDto } from './dto/mailCheck.dto';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
-import { MailResponseDto } from './dto/mail.dto';
+import { checkResponseDecorator } from './decorator/check.decorator';
+import { deleteMailResponseDecorator, mailResponseDecorator } from './decorator/mail.decorator';
+import { User } from 'src/global/utils/memberData';
 
 @Controller('api/mail')
 @ApiBearerAuth()
@@ -19,48 +20,39 @@ export class MailController {
   @UseGuards(JwtAuthGuard)
   @Sse('check')
   @ApiOperation({ summary: '알림 연결 요청 API' })
-  @ApiResponse({
-    status: 200,
-    description: 'Connect Alarm server',
-    type: MailCheckResponseDto
-  })
-  initialConnectSse(@Req() req: any, @Res() res: Response) {
-    return this.mailService.connectSseAndInitiate(req, res);
+  @checkResponseDecorator()
+  initialConnectSse(@User() user: { memberId: number }, @Res() res: Response) {
+    const { memberId } = user;
+    return this.mailService.connectSseAndInitiate(memberId, res);
+  }
+
+  @Get('event/:memberId')
+  eventAlarm(@Param('memberId') memberId: number) {
+    this.mailService.startAlarm(memberId);
   }
 
   @Get('call/:memberId')
-  triggerAlarmObs(@Param('memberId') memberId: number) {
+  triggerAlarm(@Param('memberId') memberId: number) {
     this.eventEmitter.emit('sendAlarm', memberId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: '알림 조회 요청 API' })
-  @ApiResponse({
-    status: 200,
-    description: 'Get mails by member information',
-    type: MailResponseDto
-  })
-  async getMailsByMemberId(@Req() req: any) {
-    const data = await this.mailService.getMailsByMemberId(req.user.memberId);
+  @mailResponseDecorator()
+  async getMailsByMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    const data = await this.mailService.getMailsByMemberId(memberId);
     return successhandler(successMessage.GET_MAIL_SUCCESS, data);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete()
-  @ApiResponse({
-    status: 200,
-    description: 'Delete all mails by member information',
-    schema: {
-      example: {
-        code: 200,
-        message: '메일 삭제를 완료했습니다.'
-      }
-    }
-  })
+  @deleteMailResponseDecorator()
   @ApiOperation({ summary: '알림 삭제 요청 API' })
-  async deleteMailsByMemberId(@Req() req: any) {
-    await this.mailService.deleteAllMailByMemberId(req.user.memberId);
+  async deleteMailsByMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    await this.mailService.deleteAllMailByMemberId(memberId);
     return successhandler(successMessage.DELETE_MAIL_SUCCESS);
   }
 }
