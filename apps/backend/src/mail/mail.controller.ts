@@ -3,10 +3,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailService } from './mail.service';
 import { Response } from 'express';
 import { successhandler, successMessage } from 'src/global/successhandler';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { MailCheckResponseDto } from './dto/mailCheck.dto';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
-import { MailResponseDto } from './dto/mail.dto';
+import { checkResponseDecorator } from './decorator/check.decorator';
+import { deleteMailResponseDecorator, mailResponseDecorator } from './decorator/mail.decorator';
 
 @Controller('api/mail')
 @ApiBearerAuth()
@@ -19,11 +19,7 @@ export class MailController {
   @UseGuards(JwtAuthGuard)
   @Sse('check')
   @ApiOperation({ summary: '알림 연결 요청 API' })
-  @ApiResponse({
-    status: 200,
-    description: 'Connect Alarm server',
-    type: MailCheckResponseDto
-  })
+  @checkResponseDecorator()
   initialConnectSse(@Req() req: any, @Res() res: Response) {
     return this.mailService.connectSseAndInitiate(req, res);
   }
@@ -36,11 +32,7 @@ export class MailController {
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: '알림 조회 요청 API' })
-  @ApiResponse({
-    status: 200,
-    description: 'Get mails by member information',
-    type: MailResponseDto
-  })
+  @mailResponseDecorator()
   async getMailsByMemberId(@Req() req: any) {
     const data = await this.mailService.getMailsByMemberId(req.user.memberId);
     return successhandler(successMessage.GET_MAIL_SUCCESS, data);
@@ -48,16 +40,7 @@ export class MailController {
 
   @UseGuards(JwtAuthGuard)
   @Delete()
-  @ApiResponse({
-    status: 200,
-    description: 'Delete all mails by member information',
-    schema: {
-      example: {
-        code: 200,
-        message: '메일 삭제를 완료했습니다.'
-      }
-    }
-  })
+  @deleteMailResponseDecorator()
   @ApiOperation({ summary: '알림 삭제 요청 API' })
   async deleteMailsByMemberId(@Req() req: any) {
     await this.mailService.deleteAllMailByMemberId(req.user.memberId);

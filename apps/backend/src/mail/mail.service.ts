@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Response } from 'express';
 import { DatabaseService } from 'src/database/database.service';
@@ -27,7 +27,10 @@ export class MailService {
 
     const userSubject = this.sseSubjects.get(memberId);
     if (!userSubject) {
-      throw new Error('유저 서브젝트가 제대로 생성되지 않았습니다.');
+      throw new HttpException(
+        'SSE 알림 서버에 등록 실패했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
 
     res.on('close', () => {
