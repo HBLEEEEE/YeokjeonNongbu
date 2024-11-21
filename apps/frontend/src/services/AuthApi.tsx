@@ -39,9 +39,9 @@ export const login = async (data: LoginRequest) => {
     return { success: false, message: '알 수 없는 오류가 발생했습니다.' };
   } catch (error) {
     if (error instanceof Error) {
-      return { success: false, message: '로그아웃 중 오류가 발생했습니다.' };
+      return { success: false, message: '로그인 중 오류가 발생했습니다.' };
     }
-    return { success: false, message: '로그아웃 중 오류가 발생했습니다.' };
+    return { success: false, message: '로그인 중 오류가 발생했습니다.' };
   }
 };
 
@@ -56,9 +56,9 @@ export const signUp = async (data: SignUpRequest) => {
     }
   } catch (error) {
     if (error instanceof Error) {
-      return { success: false, message: '로그아웃 중 오류가 발생했습니다.' };
+      return { success: false, message: '회원가입 중 오류가 발생했습니다.' };
     }
-    return { success: false, message: '로그아웃 중 오류가 발생했습니다.' };
+    return { success: false, message: '회원가입 중 오류가 발생했습니다.' };
   }
 };
 

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import EditIcon from '@/components/EditIcon';
+import SaveIcon from './SaveIcon';
 
 interface ProfileProps {
   id: string;
@@ -9,13 +10,17 @@ interface ProfileProps {
 const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
   const [introduce, setIntroduce] = useState<string>('안녕하세요! 농부왕의 농장입니다!');
   const [isEditable, setIsEditable] = useState<boolean>(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleDoubleClick = () => {
-    setIsEditable(true);
-  };
-
-  const handleBlur = () => {
-    setIsEditable(false);
+  const editIntroduce = () => {
+    if (!isEditable) {
+      setIsEditable(true);
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    } else {
+      setIsEditable(false);
+    }
   };
 
   return (
@@ -30,14 +35,21 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
       </div>
       <div className="flex w-full bg-light-red mt-2 flex-grow rounded-md text-center justify-center p-2">
         <textarea
-          className={`bg-light-red text-red-soft font-bold px-2 py-1 w-full cursor-pointer resize-none rounded
-          ${isEditable ? 'focus:outline' : 'focus:outline-none'}`}
+          ref={textareaRef}
+          className={`bg-light-red text-red-soft font-bold p-1 mt-2 mx-2 w-full resize-none rounded ${isEditable ? 'border-2 border-blue-500' : 'border-none'}`}
           value={introduce}
           onChange={e => setIntroduce(e.target.value)}
           readOnly={!isEditable}
-          onDoubleClick={handleDoubleClick}
-          onBlur={handleBlur}
         />
+        {isEditable ? (
+          <>
+            <SaveIcon onClick={editIntroduce} />
+          </>
+        ) : (
+          <>
+            <EditIcon onClick={editIntroduce} />
+          </>
+        )}
       </div>
     </div>
   );
