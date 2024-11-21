@@ -23,13 +23,14 @@ export const login = async (data: LoginRequest) => {
     const response = await api.post('/login', data);
 
     if (response.data.code === 200) {
-      const { accessToken, refreshToken } = response.data.data!;
+      const { accessToken, refreshToken, nickname } = response.data.data!;
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
       return {
         success: true,
-        message: response.data.message
+        message: response.data.message,
+        nickname: nickname
       };
     } else if (response.data.code === 400) {
       return { success: false, message: response.data.message };
