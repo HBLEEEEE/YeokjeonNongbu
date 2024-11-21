@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { GoogleLoginDto } from './dto/googleLogin.dto';
 import { KakaoLoginDto } from './dto/kakaoLogin.dto';
 import { RedisClientType } from 'redis';
+import { Nullable, Optional } from 'src/global/utils/dataCustomType';
 
 @Injectable()
 export class AuthService {
@@ -61,29 +62,28 @@ export class AuthService {
     if (!isPasswordValid)
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
 
-    const payload = {
-      memberId: member.rows[0].member_id,
-      email,
-      nickname: member.rows[0].nickname
-    };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-    return { accessToken, refreshToken };
+    return this.generateTokens(member.rows[0].member_id);
   }
 
-  async loginWithSocialMedia(email: string, nickname: string) {
+  private async verifyUser(email: string, nickname: string) {
     const existingUser = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
-
-    if (!existingUser) {
-      const hashedPassword = await bcrypt.hash('default', 10);
-      await this.databaseService.query(authQueries.signUpQuery, [email, hashedPassword, nickname]);
-    }
-    const member = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
-    const payload = {
-      memberId: member.rows[0].member_id,
+    if (existingUser?.rows?.length) return existingUser.rows[0].memberId;
+    const hashedPassword = await bcrypt.hash('default', 10);
+    const newMember = await this.databaseService.query(authQueries.signUpQuery, [
       email,
-      nickname: member.rows[0].nickname
-    };
+      hashedPassword,
+      nickname
+    ]);
+    return newMember.rows[0].memberId;
+  }
+
+  async SocialLogin(email: string, nickname: string) {
+    const memberId = await this.verifyUser(email, nickname);
+    return this.generateTokens(memberId);
+  }
+
+  private async generateTokens(memberId: number) {
+    const payload = { memberId };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     return { accessToken, refreshToken };
@@ -91,15 +91,15 @@ export class AuthService {
 
   async googleLogin(googleLoginDto: GoogleLoginDto) {
     const { email, name } = googleLoginDto;
-    return this.loginWithSocialMedia(email, name);
+    return this.SocialLogin(email, name);
   }
 
   async kakaoLogin(kakaoLoginDto: KakaoLoginDto) {
     const { email, nickname } = kakaoLoginDto;
-    return this.loginWithSocialMedia(email, nickname);
+    return this.SocialLogin(email, nickname);
   }
 
-  async logout(token: string | undefined) {
+  async logout(token: Optional<string>) {
     if (!token) throw new HttpException('토큰이 필요합니다.', HttpStatus.BAD_REQUEST);
 
     const decodedToken = this.jwtService.decode(token) as { exp: number };
@@ -111,7 +111,7 @@ export class AuthService {
       await this.redisClient.set(`blacklist:${token}`, 'true', { PX: remainingTime });
   }
 
-  async updateIntroduce(memberId: number, introduce: string | null) {
-    await this.databaseService.query(authQueries.upateMemberQuery, [introduce, memberId]);
+  async updateIntroduce(memberId: number, introduce: Nullable<string>) {
+    await this.databaseService.query(authQueries.updateMemberQuery, [introduce, memberId]);
   }
 }

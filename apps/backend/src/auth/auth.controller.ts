@@ -14,8 +14,8 @@ import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
 import { Request } from 'express';
 import { logoutResponseDecorator } from './decorator/logout.decorator';
 import { UpdateIntroduceDto } from './dto/updateIntroduce.dto';
-import { MemberData } from 'src/global/utils/requestInterface';
 import { updateIntroduceResponseDecorator } from './decorator/updateIntroduce.decorator';
+import { User } from 'src/global/utils/memberData';
 
 @Controller('api/auth')
 export class AuthController {
@@ -79,8 +79,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '유저 소개글 변경 API' })
   @updateIntroduceResponseDecorator()
-  async updateIntroduce(@Req() req: Request, @Body() updateIntroduceDto: UpdateIntroduceDto) {
-    const { memberId } = req.user as MemberData;
+  async updateIntroduce(
+    @User() user: { memberId: number },
+    @Body() updateIntroduceDto: UpdateIntroduceDto
+  ) {
+    const { memberId } = user;
     const { introduce } = updateIntroduceDto;
     await this.authService.updateIntroduce(memberId, introduce);
     return successhandler(successMessage.INTRODUCE_UPDATE_SUCCESS);
