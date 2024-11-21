@@ -1,5 +1,6 @@
 export interface Alarm {
-  id: number;
-  message: string;
-  price: string;
+  mailId: number;
+  content: string;
+  createAt: string;
+  readStatus: boolean
 }
