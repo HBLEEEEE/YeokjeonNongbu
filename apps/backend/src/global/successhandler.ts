@@ -1,4 +1,3 @@
-
 interface SuccessMessage {
   code: number;
   message: string;
