@@ -39,7 +39,14 @@ export class AuthService {
       throw new HttpException('닉네임은 2자에서 10자 사이로 입력해주세요.', HttpStatus.BAD_REQUEST);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await this.databaseService.query(authQueries.signUpQuery, [email, hashedPassword, nickname]);
+    const member = await this.databaseService.query(authQueries.signUpQuery, [
+      email,
+      hashedPassword,
+      nickname
+    ]);
+    await this.databaseService.query(authQueries.createLottoColumnQuery, [
+      member.rows[0].member_id
+    ]);
   }
 
   async login(loginDto: LoginDto) {

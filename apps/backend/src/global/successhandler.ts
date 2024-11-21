@@ -1,3 +1,5 @@
+import { Nullable } from './utils/dataCustomType';
+
 interface SuccessMessage {
   code: number;
   message: string;
@@ -16,10 +18,11 @@ export const successMessage = {
   GET_TRANSACTION_SUCCESS: { code: 200, message: '거래 내역 조회를 완료했습니다.' },
   CREATE_ORDER_SUCCESS: { code: 201, message: '주문이 성공적으로 생성되었습니다.' },
   DELETE_ORDER_SUCCESS: { code: 201, message: '주문이 성공적으로 삭제되었습니다.' },
-  BUY_LOTTO_SUCCESS: { code: 200, message: '로또 구매를 완료했습니다.' }
+  BUY_LOTTO_SUCCESS: { code: 200, message: '로또 구매를 완료했습니다.' },
+  TOP5_RANK_GET_SUCCESS: { code: 200, message: '상위 5명을 조회했습니다.' }
 };
 
-export function successhandler<T>(success: SuccessMessage, data: T | null = null) {
+export function successhandler<T>(success: SuccessMessage, data: Nullable<T> = null) {
   return {
     code: success.code,
     message: success.message,
