@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateIntroduceDto {
+export class UpdateNicknameDto {
   @ApiProperty({
-    description: '소개글',
-    example: '나는 누구?'
+    description: '닉네임',
+    example: '홍길동'
   })
-  introduce: string;
+  nickname: string;
 }
 
-export class UpdateIntroduceSuccessResponseDto {
+export class UpdateNicknameSuccessResponseDto {
   @ApiProperty({
     description: '응답 코드',
     example: 200
@@ -17,7 +17,7 @@ export class UpdateIntroduceSuccessResponseDto {
 
   @ApiProperty({
     description: '응답 메세지',
-    example: '소개글이 변경되었습니다.'
+    example: '닉네임이 변경되었습니다.'
   })
   message: string;
 }

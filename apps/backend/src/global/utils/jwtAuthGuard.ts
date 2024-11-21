@@ -26,7 +26,7 @@ export class JwtAuthGuard {
       }
 
       const { memberId } = decoded;
-      request.member = { memberId };
+      request.user = { memberId };
       return true;
     } catch {
       throw new HttpException('잘못된 토큰입니다.', HttpStatus.UNAUTHORIZED);

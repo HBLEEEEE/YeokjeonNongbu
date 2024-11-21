@@ -1,8 +1,9 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiHeader, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiResponse } from '@nestjs/swagger';
 
 export function TokenDecorator() {
   return applyDecorators(
+    ApiBearerAuth(),
     ApiHeader({
       name: 'Authorization',
       description: 'Bearer <token>',
