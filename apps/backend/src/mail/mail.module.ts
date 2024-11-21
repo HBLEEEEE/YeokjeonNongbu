@@ -5,6 +5,7 @@ import { DatabaseModule } from 'src/database/database.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MailRedisUtil } from './util/mailRedisUtil';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     })
   ],
   controllers: [MailController],
-  providers: [MailService]
+  providers: [MailService, MailRedisUtil]
 })
 export class MailModule {}

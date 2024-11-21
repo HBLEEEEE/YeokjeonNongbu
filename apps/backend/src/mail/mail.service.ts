@@ -1,22 +1,20 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Response } from 'express';
 import { DatabaseService } from 'src/database/database.service';
 import { mailQueries } from './mail.queries';
 import { successhandler, successMessage } from 'src/global/successhandler';
 import { map, BehaviorSubject } from 'rxjs';
-import { RedisClientType } from 'redis';
+import { MailRedisUtil } from './util/mailRedisUtil';
 
 @Injectable()
 export class MailService {
   constructor(
-    @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType,
-    private readonly databaseService: DatabaseService
+    private readonly databaseService: DatabaseService,
+    private readonly mailRedisUtil: MailRedisUtil
   ) {}
-  private sseSubjects: Map<string, BehaviorSubject<string>> = new Map();
 
-  async connectSseAndInitiate(req: any, res: Response) {
-    const memberId = req.user.memberId;
+  async connectSseAndInitiate(memberId: number, res: Response) {
     const checkUnread = await this.databaseService.query(mailQueries.checkUnreadQuery, [memberId]);
     const data = {
       check: checkUnread.rows[0].result,
@@ -24,31 +22,28 @@ export class MailService {
     };
     const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
 
-    if (!this.sseSubjects.has(memberId)) {
-      const newSubject = new BehaviorSubject<string>(JSON.stringify(body));
-      this.sseSubjects.set(memberId, newSubject);
-    }
+    const newSubject = new BehaviorSubject<string>(JSON.stringify(body));
+    await this.mailRedisUtil.registerSseRedis(String(memberId), newSubject);
+    const getSubject = await this.mailRedisUtil.getSseRedis(String(memberId));
 
-    const userSubject = this.sseSubjects.get(memberId);
-    if (!userSubject) {
+    if (!getSubject) {
       throw new HttpException(
         'SSE 알림 서버에 등록 실패했습니다.',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
 
-    res.on('close', () => {
-      this.sseSubjects.delete(memberId);
+    res.on('close', async () => {
+      await this.mailRedisUtil.deleteSseRedis(String(memberId));
       res.end();
     });
 
-    return userSubject.asObservable().pipe(map(message => ({ data: message })));
+    return newSubject.asObservable().pipe(map(message => ({ data: message })));
   }
 
   @OnEvent('sendAlarm')
-  handleAlarmEventObs(memberId: string) {
-    const userSubject = this.sseSubjects.get(memberId);
-
+  async handleAlarmEventObs(memberId: string) {
+    const userSubject = await this.mailRedisUtil.getSseRedis(memberId);
     if (userSubject) {
       const data = {
         check: true,

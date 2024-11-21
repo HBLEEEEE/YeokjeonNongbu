@@ -3,7 +3,7 @@ import { RedisClientType } from 'redis';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
-export class JwtAuthGuard {
+export class MailRedisUtil {
   constructor(@Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType) {}
 
   async registerSseRedis(key: string, value: BehaviorSubject<string>) {
