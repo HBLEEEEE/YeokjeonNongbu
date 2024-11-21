@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import AlarmModal from './AlarmModal';
-import BarModal from './BarModal';
+import AlarmModal from '@/components/AlarmModal';
+import BarModal from '@/components/BarModal';
 import { Alarm } from '@/types/Index';
+import { useUser } from '@/components/UserContext';
 
 const Header: React.FC = () => {
   const [alarms, setAlarms] = useState<Alarm[]>([
@@ -45,6 +46,7 @@ const Header: React.FC = () => {
   ]);
   const [isAlarmOpen, setIsAlarmOpen] = useState<boolean>(false);
   const [isBarOpen, setIsBarOpen] = useState<boolean>(false);
+  const { nickname, totalAssets } = useUser();
 
   const clearAllAlarms = () => {
     setAlarms([]);
@@ -66,11 +68,11 @@ const Header: React.FC = () => {
         </Link>
 
         <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
-          <p>농부왕</p>
+          <p>{nickname}</p>
         </section>
 
         <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
-          <p>￦ 932,517,456</p>
+          <p>￦ {totalAssets}</p>
         </section>
       </div>
 

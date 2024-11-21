@@ -9,6 +9,7 @@ import CropMarket from '@/pages/CropMarket';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PrivateRoute from '@/components/ProtectRoute';
+import { UserProvider } from '@/components/UserContext';
 
 interface LayoutProps {
   path: string;
@@ -52,9 +53,11 @@ const router = createBrowserRouter(routes);
 function App() {
   return (
     <div className="bg-bg-color min-h-screen">
-      <AnimatePresence>
-        <RouterProvider router={router} />
-      </AnimatePresence>
+      <UserProvider>
+        <AnimatePresence>
+          <RouterProvider router={router} />
+        </AnimatePresence>
+      </UserProvider>
     </div>
   );
 }
