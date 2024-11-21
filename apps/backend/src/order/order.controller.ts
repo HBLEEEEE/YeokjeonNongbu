@@ -9,13 +9,15 @@ import { successhandler, successMessage } from '../global/successhandler';
 import { orderResponseDecorator } from './decorator/order.decorator';
 import { transactionResponseDecorator } from './decorator/getTransactions.decorator';
 import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
+import { AccountService } from '../account/account.service';
 
 @Controller('api/order')
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
     private readonly orderBookService: OrderBookService,
-    private readonly machineService: MatchingService
+    private readonly machineService: MatchingService,
+    private readonly accountService: AccountService
   ) {}
 
   @Post('buy/limit')
@@ -25,10 +27,16 @@ export class OrderController {
   async createBuyOrder(@Body() limitOrderDto: LimitOrderDto) {
     const orderDto = DtoTransformer.toOrderDto(limitOrderDto);
     await this.orderService.saveOrder(orderDto);
+    await this.accountService.updateCashByPlacingOrder(
+      limitOrderDto.memberId,
+      limitOrderDto.quantity * limitOrderDto.price,
+      limitOrderDto.orderType
+    );
     await this.machineService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
+  //TODO 판매 주문 생성시 보유 작물 수량 체크하고 pending 상태 구현
   @Post('sell/limit')
   @UseGuards(HasSufficientCashGuard)
   @ApiOperation({ summary: '판매 주문 생성' })

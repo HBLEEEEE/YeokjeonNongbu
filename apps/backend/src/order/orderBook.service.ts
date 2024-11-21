@@ -57,7 +57,7 @@ export class OrderBookService {
   }
 
   async getBuyOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {
-    const orderKey = `orderBook:${cropId}:sell`;
+    const orderKey = `orderBook:${cropId}:buy`;
     const orders = await this.redisClient.zRange(orderKey, 0, -1);
     return orders.map((order: string) => this.deserializeOrder(order));
   }

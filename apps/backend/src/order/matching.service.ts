@@ -3,13 +3,15 @@ import { OrderBookService } from './orderBook.service';
 import { OrderStatus, OrderType } from './enums/orderType';
 import { OrderService } from './order.service';
 import { MarketService } from '../market/market.service';
+import { AccountService } from '../account/account.service';
 
 @Injectable()
 export class MatchingService {
   constructor(
     private readonly orderBookService: OrderBookService,
     private readonly orderService: OrderService,
-    private readonly marketService: MarketService
+    private readonly marketService: MarketService,
+    private readonly accountService: AccountService
   ) {}
 
   async matchOrders(cropId: number): Promise<void> {
@@ -32,9 +34,10 @@ export class MatchingService {
       //TODO DB 트랜잭션 업데이트,체결 이벤트 발생
       // 1. 주문 DB 업데이트 v
       // 2. 체결 트랜잭션 DB 생성 및 저장 v
-      // 3. 레디스 오더북 수정 v
-      // 4. 현재 가격 업데이트 (레디스) v
-      // 5. 체결 이벤트 발생
+      // 3. 회원 DB 현금 업데이트 v
+      // 4. 레디스 오더북 수정 v
+      // 5. 현재 가격 업데이트 (레디스) v
+      // 6. 체결 이벤트 발생
       // 이후 트랜잭션 적용 및 분리 예정
 
       // 1. 주문 DB 업데이트
@@ -42,30 +45,30 @@ export class MatchingService {
         await this.orderService.updateOrder(
           sellOrder.orderId,
           OrderStatus.COMPLETED,
-          matchedQuantity,
+          sellOrder.filledQuantity + matchedQuantity,
           sellOrder.unfilledQuantity - matchedQuantity
         );
       } else if (sellOrder.unfilledQuantity > matchedQuantity) {
         await this.orderService.updateOrder(
           sellOrder.orderId,
           OrderStatus.PARTIALLY_FILLED,
-          matchedQuantity,
+          sellOrder.filledQuantity + matchedQuantity,
           sellOrder.unfilledQuantity - matchedQuantity
         );
       }
 
-      if (buyOrder.unfilledQuantity <= matchedQuantity) {
+      if (buyOrder.unfilledQuantity === matchedQuantity) {
         await this.orderService.updateOrder(
           buyOrder.orderId,
           OrderStatus.COMPLETED,
-          matchedQuantity,
+          buyOrder.filledQuantity + matchedQuantity,
           buyOrder.unfilledQuantity - matchedQuantity
         );
       } else if (buyOrder.unfilledQuantity > matchedQuantity) {
         await this.orderService.updateOrder(
           buyOrder.orderId,
           OrderStatus.PARTIALLY_FILLED,
-          matchedQuantity,
+          buyOrder.filledQuantity + matchedQuantity,
           buyOrder.unfilledQuantity - matchedQuantity
         );
       }
@@ -74,7 +77,20 @@ export class MatchingService {
       await this.orderService.saveTransaction(sellOrder, buyOrder.price, matchedQuantity);
       await this.orderService.saveTransaction(buyOrder, buyOrder.price, matchedQuantity);
 
-      // 3. 레디스 오더북 수정
+      // 3. 회원 DB 현금 업데이트
+      await this.accountService.updateCashByCompletingOrder(
+        sellOrder.memberId,
+        sellOrder.price * matchedQuantity,
+        OrderType.SELL
+      );
+
+      await this.accountService.updateCashByCompletingOrder(
+        buyOrder.memberId,
+        buyOrder.price * matchedQuantity,
+        OrderType.BUY
+      );
+
+      // 4. 레디스 오더북 수정
       await this.orderBookService.updateOrder(
         cropId,
         OrderType.BUY,
