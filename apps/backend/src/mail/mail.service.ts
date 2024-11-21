@@ -61,7 +61,7 @@ export class MailService {
     }
   }
 
-  async getMailsByMemberId(memberId: string) {
+  async getMailsByMemberId(memberId: number) {
     try {
       const response = await this.databaseService.query(mailQueries.getAllMailQuery, [memberId]);
       return response.rows;
@@ -70,7 +70,7 @@ export class MailService {
     }
   }
 
-  async deleteAllMailByMemberId(memberId: string) {
+  async deleteAllMailByMemberId(memberId: number) {
     try {
       const response = await this.databaseService.query(mailQueries.deleteMailQuery, [memberId]);
       return response;
