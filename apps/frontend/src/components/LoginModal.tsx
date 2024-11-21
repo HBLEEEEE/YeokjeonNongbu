@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
+import { login } from '@/services/AuthApi';
 
 interface LoginProps {
   setModalStep: (step: ModalStep) => void;
@@ -12,16 +13,35 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
   const [password, setPassword] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!email || !emailRegex.test(email)) {
+      setErrorMessage('유효한 이메일을 입력해주세요.');
+      return;
+    }
+
     if (!email || !password) {
       setErrorMessage('이메일과 비밀번호를 모두 입력해주세요.');
       return;
     }
 
-    // 로그인 작업 필요
-
-    setErrorMessage(null);
-    navigate('/main');
+    try {
+      const response = await login({ email, password });
+      if (response.success) {
+        alert(response.message);
+        setErrorMessage(null);
+        navigate('/main');
+      } else {
+        setErrorMessage(response.message || '로그인 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message || '서버와의 연결에 실패했습니다.');
+      } else {
+        setErrorMessage('서버와의 연결에 실패했습니다.');
+      }
+    }
   };
 
   return (

@@ -8,6 +8,7 @@ import Ranking from '@/pages/Ranking';
 import CropMarket from '@/pages/CropMarket';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PrivateRoute from '@/components/ProtectRoute';
 
 interface LayoutProps {
   path: string;
@@ -35,11 +36,11 @@ const Layout: React.FC<LayoutProps> = ({ path, children }) => {
 const routes = [
   { path: '/', element: <Intro /> },
   ...[
-    { path: '/main', element: <Main /> },
-    { path: '/lottery', element: <Lottery /> },
-    { path: '/mypage', element: <MyPage /> },
-    { path: '/ranking', element: <Ranking /> },
-    { path: '/cropmarket', element: <CropMarket /> }
+    { path: '/main', element: <PrivateRoute element={<Main />} /> },
+    { path: '/lottery', element: <PrivateRoute element={<Lottery />} /> },
+    { path: '/mypage', element: <PrivateRoute element={<MyPage />} /> },
+    { path: '/ranking', element: <PrivateRoute element={<Ranking />} /> },
+    { path: '/cropmarket', element: <PrivateRoute element={<CropMarket />} /> }
   ].map(route => ({
     ...route,
     element: <Layout path={route.path}>{route.element}</Layout>
