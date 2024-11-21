@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { LottoModule } from './lotto/lotto.module';
+import { RankModule } from './rank/rank.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -15,7 +17,9 @@ import { LottoModule } from './lotto/lotto.module';
     OrderModule,
     MailModule,
     LottoModule,
-    ConfigModule.forRoot()
+    ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
+    RankModule
   ],
   controllers: [],
   providers: []
