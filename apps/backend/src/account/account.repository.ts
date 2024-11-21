@@ -1,6 +1,6 @@
 import { DatabaseService } from '../database/database.service';
 import { Injectable } from '@nestjs/common';
-import { AccountCashDto } from './dto/accountMoney.dto';
+import { AccountCashDto } from './dto/accountCash.dto';
 
 @Injectable()
 export class AccountRepository {
@@ -8,10 +8,10 @@ export class AccountRepository {
 
   async getCashFromMemberId(memberId: number): Promise<AccountCashDto> {
     const query = `
-        SELECT available_cash, pending_cash, total_cash
-        FROM members
-        WHERE member_id = $1
-    `;
+            SELECT available_cash, pending_cash, total_cash
+            FROM members
+            WHERE member_id = $1
+        `;
 
     const values = [memberId];
 

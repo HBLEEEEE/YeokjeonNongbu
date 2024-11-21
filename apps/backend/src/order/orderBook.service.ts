@@ -9,7 +9,7 @@ import { TransactionDto } from './dto/transaction.dto';
 export class OrderBookService {
   constructor(
     @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType,
-    private readonly repository: OrderRepository
+    private readonly orderRepository: OrderRepository
   ) {}
 
   async addOrder(order: OrderBookDto): Promise<void> {
@@ -53,7 +53,7 @@ export class OrderBookService {
   }
 
   async getTransactionsByMemberId(memberId: number): Promise<TransactionDto[]> {
-    return await this.repository.getTransactionsByMemberId(memberId);
+    return await this.orderRepository.getTransactionsByMemberId(memberId);
   }
 
   async getBuyOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {

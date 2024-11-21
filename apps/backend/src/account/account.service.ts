@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AccountRepository } from './account.repository';
-import { AccountCashDto } from './dto/accountMoney.dto';
+import { AccountCashDto } from './dto/accountCash.dto';
 
 @Injectable()
 export class AccountService {

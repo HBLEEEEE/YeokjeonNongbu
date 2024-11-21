@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AccountCashDto } from './accountMoney.dto';
+import { AccountCashDto } from './accountCash.dto';
 
 export class GetCashResponseDto {
   @ApiProperty({

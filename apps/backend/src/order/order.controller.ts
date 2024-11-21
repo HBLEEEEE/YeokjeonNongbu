@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { OrderBookService } from './orderBook.service';
 import DtoTransformer from './utils/dtoTransformer';
@@ -8,6 +8,7 @@ import { MatchingService } from './matching.service';
 import { successhandler, successMessage } from '../global/successhandler';
 import { orderResponseDecorator } from './decorator/order.decorator';
 import { transactionResponseDecorator } from './decorator/getTransactions.decorator';
+import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
 
 @Controller('api/order')
 export class OrderController {
@@ -18,6 +19,7 @@ export class OrderController {
   ) {}
 
   @Post('buy/limit')
+  @UseGuards(HasSufficientCashGuard)
   @ApiOperation({ summary: '구매 주문 생성' })
   @orderResponseDecorator()
   async createBuyOrder(@Body() limitOrderDto: LimitOrderDto) {
@@ -28,6 +30,7 @@ export class OrderController {
   }
 
   @Post('sell/limit')
+  @UseGuards(HasSufficientCashGuard)
   @ApiOperation({ summary: '판매 주문 생성' })
   @orderResponseDecorator()
   async createSellOrder(@Body() limitOrderDto: LimitOrderDto) {
