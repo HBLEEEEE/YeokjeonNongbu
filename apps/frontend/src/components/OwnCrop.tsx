@@ -39,7 +39,7 @@ const currentCrops = [
 const OwnCrop: React.FC = () => {
   return (
     <>
-      <table className="w-full text-center">
+      <table className="h-full w-full md:text-xs lg:text-xs xl:text-sm w-full text-center">
         <thead>
           <tr>
             <th>작물명</th>

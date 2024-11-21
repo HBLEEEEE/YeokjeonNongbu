@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
+import { signUp } from '@/services/AuthApi';
 
 interface SignUpModalProps {
   step: number;
@@ -44,7 +45,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
     setModalStep(ModalStep.SignUpStep2);
   };
 
-  const handleSign2 = () => {
+  const handleSign2 = async () => {
     if (!id || id.length < 2 || id.length > 10) {
       setErrorMessage('닉네임는 2자 이상, 10자 이하로 입력해주세요.');
       idInputRef.current?.focus();
@@ -53,10 +54,13 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
 
     setErrorMessage(null);
 
-    // 아이디 검사 로직 추가 (백엔드에서 체크 필요)
-    // 아이디가 존재하지 않으면 회원가입을 완료한다 (백엔드 작업 필요)
+    const response = await signUp({ email, password, nickname: id });
 
-    navigate('/main');
+    if (response.success) {
+      navigate('/main');
+    } else {
+      setErrorMessage(response.message);
+    }
   };
 
   return (

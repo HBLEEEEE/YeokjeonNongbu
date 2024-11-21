@@ -1,12 +1,26 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '@/services/AuthApi';
 
-interface barProps {
+interface BarProps {
   isOpen: boolean;
   closeModal: () => void;
 }
 
-const BarModal: React.FC<barProps> = ({ isOpen, closeModal }) => {
-  if (!isOpen) return;
+const BarModal: React.FC<BarProps> = ({ isOpen, closeModal }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const result = await logout();
+
+    if (result.success) {
+      navigate('/');
+    } else {
+      alert(result.message);
+    }
+    closeModal();
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed top-12 right-4 mt-12 mr-6 z-50">
@@ -18,9 +32,9 @@ const BarModal: React.FC<barProps> = ({ isOpen, closeModal }) => {
         >
           마이페이지
         </Link>
-        <Link to="/" onClick={closeModal} className="text-lg font-bold text-light-gray text-shadow">
+        <button onClick={handleLogout} className="text-lg font-bold text-light-gray text-shadow">
           로그아웃
-        </Link>
+        </button>
       </div>
     </div>
   );

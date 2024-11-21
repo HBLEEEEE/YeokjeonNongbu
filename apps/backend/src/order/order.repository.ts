@@ -3,6 +3,7 @@ import { DatabaseService } from '../database/database.service';
 import { OrderDto } from './dto/order.dto';
 import { OrderStatus } from './enums/orderType';
 import { OrderBookDto } from './dto/orderBook.dto';
+import { TransactionDto } from './dto/transaction.dto';
 
 @Injectable()
 export class OrderRepository {
@@ -74,7 +75,6 @@ export class OrderRepository {
             VALUES ($1, $2, $3, $4, $5, $6, $7)
         `;
 
-    console.log(order);
     const values = [
       order.orderId,
       order.memberId,
@@ -88,7 +88,7 @@ export class OrderRepository {
     await this.databaseService.query(query, values);
   }
 
-  async getTransactionsByMemberId(memberId: number): Promise<OrderDto[]> {
+  async getTransactionsByMemberId(memberId: number): Promise<TransactionDto[]> {
     const query = `
             SELECT *
             FROM transactions
@@ -98,6 +98,17 @@ export class OrderRepository {
     const values = [memberId];
 
     const result = await this.databaseService.query(query, values);
-    return result.rows;
+    return result.rows.map(data => {
+      return {
+        orderId: data.order_id,
+        memberId: data.member_id,
+        cropId: data.crop_id,
+        tradingType: data.trading_type,
+        price: data.price,
+        totalPrice: data.total_price,
+        createdAt: data.created_at,
+        amount: data.amount
+      };
+    });
   }
 }
