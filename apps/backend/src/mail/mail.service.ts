@@ -1,14 +1,18 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Response } from 'express';
 import { DatabaseService } from 'src/database/database.service';
 import { mailQueries } from './mail.queries';
 import { successhandler, successMessage } from 'src/global/successhandler';
 import { map, BehaviorSubject } from 'rxjs';
+import { RedisClientType } from 'redis';
 
 @Injectable()
 export class MailService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType,
+    private readonly databaseService: DatabaseService
+  ) {}
   private sseSubjects: Map<string, BehaviorSubject<string>> = new Map();
 
   async connectSseAndInitiate(req: any, res: Response) {
