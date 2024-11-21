@@ -26,8 +26,13 @@ export class MailController {
     return this.mailService.connectSseAndInitiate(memberId, res);
   }
 
+  @Get('event/:memberId')
+  eventAlarm(@Param('memberId') memberId: number) {
+    this.mailService.startAlarm(memberId);
+  }
+
   @Get('call/:memberId')
-  triggerAlarmObs(@Param('memberId') memberId: number) {
+  triggerAlarm(@Param('memberId') memberId: number) {
     this.eventEmitter.emit('sendAlarm', memberId);
   }
 
