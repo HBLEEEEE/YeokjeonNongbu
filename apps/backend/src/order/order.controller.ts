@@ -3,9 +3,11 @@ import { OrderService } from './order.service';
 import { OrderBookService } from './orderBook.service';
 import DtoTransformer from './utils/dtoTransformer';
 import { LimitOrderDto } from './dto/limitOrder.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MatchingService } from './matching.service';
 import { successhandler, successMessage } from '../global/successhandler';
+import { orderResponseDecorator } from './decorator/order.decorator';
+import { transactionResponseDecorator } from './decorator/getTransactions.decorator';
 
 @Controller('api/order')
 export class OrderController {
@@ -17,6 +19,7 @@ export class OrderController {
 
   @Post('buy/limit')
   @ApiOperation({ summary: '구매 주문 생성' })
+  @orderResponseDecorator()
   async createBuyOrder(@Body() limitOrderDto: LimitOrderDto) {
     const orderDto = DtoTransformer.toOrderDto(limitOrderDto);
     await this.orderService.saveOrder(orderDto);
@@ -26,6 +29,7 @@ export class OrderController {
 
   @Post('sell/limit')
   @ApiOperation({ summary: '판매 주문 생성' })
+  @orderResponseDecorator()
   async createSellOrder(@Body() limitOrderDto: LimitOrderDto) {
     const orderDto = DtoTransformer.toOrderDto(limitOrderDto);
     await this.orderService.saveOrder(orderDto);
@@ -35,6 +39,7 @@ export class OrderController {
 
   @Get('')
   @ApiOperation({ summary: '각 회원 체결 내역 조회' })
+  @transactionResponseDecorator()
   async getTransactionsByMemberId(@Query('memberId') memberId: number) {
     const transactions = await this.orderBookService.getTransactionsByMemberId(memberId);
     return successhandler(successMessage.GET_TRANSACTION_SUCCESS, transactions);
@@ -42,6 +47,7 @@ export class OrderController {
 
   @Post('cancel')
   @ApiOperation({ summary: '주문 취소' })
+  @ApiResponse({ status: 200, description: '주문 취소 성공' })
   async cancelOrder(
     @Body()
     { cropId, orderId, orderType }: { cropId: number; orderId: number; orderType: 'buy' | 'sell' }

@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LottoModule } from './lotto/lotto.module';
 import { RankModule } from './rank/rank.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     LottoModule,
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
-    RankModule
+    RankModule,
+    AccountModule
   ],
   controllers: [],
   providers: []
