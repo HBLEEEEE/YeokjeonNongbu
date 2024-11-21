@@ -5,8 +5,11 @@ import SignUpModal from '@/components/SignUpModal';
 import CloseIcon from '@/components/CloseIcon';
 import BackIcon from '@/components/BackIcon';
 import { ModalStep } from '@/constants/ModalConstants';
+import { isLoggedIn } from '@/services/AuthApi';
+import { useNavigate } from 'react-router-dom';
 
 const Intro: React.FC = () => {
+  const navigate = useNavigate();
   const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
   const [skipAnimations, setSkipAnimations] = useState<boolean>(false);
   const [modalStep, setModalStep] = useState<ModalStep>(ModalStep.None);
@@ -17,6 +20,7 @@ const Intro: React.FC = () => {
   };
 
   useEffect(() => {
+    if (isLoggedIn()) navigate('/main');
     const timer = setTimeout(() => setIsButtonVisible(true), 4000);
     return () => clearTimeout(timer);
   }, []);

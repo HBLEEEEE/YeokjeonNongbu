@@ -6,11 +6,8 @@ import tailwindcss from 'tailwindcss';
 export default defineConfig({
   plugins: [react()],
   server: {
-    hmr: {
-      protocol: 'wss',
-      host: 'yeokjeonnongbu.shop',
-      port: 3000
-    },
+    host: true,
+    port: 3000,
     cors: true
   },
   resolve: {
