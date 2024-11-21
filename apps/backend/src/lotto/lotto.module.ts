@@ -8,7 +8,7 @@ import { LottoService } from './lotto.service';
   imports: [
     DatabaseModule,
     JwtModule.register({
-      secret: 'jwt',
+      secret: 'web13',
       signOptions: { expiresIn: '1h' }
     })
   ],
