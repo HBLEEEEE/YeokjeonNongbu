@@ -1,15 +1,15 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { TokenDecorator } from 'src/global/utils/tokenSwagger';
-import { UpdateIntroduceSuccessResponseDto } from '../dto/updateIntroduce.dto';
+import { UpdateNicknameSuccessResponseDto } from '../dto/updateNickname.dto';
 
-export function updateIntroduceResponseDecorator() {
+export function updateNicknameResponseDecorator() {
   return applyDecorators(
     ApiBearerAuth(),
     ApiResponse({
       status: 200,
-      description: '소개글 수정 성공',
-      type: UpdateIntroduceSuccessResponseDto
+      description: '닉네임 수정 성공',
+      type: UpdateNicknameSuccessResponseDto
     }),
     TokenDecorator()
   );

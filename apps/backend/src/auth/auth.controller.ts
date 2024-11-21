@@ -16,6 +16,7 @@ import { logoutResponseDecorator } from './decorator/logout.decorator';
 import { UpdateIntroduceDto } from './dto/updateIntroduce.dto';
 import { updateIntroduceResponseDecorator } from './decorator/updateIntroduce.decorator';
 import { User } from 'src/global/utils/memberData';
+import { UpdateNicknameDto } from './dto/updateNickname.dto';
 
 @Controller('api/auth')
 export class AuthController {
@@ -87,5 +88,19 @@ export class AuthController {
     const { introduce } = updateIntroduceDto;
     await this.authService.updateIntroduce(memberId, introduce);
     return successhandler(successMessage.INTRODUCE_UPDATE_SUCCESS);
+  }
+
+  @Patch('nickname')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '유저 닉네임 변경 API' })
+  @updateIntroduceResponseDecorator()
+  async updateNickname(
+    @User() user: { memberId: number },
+    @Body() updateNicknameDto: UpdateNicknameDto
+  ) {
+    const { memberId } = user;
+    const { nickname } = updateNicknameDto;
+    await this.authService.updateNickname(memberId, nickname);
+    return successhandler(successMessage.NICKNAME_UPDATE_SUCCESS);
   }
 }
