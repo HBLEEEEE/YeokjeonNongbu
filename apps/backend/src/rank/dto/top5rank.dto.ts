@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class rank5DataDto {
+export class Rank5DataDto {
   @ApiProperty({
     description: '닉네임',
     example: '홍길동'
@@ -14,7 +14,7 @@ export class rank5DataDto {
   score: number;
 }
 
-export class rank5SuccessResponseDto {
+export class Rank5SuccessResponseDto {
   @ApiProperty({
     description: '응답 코드',
     example: 200
@@ -29,7 +29,7 @@ export class rank5SuccessResponseDto {
 
   @ApiProperty({
     description: '응답 데이터',
-    type: [rank5DataDto],
+    type: [Rank5DataDto],
     example: [
       { nickname: '파이썬', score: 50000 },
       { nickname: '자바', score: 40000 },
@@ -38,5 +38,5 @@ export class rank5SuccessResponseDto {
       { nickname: 'C 언어', score: 10000 }
     ]
   })
-  data: rank5DataDto;
+  data: Rank5DataDto;
 }

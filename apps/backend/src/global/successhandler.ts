@@ -16,7 +16,8 @@ export const successMessage = {
   DELETE_MAIL_SUCCESS: { code: 200, message: '메일 삭제를 완료했습니다.' },
   GET_MAIL_ALARM_SUCCESS: { code: 200, message: 'Catch alarm!.' },
   BUY_LOTTO_SUCCESS: { code: 200, message: '로또 구매를 완료했습니다.' },
-  TOP5_RANK_GET_SUCCESS: { code: 200, message: '상위 5명을 조회했습니다.' }
+  GET_TOP5_RANK_SUCCESS: { code: 200, message: '상위 5명을 조회했습니다.' },
+  GET_RANK_SUCCESS: { code: 200, message: '현재 랭킹을 조회했습니다.' }
 };
 
 export function successhandler<T>(success: SuccessMessage, data: Nullable<T> = null) {

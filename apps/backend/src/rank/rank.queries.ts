@@ -1,5 +1,5 @@
 export const rankQueries = {
-  moneyDataQuery: `SELECT 
+  moneyDataQuery: `SELECT
         m.nickname,
         m.total_cash + COALESCE(SUM(mc.quantity * cp.price), 0) AS total_asset
     FROM 
