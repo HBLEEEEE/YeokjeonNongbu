@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { SignUpSuccessResponseDto } from 'src/auth/dto/signUp.dto';
+import { SignUpSuccessResponseDto } from '../dto/signUp.dto';
 
 export function signUpResponseDecorator() {
   return applyDecorators(

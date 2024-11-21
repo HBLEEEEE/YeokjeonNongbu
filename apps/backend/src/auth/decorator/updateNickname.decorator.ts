@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { TokenDecorator } from 'src/global/utils/tokenSwagger';
+import { TokenDecorator } from '../../global/utils/tokenSwagger';
 import { UpdateNicknameSuccessResponseDto } from '../dto/updateNickname.dto';
 
 export function updateNicknameResponseDecorator() {

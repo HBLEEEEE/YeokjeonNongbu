@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from '../database/database.service';
 import { SignUpDto } from './dto/signUp.dto';
 import * as bcrypt from 'bcrypt';
 import { authQueries } from './auth.queries';
@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { GoogleLoginDto } from './dto/googleLogin.dto';
 import { KakaoLoginDto } from './dto/kakaoLogin.dto';
 import { RedisClientType } from 'redis';
-import { Nullable, Optional } from 'src/global/utils/dataCustomType';
+import { Nullable, Optional } from '../global/utils/dataCustomType';
 
 @Injectable()
 export class AuthService {
