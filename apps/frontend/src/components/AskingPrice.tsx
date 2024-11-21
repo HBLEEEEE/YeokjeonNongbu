@@ -36,13 +36,13 @@ interface AskingPriceProps {
 
 const AskingPrice: React.FC<AskingPriceProps> = ({ crop }) => {
   return (
-    <div className="w-full md:text-xs lg:text-xs xl:text-sm">
+    <div className="w-full h-full md:text-xs lg:text-xs xl:text-sm">
       <div className="grid grid-cols-[1fr_1fr_1fr] gap-1 font-semibold bg-gray-800 px-1">
         <div className="text-center">구분</div>
         <div className="text-center">가격</div>
         <div className="text-center">수량</div>
       </div>
-      <div className="md:max-h-20 lg:max-h-24 xl:max-h-28 overflow-y-auto">
+      <div className="md:max-h-16 lg:max-h-26 xl:max-h-28 overflow-y-auto">
         {cropPrices[crop].map(([type, price, qty], idx) => (
           <div key={idx} className="grid grid-cols-[1fr_1fr_1fr] gap-1 py-1 px-1 items-center">
             <div className="text-center">{type}</div>

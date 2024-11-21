@@ -33,7 +33,7 @@ const CropMarket: React.FC = () => {
 
   return (
     <main className="flex flex-row justify-center items-center min-h-screen select-none pt-16 gap-4">
-      <div className="flex flex-col items-center z-[10] gap-4 w-full lg:w-[60%]">
+      <div className="flex flex-col items-start z-[10] gap-4 w-full lg:w-[60%] max-w-[1300px]">
         <div className="w-full flex flex-col justify-start gap-2">
           <CropSelector
             currentCrop={crop}
@@ -48,7 +48,7 @@ const CropMarket: React.FC = () => {
             <Chart timeData={timeData} />
           </div>
         </section>
-        <section className="w-full flex flex-row items-start gap-4 lg:gap-8">
+        <section className="w-full flex flex-row items-start gap-4 lg:gap-8 xl:gap-10 2xl:gap-24">
           <WoodBoard>
             <h3 className="flex justify-center lg:text-sm xl:text-base font-bold mb-2">
               오늘의 {crop} 가격
