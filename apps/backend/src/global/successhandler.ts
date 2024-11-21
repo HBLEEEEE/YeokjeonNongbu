@@ -19,6 +19,8 @@ export const successMessage = {
   CREATE_ORDER_SUCCESS: { code: 201, message: '주문이 성공적으로 생성되었습니다.' },
   DELETE_ORDER_SUCCESS: { code: 201, message: '주문이 성공적으로 삭제되었습니다.' },
   BUY_LOTTO_SUCCESS: { code: 200, message: '로또 구매를 완료했습니다.' },
+  TOP5_RANK_GET_SUCCESS: { code: 200, message: '상위 5명을 조회했습니다.' },
+  GET_ACCOUNT_CASH_SUCCESS: { code: 200, message: '회원 잔고 조회 성공' },
   GET_TOP5_RANK_SUCCESS: { code: 200, message: '상위 5명을 조회했습니다.' },
   GET_RANK_SUCCESS: { code: 200, message: '현재 랭킹을 조회했습니다.' }
 };

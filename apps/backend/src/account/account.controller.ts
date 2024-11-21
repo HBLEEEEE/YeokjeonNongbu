@@ -1,0 +1,18 @@
+import { Controller, Get, Query } from '@nestjs/common';
+import { AccountService } from './account.service';
+import { ApiOperation } from '@nestjs/swagger';
+import { accountCashDecorator } from './decorator/account.decorator';
+import { successhandler, successMessage } from '../global/successhandler';
+
+@Controller('api/account')
+export class AccountController {
+  constructor(private readonly accountService: AccountService) {}
+
+  @Get('cash')
+  @ApiOperation({ summary: '회원의 현금 정보 조회' })
+  @accountCashDecorator()
+  async getCashFromMemberId(@Query('memberId') memberId: number) {
+    const cash = await this.accountService.getCashFromMemberId(memberId);
+    return successhandler(successMessage.GET_ACCOUNT_CASH_SUCCESS, cash);
+  }
+}
