@@ -22,7 +22,7 @@ const CropSelector: React.FC<CropSelectorProps> = ({
   handleIntervalChange
 }) => {
   return (
-    <div className="w-full flex flex-row flex-wrap gap-4 sm:gap-8">
+    <div className="w-full flex flex-row flex-wrap md:gap-1 lg:gap-4 xl:gap-8 2xl:gap-10">
       {crops.map(crop => (
         <button
           key={crop}
@@ -33,7 +33,9 @@ const CropSelector: React.FC<CropSelectorProps> = ({
               : 'border-transparent hover:border-orange-500'
           }`}
         >
-          <span className={`text-sm font-medium ${crop === currentCrop ? 'text-orange-500' : ''}`}>
+          <span
+            className={`md:text-xs lg:text-sm text-sm font-medium ${crop === currentCrop ? 'text-orange-500' : ''}`}
+          >
             {crop}
           </span>
           <img src={`${cropImages[crop]}`} alt={crop} className="w-8 h-8" />
