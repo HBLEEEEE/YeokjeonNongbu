@@ -23,7 +23,7 @@ export class RankController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '현재 랭킹 반환 api' })
   @getRankResponseDecorator()
-  @Get()
+  @Get('now')
   async getRanking(@User() user: { nickname: string }) {
     const { nickname } = user;
     const data = await this.rankService.getRanking(nickname);
