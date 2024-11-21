@@ -27,6 +27,8 @@ export const login = async (data: LoginRequest) => {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
+      localStorage.setItem('nickname', nickname);
+
       return {
         success: true,
         message: response.data.message,
