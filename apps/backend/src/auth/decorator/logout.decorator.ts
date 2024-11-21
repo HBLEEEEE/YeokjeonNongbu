@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { LogoutSuccessResponseDto } from '../dto/logout.dto';
-import { TokenDecorator } from 'src/global/utils/tokenSwagger';
+import { TokenDecorator } from '../../global/utils/tokenSwagger';
 
 export function logoutResponseDecorator() {
   return applyDecorators(

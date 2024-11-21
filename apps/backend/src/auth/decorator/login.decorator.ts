@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { LoginSuccessResponseDto } from 'src/auth/dto/login.dto';
+import { LoginSuccessResponseDto } from '../dto/login.dto';
 
 export function loginResponseDecorator() {
   return applyDecorators(

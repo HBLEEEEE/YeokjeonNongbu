@@ -35,4 +35,16 @@ export class RankService {
     const members = await this.redisClient.zRangeWithScores('ranking', -5, -1);
     return members.reverse();
   }
+
+  async getRanking(nickname: string) {
+    const rank = await this.redisClient.zRevRank('ranking', nickname);
+    if (rank) {
+      return {
+        rank: rank + 1
+      };
+    }
+    return {
+      rank: '해당 유저의 랭킹이 존재 하지 않습니다.'
+    };
+  }
 }
