@@ -8,7 +8,7 @@ export class UpdateIntroduceDto {
   introduce: string;
 }
 
-export class updateIntroduceSuccessResponseDto {
+export class UpdateIntroduceSuccessResponseDto {
   @ApiProperty({
     description: '응답 코드',
     example: 200
@@ -17,7 +17,7 @@ export class updateIntroduceSuccessResponseDto {
 
   @ApiProperty({
     description: '응답 메세지',
-    example: '로그인 되었습니다.'
+    example: '소개글이 변경되었습니다.'
   })
   message: string;
 }

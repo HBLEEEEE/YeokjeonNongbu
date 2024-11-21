@@ -1,21 +1,23 @@
 import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { SignUpDto } from './dto/signUp.dto';
-import { successhandler, successMessage } from 'src/global/successhandler';
+import { Request } from 'express';
 import { ApiOperation } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
-import { signUpResponseDecorator } from './decorator/signUp.decorator';
-import { loginResponseDecorator } from './decorator/login.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from './auth.service';
+import { User } from 'src/global/utils/memberData';
+import { successhandler, successMessage } from 'src/global/successhandler';
+import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
+import { SignUpDto } from './dto/signUp.dto';
+import { LoginDto } from './dto/login.dto';
 import { GoogleLoginDto } from './dto/googleLogin.dto';
 import { KakaoLoginDto } from './dto/kakaoLogin.dto';
-import { oauthResponseDecorator } from './decorator/oauth.decorator';
-import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
-import { Request } from 'express';
-import { logoutResponseDecorator } from './decorator/logout.decorator';
 import { UpdateIntroduceDto } from './dto/updateIntroduce.dto';
+import { UpdateNicknameDto } from './dto/updateNickname.dto';
+import { signUpResponseDecorator } from './decorator/signUp.decorator';
+import { loginResponseDecorator } from './decorator/login.decorator';
+import { oauthResponseDecorator } from './decorator/oauth.decorator';
+import { logoutResponseDecorator } from './decorator/logout.decorator';
 import { updateIntroduceResponseDecorator } from './decorator/updateIntroduce.decorator';
-import { User } from 'src/global/utils/memberData';
+import { updateNicknameResponseDecorator } from './decorator/updateNickname.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -87,5 +89,19 @@ export class AuthController {
     const { introduce } = updateIntroduceDto;
     await this.authService.updateIntroduce(memberId, introduce);
     return successhandler(successMessage.INTRODUCE_UPDATE_SUCCESS);
+  }
+
+  @Patch('nickname')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '유저 닉네임 변경 API' })
+  @updateNicknameResponseDecorator()
+  async updateNickname(
+    @User() user: { memberId: number },
+    @Body() updateNicknameDto: UpdateNicknameDto
+  ) {
+    const { memberId } = user;
+    const { nickname } = updateNicknameDto;
+    await this.authService.updateNickname(memberId, nickname);
+    return successhandler(successMessage.NICKNAME_UPDATE_SUCCESS);
   }
 }

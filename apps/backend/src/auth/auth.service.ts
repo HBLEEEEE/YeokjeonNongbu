@@ -39,7 +39,14 @@ export class AuthService {
       throw new HttpException('닉네임은 2자에서 10자 사이로 입력해주세요.', HttpStatus.BAD_REQUEST);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await this.databaseService.query(authQueries.signUpQuery, [email, hashedPassword, nickname]);
+    const member = await this.databaseService.query(authQueries.signUpQuery, [
+      email,
+      hashedPassword,
+      nickname
+    ]);
+    await this.databaseService.query(authQueries.createLottoColumnQuery, [
+      member.rows[0].member_id
+    ]);
   }
 
   async login(loginDto: LoginDto) {
@@ -62,28 +69,37 @@ export class AuthService {
     if (!isPasswordValid)
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
 
-    return this.generateTokens(member.rows[0].member_id);
+    const nickname = member.rows[0].nickname;
+    const { accessToken, refreshToken } = await this.generateTokens(
+      member.rows[0].member_id,
+      member.rows[0].nickname
+    );
+    return { nickname, accessToken, refreshToken };
   }
 
   private async verifyUser(email: string, nickname: string) {
     const existingUser = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
-    if (existingUser?.rows?.length) return existingUser.rows[0].memberId;
+    if (existingUser?.rows?.length) return existingUser.rows[0];
     const hashedPassword = await bcrypt.hash('default', 10);
     const newMember = await this.databaseService.query(authQueries.signUpQuery, [
       email,
       hashedPassword,
       nickname
     ]);
-    return newMember.rows[0].memberId;
+    return newMember.rows[0];
   }
 
   async SocialLogin(email: string, nickname: string) {
-    const memberId = await this.verifyUser(email, nickname);
-    return this.generateTokens(memberId);
+    const member = await this.verifyUser(email, nickname);
+    const { accessToken, refreshToken } = await this.generateTokens(
+      member.rows[0].member_id,
+      member.rows[0].nickname
+    );
+    return { nickname, accessToken, refreshToken };
   }
 
-  private async generateTokens(memberId: number) {
-    const payload = { memberId };
+  private async generateTokens(memberId: number, nickname: string) {
+    const payload = { memberId, nickname };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     return { accessToken, refreshToken };
@@ -112,6 +128,12 @@ export class AuthService {
   }
 
   async updateIntroduce(memberId: number, introduce: Nullable<string>) {
-    await this.databaseService.query(authQueries.updateMemberQuery, [introduce, memberId]);
+    await this.databaseService.query(authQueries.updateInroduceQuery, [introduce, memberId]);
+  }
+
+  async updateNickname(memberId: number, nickname: Nullable<string>) {
+    if (!nickname || nickname.length < 2 || nickname.length > 10)
+      throw new HttpException('닉네임은 2자에서 10자 사이로 입력해주세요.', HttpStatus.BAD_REQUEST);
+    await this.databaseService.query(authQueries.updateNicknameQuery, [nickname, memberId]);
   }
 }

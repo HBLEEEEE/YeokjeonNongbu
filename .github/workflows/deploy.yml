@@ -55,3 +55,6 @@ jobs:
 
             echo "Running new container..."
             docker run -d --name myapp -p 3000:3000 -p 8080:8080 --env-file /root/src/config/.env ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:latest
+
+            echo "Removing unused Docker images..."
+            docker image prune
