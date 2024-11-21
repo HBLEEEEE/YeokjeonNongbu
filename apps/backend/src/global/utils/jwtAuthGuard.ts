@@ -25,8 +25,8 @@ export class JwtAuthGuard {
         throw new HttpException('만료된 토큰입니다.', HttpStatus.UNAUTHORIZED);
       }
 
-      const { memberId } = decoded;
-      request.user = { memberId };
+      const { memberId, nickname } = decoded;
+      request.user = { memberId, nickname };
       return true;
     } catch {
       throw new HttpException('잘못된 토큰입니다.', HttpStatus.UNAUTHORIZED);

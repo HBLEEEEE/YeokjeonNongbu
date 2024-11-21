@@ -70,7 +70,10 @@ export class AuthService {
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
 
     const nickname = member.rows[0].nickname;
-    const { accessToken, refreshToken } = await this.generateTokens(member.rows[0].member_id);
+    const { accessToken, refreshToken } = await this.generateTokens(
+      member.rows[0].member_id,
+      member.rows[0].nickname
+    );
     return { nickname, accessToken, refreshToken };
   }
 
@@ -88,12 +91,15 @@ export class AuthService {
 
   async SocialLogin(email: string, nickname: string) {
     const member = await this.verifyUser(email, nickname);
-    const { accessToken, refreshToken } = await this.generateTokens(member.rows[0].member_id);
+    const { accessToken, refreshToken } = await this.generateTokens(
+      member.rows[0].member_id,
+      member.rows[0].nickname
+    );
     return { nickname, accessToken, refreshToken };
   }
 
-  private async generateTokens(memberId: number) {
-    const payload = { memberId };
+  private async generateTokens(memberId: number, nickname: string) {
+    const payload = { memberId, nickname };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     return { accessToken, refreshToken };
