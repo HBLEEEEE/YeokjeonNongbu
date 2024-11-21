@@ -6,12 +6,42 @@ import { Alarm } from '@/types/Index';
 
 const Header: React.FC = () => {
   const [alarms, setAlarms] = useState<Alarm[]>([
-    { mailId: 1, content: '당근을 500원에 20개를 매수하셨습니다.', createAt: '2024-11-20T11:16:00.000Z', readStatus: false },
-    { mailId: 2, content: '당근을 500원에 20개를 매수하셨습니다.', createAt: '2024-11-20T11:00:00.000Z', readStatus: false },
-    { mailId: 3, content: '당근을 500원에 20개를 매수하셨습니다.', createAt: '2024-11-20T10:00:00.000Z', readStatus: false },
-    { mailId: 4, content: '당근을 500원에 20개를 매수하셨습니다.', createAt: '2024-11-19T15:00:00.000Z', readStatus: false },
-    { mailId: 5, content: '당근을 500원에 20개를 매수하셨습니다.', createAt: '2024-10-11T15:00:00.000Z', readStatus: false },
-    { mailId: 6, content: '당근을 500원에 20개를 매수하셨습니다.', createAt: '2023-11-11T15:00:00.000Z', readStatus: false },
+    {
+      mailId: 1,
+      content: '당근을 500원에 20개를 매수하셨습니다.',
+      createAt: '2024-11-20T11:16:00.000Z',
+      readStatus: false
+    },
+    {
+      mailId: 2,
+      content: '당근을 500원에 20개를 매수하셨습니다.',
+      createAt: '2024-11-20T11:00:00.000Z',
+      readStatus: false
+    },
+    {
+      mailId: 3,
+      content: '당근을 500원에 20개를 매수하셨습니다.',
+      createAt: '2024-11-20T10:00:00.000Z',
+      readStatus: false
+    },
+    {
+      mailId: 4,
+      content: '당근을 500원에 20개를 매수하셨습니다.',
+      createAt: '2024-11-19T15:00:00.000Z',
+      readStatus: false
+    },
+    {
+      mailId: 5,
+      content: '당근을 500원에 20개를 매수하셨습니다.',
+      createAt: '2024-10-11T15:00:00.000Z',
+      readStatus: false
+    },
+    {
+      mailId: 6,
+      content: '당근을 500원에 20개를 매수하셨습니다.',
+      createAt: '2023-11-11T15:00:00.000Z',
+      readStatus: false
+    }
   ]);
   const [isAlarmOpen, setIsAlarmOpen] = useState<boolean>(false);
   const [isBarOpen, setIsBarOpen] = useState<boolean>(false);

@@ -23,11 +23,11 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, cle
     let interval = Math.floor(seconds / 31536000);
 
     if (interval >= 1) return `${interval} 년 전`;
-    interval = Math.floor(seconds / 2592000); 
+    interval = Math.floor(seconds / 2592000);
     if (interval >= 1) return `${interval} 달 전`;
     interval = Math.floor(seconds / 86400);
     if (interval >= 1) return `${interval} 일 전`;
-    interval = Math.floor(seconds / 3600); 
+    interval = Math.floor(seconds / 3600);
     if (interval >= 1) return `${interval} 시간 전`;
     interval = Math.floor(seconds / 60);
     if (interval >= 1) return `${interval} 분 전`;
@@ -51,8 +51,8 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ alarms, isOpen, closeModal, cle
                 >
                   <img src="/coin.png" alt="coin" className="w-10 h-10 mr-4" />
                   <div className="flex flex-col text-brown-medium text-center text-xs gap-1">
-                    <p className='flex font-semibold'>{alarm.content}</p>
-                    <p className='flex justify-end font-normal'>{timeAgo(alarm.createAt)}</p>
+                    <p className="flex font-semibold">{alarm.content}</p>
+                    <p className="flex justify-end font-normal">{timeAgo(alarm.createAt)}</p>
                   </div>
                 </div>
               ))}
