@@ -62,7 +62,7 @@ export class AuthService {
       );
 
     const member = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
-    if (!member)
+    if (member.rows.length === 0)
       throw new HttpException('이메일 또는 비밀번호가 올바르지 않습니다.', HttpStatus.UNAUTHORIZED);
 
     const isPasswordValid = await bcrypt.compare(password, member.rows[0].password);
