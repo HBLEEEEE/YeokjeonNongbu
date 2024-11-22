@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
 import { login } from '@/services/AuthApi';
+import { useUser } from '@/components/UserContext';
 
 interface LoginProps {
   setModalStep: (step: ModalStep) => void;
@@ -12,6 +13,7 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { setNickname } = useUser();
 
   const handleLogin = async () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -30,6 +32,7 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
       const response = await login({ email, password });
       if (response.success) {
         alert(response.message);
+        setNickname(response.nickname);
         setErrorMessage(null);
         navigate('/main');
       } else {

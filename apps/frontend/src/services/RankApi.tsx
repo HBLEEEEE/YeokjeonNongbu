@@ -3,9 +3,16 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: 'http://yeokjeonnongbu.shop:8080/api/rank',
   headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+    'Content-Type': 'application/json'
   }
+});
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const getTop5 = async () => {
