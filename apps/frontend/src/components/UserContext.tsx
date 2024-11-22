@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface UserContextType {
   nickname: string;
@@ -14,8 +14,19 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [nickname, setNickname] = useState<string>('');
-  const [totalAssets, setTotalAssets] = useState<number>(0);
+  const [nickname, setNickname] = useState<string>(() => {
+    const savedNickname = localStorage.getItem('nickname');
+    return savedNickname || '';
+  });
+  const [totalAssets, setTotalAssets] = useState<number>(() => {
+    const savedTotalAssets = localStorage.getItem('totalAssets');
+    return savedTotalAssets ? parseFloat(savedTotalAssets) : 0;
+  });
+
+  useEffect(() => {
+    if (nickname) localStorage.setItem('nickname', nickname);
+    if (totalAssets !== 0) localStorage.setItem('totalAssets', totalAssets.toString());
+  }, [nickname, totalAssets]);
 
   return (
     <UserContext.Provider value={{ nickname, totalAssets, setNickname, setTotalAssets }}>
