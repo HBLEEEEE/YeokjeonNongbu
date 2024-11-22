@@ -6,10 +6,18 @@ import { OrderRepository } from './order.repository';
 import { DatabaseModule } from '../database/database.module';
 import { MatchingService } from './matching.service';
 import { MarketModule } from '../market/market.module';
+import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
+import { AccountModule } from '../account/account.module';
 
 @Module({
-  providers: [OrderService, OrderBookService, OrderRepository, MatchingService],
+  providers: [
+    OrderService,
+    OrderBookService,
+    OrderRepository,
+    MatchingService,
+    HasSufficientCashGuard
+  ],
   controllers: [OrderController],
-  imports: [DatabaseModule, MarketModule]
+  imports: [DatabaseModule, MarketModule, AccountModule]
 })
 export class OrderModule {}
