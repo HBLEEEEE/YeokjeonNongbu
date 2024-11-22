@@ -2,6 +2,7 @@ import { DatabaseService } from '../database/database.service';
 import { Injectable } from '@nestjs/common';
 import { AccountCashDto } from './dto/accountCash.dto';
 import { OrderType } from '../order/enums/orderType';
+import { AccountCropDto } from './dto/accountCrop.dto';
 
 @Injectable()
 export class AccountRepository {
@@ -9,10 +10,10 @@ export class AccountRepository {
 
   async getCashFromMemberId(memberId: number): Promise<AccountCashDto> {
     const query = `
-      SELECT available_cash, pending_cash, total_cash
-      FROM members
-      WHERE member_id = $1
-    `;
+            SELECT available_cash, pending_cash, total_cash
+            FROM members
+            WHERE member_id = $1
+        `;
 
     const values = [memberId];
 
@@ -35,11 +36,11 @@ export class AccountRepository {
     }
 
     const query = `
-      UPDATE members
-      SET available_cash = available_cash - $1,
-          pending_cash   = pending_cash + $1
-      WHERE member_id = $2
-    `;
+            UPDATE members
+            SET available_cash = available_cash - $1,
+                pending_cash   = pending_cash + $1
+            WHERE member_id = $2
+        `;
 
     const values = [total_price, memberId];
     await this.databaseService.query(query, values);
@@ -53,19 +54,37 @@ export class AccountRepository {
     let query = ``;
     if (orderType === OrderType.BUY) {
       query = `
-        UPDATE members
-        SET pending_cash = pending_cash - $1
-        WHERE member_id = $2
-      `;
+                UPDATE members
+                SET pending_cash = pending_cash - $1
+                WHERE member_id = $2
+            `;
     } else if (orderType === OrderType.SELL) {
       query = `
-        UPDATE members
-        SET available_cash = available_cash + $1
-        WHERE member_id = $2
-      `;
+                UPDATE members
+                SET available_cash = available_cash + $1
+                WHERE member_id = $2
+            `;
     }
 
     const values = [total_price, memberId];
     await this.databaseService.query(query, values);
+  }
+
+  async getCropsByMemberId(memberId: number, cropId: number): Promise<AccountCropDto> {
+    const query = `
+            SELECT crop_id, quantity
+            FROM member_crops
+            WHERE member_id = $1
+              AND crop_id = $2
+        `;
+
+    const values = [memberId, cropId];
+
+    const result = await this.databaseService.query(query, values);
+    return {
+      memberId: memberId,
+      cropId: cropId,
+      quantity: result.rows[0].quantity
+    };
   }
 }
