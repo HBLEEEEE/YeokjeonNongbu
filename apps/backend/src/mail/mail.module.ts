@@ -6,15 +6,10 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailRedisUtil } from './util/mailRedisUtil';
-import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     DatabaseModule,
-    HttpModule.register({
-      timeout: 5000,
-      maxRedirects: 5
-    }),
     EventEmitterModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
