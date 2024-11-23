@@ -70,9 +70,58 @@ export class AccountRepository {
     await this.databaseService.query(query, values);
   }
 
+  async updateCropByPlacingSellOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    const query = `
+            UPDATE member_crops
+            SET available_quantity = available_quantity - $3,
+                pending_quantity   = pending_quantity + $3
+            WHERE member_id = $1
+              AND crop_id = $2
+        `;
+
+    const values = [memberId, cropId, quantity];
+    await this.databaseService.query(query, values);
+  }
+
+  async updateCropByCompletingSellOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    const query = `
+            UPDATE member_crops
+            SET pending_quantity = pending_quantity - $3
+            WHERE member_id = $1
+              AND crop_id = $2
+        `;
+
+    const values = [memberId, cropId, quantity];
+    await this.databaseService.query(query, values);
+  }
+
+  async updateCropByCompletingBuyOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    const query = `
+            INSERT INTO member_crops (member_id, crop_id, available_quantity)
+            VALUES ($1, $2, $3) ON CONFLICT (member_id, crop_id)
+    DO
+            UPDATE SET available_quantity = member_crops.available_quantity + $3;
+        `;
+
+    const values = [memberId, cropId, quantity];
+    await this.databaseService.query(query, values);
+  }
+
   async getCropsByMemberId(memberId: number, cropId: number): Promise<AccountCropDto> {
     const query = `
-            SELECT crop_id, quantity
+            SELECT crop_id, available_quantity
             FROM member_crops
             WHERE member_id = $1
               AND crop_id = $2
@@ -81,10 +130,18 @@ export class AccountRepository {
     const values = [memberId, cropId];
 
     const result = await this.databaseService.query(query, values);
+
+    if (!result || result.rows.length === 0) {
+      return {
+        memberId: memberId,
+        cropId: cropId,
+        quantity: 0
+      };
+    }
     return {
       memberId: memberId,
       cropId: cropId,
-      quantity: result.rows[0].quantity
+      quantity: result.rows[0].available_quantity || 0
     };
   }
 }
