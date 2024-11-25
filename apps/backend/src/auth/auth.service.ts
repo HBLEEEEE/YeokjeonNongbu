@@ -100,7 +100,8 @@ export class AuthService {
       member.member_id,
       member.nickname
     );
-    const redirectUrl = `http://localhost:3000?accessToken=${accessToken}&refreshToken=${refreshToken}&nickname=${nickname}`;
+    const oauthRedirectURL = this.configService.get<string>('OAUTH_CALLBACK_URL');
+    const redirectUrl = `${oauthRedirectURL}?accessToken=${accessToken}&refreshToken=${refreshToken}&nickname=${nickname}`;
     return redirectUrl;
   }
 
