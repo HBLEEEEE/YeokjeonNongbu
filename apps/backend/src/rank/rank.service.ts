@@ -23,12 +23,14 @@ export class RankService {
   async storeMoneyRanking() {
     await this.redisClient.del('ranking');
     const membersMoney = await this.databaseService.query(rankQueries.moneyDataQuery);
+    const pipeline = this.redisClient.multi();
     for (const memberMoney of membersMoney.rows) {
-      await this.redisClient.zAdd('ranking', {
+      pipeline.zAdd('ranking', {
         score: memberMoney.total_asset,
         value: memberMoney.nickname
       });
     }
+    await pipeline.exec();
   }
 
   async getTopRankings() {
@@ -38,13 +40,9 @@ export class RankService {
 
   async getRanking(nickname: string) {
     const rank = await this.redisClient.zRevRank('ranking', nickname);
-    if (rank) {
-      return {
-        rank: rank + 1
-      };
-    }
-    return {
-      rank: '해당 유저의 랭킹이 존재 하지 않습니다.'
-    };
+    const totalmembers = await this.redisClient.zCard('ranking');
+    if (!rank) return { rank: -1, percentage: null };
+    const percentage = ((rank + 1) / totalmembers) * 100;
+    return { rank: rank + 1, percentage: percentage == 0 ? 1 : percentage.toFixed(0) };
   }
 }

@@ -1,23 +1,8 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: 'http://yeokjeonnongbu.shop:8080/api/rank',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
-  return config;
-});
+import { api } from './Api';
 
 export const getTop5 = async () => {
   try {
-    const response = await api.get('/top5');
+    const response = await api.get('rank/top5');
 
     if (response.data.code === 200) {
       const top5 = response.data.data;
@@ -34,11 +19,12 @@ export const getTop5 = async () => {
 
 export const getMyRank = async () => {
   try {
-    const response = await api.get('/now');
+    const response = await api.get('rank/now');
 
     if (response.data.code === 200) {
-      const { rank } = response.data.data;
-      return { success: true, message: response.data.message, rank };
+      const { rank, percentage } = response.data.data;
+
+      return { success: true, message: response.data.message, rank, percentage };
     }
     return { success: false, message: '알 수 없는 오류가 발생했습니다.' };
   } catch (error) {
