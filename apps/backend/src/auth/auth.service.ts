@@ -101,7 +101,7 @@ export class AuthService {
       member.nickname
     );
     const oauthRedirectURL = this.configService.get<string>('OAUTH_CALLBACK_URL');
-    const redirectUrl = `${oauthRedirectURL}?accessToken=${accessToken}&refreshToken=${refreshToken}&nickname=${nickname}`;
+    const redirectUrl = `${oauthRedirectURL}?accessToken=${accessToken}&refreshToken=${refreshToken}&nickname=${member.nickname}`;
     return redirectUrl;
   }
 
