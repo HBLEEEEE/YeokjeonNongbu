@@ -7,6 +7,7 @@ import TransactionTable from '@/components/TransactionTable';
 import Pagination from '@/components/Pagination';
 import EditNicknameModal from '@/components/EditNicknameModal';
 import { ITEMS_PER_PAGE } from '@/constants/TransactionContants';
+import { useUser } from '@/components/UserContext';
 
 const cropImages: Record<string, string> = {
   당근: '/carrot.png',
@@ -109,8 +110,7 @@ const padTransactionsToPageSize = (transactions: Transaction[]): Transaction[] =
 };
 
 const MyPage: React.FC = () => {
-  const amount = 100000000;
-  const [id, setId] = useState<string>('농부왕');
+  const { nickname, totalAssets } = useUser();
   const [isModal, setIsModal] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -126,10 +126,10 @@ const MyPage: React.FC = () => {
   return (
     <main className="flex flex-col justify-start items-center min-h-screen select-none gap-4 pt-28">
       <div className="flex flex-row z-[10] gap-24">
-        <Profile id={id} modalOpen={modalOpen} />
+        <Profile id={nickname} modalOpen={modalOpen} />
         <div
           className="flex justify-center items-center bg-no-repeat bg-contain bg-center w-[300px] h-[280px]"
-          style={{ backgroundImage: `url(${GetFarmImg(amount)})` }}
+          style={{ backgroundImage: `url(${GetFarmImg(totalAssets)})` }}
         />
       </div>
 
@@ -137,7 +137,7 @@ const MyPage: React.FC = () => {
         <div className="flex flex-row items-center bg-light-beige border-4 border-light-pink rounded-2xl p-6 gap-6">
           <div className="text-center">
             <p className="text-xl font-bold">전체 자산</p>
-            <p className="text-xl font-bold">￦ 932,517,456</p>
+            <p className="text-xl font-bold">￦ {totalAssets.toLocaleString()}</p>
           </div>
           <CropList crops={crops} emergencyFund={emergencyFund} />
         </div>
@@ -153,9 +153,7 @@ const MyPage: React.FC = () => {
         </div>
       </div>
 
-      {isModal && (
-        <EditNicknameModal isOpen={isModal} id={id} setId={setId} modalOpen={modalOpen} />
-      )}
+      {isModal && <EditNicknameModal isOpen={isModal} modalOpen={modalOpen} />}
     </main>
   );
 };

@@ -1,12 +1,13 @@
 import LotteryIcon from './LotteryIcon';
-import { WIDTH, HEIGHT } from '@/constants/LotteryConstants';
+import { WIDTH, HEIGHT, WINNINGS } from '@/constants/LotteryConstants';
 
 interface LotteryTicketProps {
   isCanvasVisible: boolean;
   canvasRef: React.RefObject<HTMLCanvasElement>;
+  rank: number;
 }
 
-const LotteryTicket: React.FC<LotteryTicketProps> = ({ isCanvasVisible, canvasRef }) => {
+const LotteryTicket: React.FC<LotteryTicketProps> = ({ isCanvasVisible, canvasRef, rank }) => {
   return (
     <div className="relative flex flex-col items-center justify-center">
       <LotteryIcon>
@@ -24,8 +25,8 @@ const LotteryTicket: React.FC<LotteryTicketProps> = ({ isCanvasVisible, canvasRe
       {isCanvasVisible && (
         <div className="absolute top-[20px] left-[280px] w-[500px] h-[270px]">
           <div className="absolute flex flex-col top-0 left-0 w-full h-full flex items-center justify-center text-2xl font-bold bg-white text-black rounded-lg">
-            <p>성공</p>
-            <p>+ 100,000,000원!</p>
+            <p>{rank === 5 ? '실패!' : '성공!'}</p>
+            {rank !== 5 && <p>+ {WINNINGS[rank][0]}원!</p>}
           </div>
           <canvas
             ref={canvasRef}
