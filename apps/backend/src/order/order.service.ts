@@ -13,7 +13,6 @@ export class OrderService {
     private readonly orderRepository: OrderRepository
   ) {}
 
-  // saveOrder: 주문 유형에 따라 적절한 저장 메서드 호출
   async saveOrder(orderDto: OrderDto): Promise<number[]> {
     switch (orderDto.tradingType) {
       case 'limit':
@@ -25,7 +24,6 @@ export class OrderService {
     }
   }
 
-  // 지정가 주문 저장 로직
   private async saveLimitOrder(orderDto: OrderDto): Promise<number[]> {
     const [orderId, memberId] = await this.orderRepository.saveOrder(orderDto);
     await this.saveOrderToOrderBook(orderDto, orderId, memberId);
@@ -33,7 +31,6 @@ export class OrderService {
     return [orderId, memberId];
   }
 
-  // 시장가 주문 저장 로직
   private async saveMarketOrder(orderDto: OrderDto): Promise<number[]> {
     const [orderId, memberId] = await this.orderRepository.saveOrder(orderDto);
     await this.saveOrderToOrderBook(orderDto, orderId, memberId);
@@ -49,7 +46,6 @@ export class OrderService {
     await this.orderBookService.addOrder(orderBookDto);
   }
 
-  // 거래 저장
   async saveTransaction(
     order: OrderBookDto,
     price: number,
@@ -63,7 +59,7 @@ export class OrderService {
     orderId: number,
     status: OrderStatus,
     filledQuantity: number,
-    unfilledQuantity: number,
+    unfilledQuantity: number | null,
     tradingType: TradingType
   ): Promise<void> {
     await this.orderRepository.updateOrder(

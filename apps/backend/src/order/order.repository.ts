@@ -9,7 +9,6 @@ import { TransactionDto } from './dto/transaction.dto';
 export class OrderRepository {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  // 주문 저장: 주문 유형에 따라 분기 처리
   async saveOrder(order: OrderDto): Promise<number[]> {
     switch (order.tradingType) {
       case 'limit':
@@ -21,7 +20,6 @@ export class OrderRepository {
     }
   }
 
-  // 지정가 주문 저장
   private async saveLimitOrder(order: OrderDto): Promise<number[]> {
     const query = `
             INSERT INTO orders (crop_id,
@@ -54,7 +52,6 @@ export class OrderRepository {
     return [result.rows[0].order_id, result.rows[0].member_id];
   }
 
-  // 시장가 주문 저장
   private async saveMarketOrder(order: OrderDto): Promise<number[]> {
     const query = `
             INSERT INTO orders (crop_id,
@@ -89,7 +86,6 @@ export class OrderRepository {
     return [result.rows[0].order_id, result.rows[0].member_id];
   }
 
-  // 주문 업데이트
   async updateOrder(
     orderId: number,
     status: OrderStatus,
@@ -100,28 +96,27 @@ export class OrderRepository {
     const query =
       tradingType === TradingType.MARKET
         ? `
-                        UPDATE orders
-                        SET status          = $1,
-                            filled_quantity = $2
-                        WHERE order_id = $3
-                `
+                  UPDATE orders
+                  SET status          = $1,
+                      filled_quantity = $2
+                  WHERE order_id = $3
+          `
         : `
-                        UPDATE orders
-                        SET status            = $1,
-                            filled_quantity   = $2,
-                            unfilled_quantity = $3
-                        WHERE order_id = $4
-                `;
+                  UPDATE orders
+                  SET status            = $1,
+                      filled_quantity   = $2,
+                      unfilled_quantity = $3
+                  WHERE order_id = $4
+          `;
 
     const values =
       tradingType === TradingType.MARKET
-        ? [status, filledQuantity, orderId] // 시장가 주문
-        : [status, filledQuantity, unfilledQuantity, orderId]; // 지정가 주문
+        ? [status, filledQuantity, orderId]
+        : [status, filledQuantity, unfilledQuantity, orderId];
 
     await this.databaseService.query(query, values);
   }
 
-  // 트랜잭션 저장
   async saveTransaction(
     order: OrderBookDto,
     price: number,

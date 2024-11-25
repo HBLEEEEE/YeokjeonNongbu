@@ -13,7 +13,6 @@ export class OrderBookService {
   ) {}
 
   async addOrder(order: OrderBookDto): Promise<void> {
-    // tradingType 추가하여 Redis 키 생성
     const orderKey = `orderBook:${order.cropId}:${order.orderType}:${order.tradingType}`;
 
     const score =
@@ -31,9 +30,8 @@ export class OrderBookService {
     orderType: OrderType,
     orderId: number,
     filledQuantity: number,
-    tradingType: TradingType // TradingType 추가
+    tradingType: TradingType
   ): Promise<void> {
-    // Redis 해당 주문 조회
     const orders = await this.getOrdersFromRedis(cropId, orderType, tradingType);
     const targetOrder = orders.find(order => order.orderId === orderId);
 
@@ -41,23 +39,29 @@ export class OrderBookService {
       throw new Error(`주문번호 ${orderId}는 존재하지 않습니다.`);
     }
 
-    // 시장가와 지정가 처리 분기
     if (tradingType === TradingType.LIMIT) {
-      // 지정가 주문: unfilledQuantity 감소
-      targetOrder.unfilledQuantity = (targetOrder.unfilledQuantity || 0) - filledQuantity;
+      targetOrder.unfilledQuantity = Math.max(
+        (targetOrder.unfilledQuantity || 0) - filledQuantity,
+        0
+      );
+      // 미체결 수량이 0인 경우 Redis 삭제
+      if (targetOrder.unfilledQuantity === 0) {
+        await this.removeOrder(cropId, orderId, orderType, tradingType);
+      } else {
+        await this.addOrder(targetOrder);
+      }
     } else if (tradingType === TradingType.MARKET) {
-      // 시장가 주문: quantity 감소
-      targetOrder.quantity = (targetOrder.quantity || 0) - filledQuantity;
+      if (orderType === OrderType.BUY) {
+        targetOrder.totalAmount = Math.max(
+          (targetOrder.totalAmount || 0) - filledQuantity * targetOrder.price!,
+          0
+        );
+      } else if (orderType === OrderType.SELL) {
+        targetOrder.quantity = Math.max((targetOrder.quantity || 0) - filledQuantity, 0);
+      }
     }
 
-    // Redis 기존 주문 삭제
-    await this.removeOrder(cropId, orderId, orderType, tradingType);
-
-    // 주문의 남은 수량이 있으면 다시 추가
-    const remainingQuantity =
-      tradingType === TradingType.LIMIT ? targetOrder.unfilledQuantity : targetOrder.quantity;
-
-    if ((remainingQuantity || 0) > 0) {
+    if (tradingType === TradingType.LIMIT && (targetOrder.unfilledQuantity || 0) > 0) {
       await this.addOrder(targetOrder);
     }
   }
@@ -84,13 +88,13 @@ export class OrderBookService {
   async getBuyOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {
     const limitOrders = await this.getOrdersFromRedis(cropId, OrderType.BUY, TradingType.LIMIT);
     const marketOrders = await this.getOrdersFromRedis(cropId, OrderType.BUY, TradingType.MARKET);
-    return [...marketOrders, ...limitOrders]; // 시장가 주문을 우선 처리
+    return [...marketOrders, ...limitOrders];
   }
 
   async getSellOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {
     const limitOrders = await this.getOrdersFromRedis(cropId, OrderType.SELL, TradingType.LIMIT);
     const marketOrders = await this.getOrdersFromRedis(cropId, OrderType.SELL, TradingType.MARKET);
-    return [...marketOrders, ...limitOrders]; // 시장가 주문을 우선 처리
+    return [...marketOrders, ...limitOrders];
   }
 
   private async getOrdersFromRedis(
@@ -116,7 +120,7 @@ export class OrderBookService {
     const parsedOrder = JSON.parse(orderData) as OrderBookDto;
     return {
       ...parsedOrder,
-      time: new Date(parsedOrder.time) // 문자열을 Date 객체로 변환
+      time: new Date(parsedOrder.time)
     };
   }
 }

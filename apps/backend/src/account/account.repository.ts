@@ -151,7 +151,8 @@ export class AccountRepository {
     }
     const query = `
             UPDATE member_crops
-            SET pending_quantity = GREATEST(pending_quantity - $1, 0)
+            SET pending_quantity   = GREATEST(pending_quantity - $1, 0),
+                available_quantity = available_quantity + $1
             WHERE member_id = $2
               AND crop_id = $3
         `;
