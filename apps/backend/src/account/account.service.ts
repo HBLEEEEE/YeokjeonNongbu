@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AccountRepository } from './account.repository';
 import { AccountCashDto } from './dto/accountCash.dto';
 import { OrderType } from '../order/enums/orderType';
+import { AccountCropDto } from './dto/accountCrop.dto';
 
 @Injectable()
 export class AccountService {
@@ -29,5 +30,33 @@ export class AccountService {
       memberId,
       total_price
     );
+  }
+
+  async updateCropByPlacingSellOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    return await this.accountRepository.updateCropByPlacingSellOrder(memberId, cropId, quantity);
+  }
+
+  async updateCropByCompletingSellOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    return await this.accountRepository.updateCropByCompletingSellOrder(memberId, cropId, quantity);
+  }
+
+  async updateCropByCompletingBuyOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    return await this.accountRepository.updateCropByCompletingBuyOrder(memberId, cropId, quantity);
+  }
+
+  async getCropFromMemberId(memberId: number, cropId: number): Promise<AccountCropDto> {
+    return await this.accountRepository.getCropsByMemberId(memberId, cropId);
   }
 }

@@ -10,6 +10,7 @@ import { orderResponseDecorator } from './decorator/order.decorator';
 import { transactionResponseDecorator } from './decorator/getTransactions.decorator';
 import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
 import { AccountService } from '../account/account.service';
+import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard';
 
 @Controller('api/order')
 export class OrderController {
@@ -32,18 +33,25 @@ export class OrderController {
       limitOrderDto.quantity * limitOrderDto.price,
       limitOrderDto.orderType
     );
+
     await this.machineService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
   //TODO 판매 주문 생성시 보유 작물 수량 체크하고 pending 상태 구현
   @Post('sell/limit')
-  @UseGuards(HasSufficientCashGuard)
+  @UseGuards(HasSufficientCropGuard)
   @ApiOperation({ summary: '판매 주문 생성' })
   @orderResponseDecorator()
   async createSellOrder(@Body() limitOrderDto: LimitOrderDto) {
     const orderDto = DtoTransformer.toOrderDto(limitOrderDto);
     await this.orderService.saveOrder(orderDto);
+    await this.accountService.updateCropByPlacingSellOrder(
+      limitOrderDto.memberId,
+      limitOrderDto.cropId,
+      limitOrderDto.quantity
+    );
+
     await this.machineService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }

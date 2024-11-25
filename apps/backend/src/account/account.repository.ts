@@ -2,6 +2,7 @@ import { DatabaseService } from '../database/database.service';
 import { Injectable } from '@nestjs/common';
 import { AccountCashDto } from './dto/accountCash.dto';
 import { OrderType } from '../order/enums/orderType';
+import { AccountCropDto } from './dto/accountCrop.dto';
 
 @Injectable()
 export class AccountRepository {
@@ -9,10 +10,10 @@ export class AccountRepository {
 
   async getCashFromMemberId(memberId: number): Promise<AccountCashDto> {
     const query = `
-      SELECT available_cash, pending_cash, total_cash
-      FROM members
-      WHERE member_id = $1
-    `;
+            SELECT available_cash, pending_cash, total_cash
+            FROM members
+            WHERE member_id = $1
+        `;
 
     const values = [memberId];
 
@@ -35,11 +36,11 @@ export class AccountRepository {
     }
 
     const query = `
-      UPDATE members
-      SET available_cash = available_cash - $1,
-          pending_cash   = pending_cash + $1
-      WHERE member_id = $2
-    `;
+            UPDATE members
+            SET available_cash = available_cash - $1,
+                pending_cash   = pending_cash + $1
+            WHERE member_id = $2
+        `;
 
     const values = [total_price, memberId];
     await this.databaseService.query(query, values);
@@ -53,19 +54,94 @@ export class AccountRepository {
     let query = ``;
     if (orderType === OrderType.BUY) {
       query = `
-        UPDATE members
-        SET pending_cash = pending_cash - $1
-        WHERE member_id = $2
-      `;
+                UPDATE members
+                SET pending_cash = pending_cash - $1
+                WHERE member_id = $2
+            `;
     } else if (orderType === OrderType.SELL) {
       query = `
-        UPDATE members
-        SET available_cash = available_cash + $1
-        WHERE member_id = $2
-      `;
+                UPDATE members
+                SET available_cash = available_cash + $1
+                WHERE member_id = $2
+            `;
     }
 
     const values = [total_price, memberId];
     await this.databaseService.query(query, values);
+  }
+
+  async updateCropByPlacingSellOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    const query = `
+            UPDATE member_crops
+            SET available_quantity = available_quantity - $3,
+                pending_quantity   = pending_quantity + $3
+            WHERE member_id = $1
+              AND crop_id = $2
+        `;
+
+    const values = [memberId, cropId, quantity];
+    await this.databaseService.query(query, values);
+  }
+
+  async updateCropByCompletingSellOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    const query = `
+            UPDATE member_crops
+            SET pending_quantity = pending_quantity - $3
+            WHERE member_id = $1
+              AND crop_id = $2
+        `;
+
+    const values = [memberId, cropId, quantity];
+    await this.databaseService.query(query, values);
+  }
+
+  async updateCropByCompletingBuyOrder(
+    memberId: number,
+    cropId: number,
+    quantity: number
+  ): Promise<void> {
+    const query = `
+            INSERT INTO member_crops (member_id, crop_id, available_quantity)
+            VALUES ($1, $2, $3) ON CONFLICT (member_id, crop_id)
+    DO
+            UPDATE SET available_quantity = member_crops.available_quantity + $3;
+        `;
+
+    const values = [memberId, cropId, quantity];
+    await this.databaseService.query(query, values);
+  }
+
+  async getCropsByMemberId(memberId: number, cropId: number): Promise<AccountCropDto> {
+    const query = `
+            SELECT crop_id, available_quantity
+            FROM member_crops
+            WHERE member_id = $1
+              AND crop_id = $2
+        `;
+
+    const values = [memberId, cropId];
+
+    const result = await this.databaseService.query(query, values);
+
+    if (!result || result.rows.length === 0) {
+      return {
+        memberId: memberId,
+        cropId: cropId,
+        quantity: 0
+      };
+    }
+    return {
+      memberId: memberId,
+      cropId: cropId,
+      quantity: result.rows[0].available_quantity || 0
+    };
   }
 }

@@ -35,9 +35,10 @@ export class MatchingService {
       // 1. 주문 DB 업데이트 v
       // 2. 체결 트랜잭션 DB 생성 및 저장 v
       // 3. 회원 DB 현금 업데이트 v
-      // 4. 레디스 오더북 수정 v
-      // 5. 현재 가격 업데이트 (레디스) v
-      // 6. 체결 이벤트 발생
+      // 4. 회원 DB 작물 업데이트 v
+      // 5. 레디스 오더북 수정 v
+      // 6. 현재 가격 업데이트 (레디스) v
+      // 7. 체결 이벤트 발생
       // 이후 트랜잭션 적용 및 분리 예정
 
       // 1. 주문 DB 업데이트
@@ -77,17 +78,31 @@ export class MatchingService {
       await this.orderService.saveTransaction(sellOrder, buyOrder.price, matchedQuantity);
       await this.orderService.saveTransaction(buyOrder, buyOrder.price, matchedQuantity);
 
-      // 3. 회원 DB 현금 업데이트
+      // 3-1. 판매 회원 DB 현금 업데이트
       await this.accountService.updateCashByCompletingOrder(
         sellOrder.memberId,
         sellOrder.price * matchedQuantity,
         OrderType.SELL
       );
-
+      // 3-2 구매 회원 DB 현금 업데이트
       await this.accountService.updateCashByCompletingOrder(
         buyOrder.memberId,
         buyOrder.price * matchedQuantity,
         OrderType.BUY
+      );
+
+      // 4-1. 판매 회원 DB 작물 업데이트
+      await this.accountService.updateCropByCompletingSellOrder(
+        sellOrder.memberId,
+        cropId,
+        matchedQuantity
+      );
+
+      // 4-2. 구매 회원 DB 작물 업데이트
+      await this.accountService.updateCropByCompletingBuyOrder(
+        sellOrder.memberId,
+        cropId,
+        matchedQuantity
       );
 
       // 4. 레디스 오더북 수정

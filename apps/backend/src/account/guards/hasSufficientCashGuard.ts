@@ -12,10 +12,10 @@ export class HasSufficientCashGuard implements CanActivate {
     let hasEnoughCash = false;
     // 지정가 주문 확인
     if (tradingType === 'limit') {
-      hasEnoughCash = await this.canLimitOrder(price, memberId, quantity);
+      hasEnoughCash = await this.canLimitBuyOrder(price, memberId, quantity);
     } else if (tradingType === 'market') {
       // TODO : 시장가 주문 기능 보안 예정
-      hasEnoughCash = await this.canMarketOrder(price, memberId);
+      hasEnoughCash = await this.canMarketBuyOrder(price, memberId);
     }
 
     if (!hasEnoughCash) {
@@ -25,14 +25,14 @@ export class HasSufficientCashGuard implements CanActivate {
     return true;
   }
 
-  async canLimitOrder(price: number, memberId: number, quantity: number): Promise<boolean> {
+  async canLimitBuyOrder(price: number, memberId: number, quantity: number): Promise<boolean> {
     const total_price = price * quantity;
     const memberCash = await this.accountService.getCashFromMemberId(memberId);
     const availableCash = memberCash.availableCash;
     return availableCash >= total_price;
   }
 
-  async canMarketOrder(total_price: number, memberId: number): Promise<boolean> {
+  async canMarketBuyOrder(total_price: number, memberId: number): Promise<boolean> {
     const memberCash = await this.accountService.getCashFromMemberId(memberId);
     const availableCash = memberCash.availableCash;
     return availableCash >= total_price;

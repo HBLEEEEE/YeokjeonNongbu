@@ -8,6 +8,7 @@ import { MatchingService } from './matching.service';
 import { MarketModule } from '../market/market.module';
 import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
 import { AccountModule } from '../account/account.module';
+import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard';
 
 @Module({
   providers: [
@@ -15,7 +16,8 @@ import { AccountModule } from '../account/account.module';
     OrderBookService,
     OrderRepository,
     MatchingService,
-    HasSufficientCashGuard
+    HasSufficientCashGuard,
+    HasSufficientCropGuard
   ],
   controllers: [OrderController],
   imports: [DatabaseModule, MarketModule, AccountModule]

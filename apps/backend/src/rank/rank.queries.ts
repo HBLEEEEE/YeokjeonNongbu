@@ -1,7 +1,7 @@
 export const rankQueries = {
   moneyDataQuery: `SELECT
         m.nickname,
-        m.total_cash + COALESCE(SUM(mc.quantity * cp.price), 0) AS total_asset
+        m.total_cash + COALESCE(SUM((mc.available_quantity + pending_quantity) * cp.price), 0) AS total_asset
     FROM 
         members m
     LEFT JOIN 
