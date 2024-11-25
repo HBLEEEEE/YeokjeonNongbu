@@ -37,8 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ path, children }) => {
 
 const routes = [
   { path: '/', element: <Intro /> },
-  { path: 'auth/kakao/redirect', element: <OauthLogin platform="kakao" /> },
-  { path: 'auth/google/redirect', element: <OauthLogin platform="google" /> },
+  { path: 'oauth/redirect', element: <OauthLogin /> },
   ...[
     { path: '/main', element: <PrivateRoute element={<Main />} /> },
     { path: '/lottery', element: <PrivateRoute element={<Lottery />} /> },

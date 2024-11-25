@@ -1,7 +1,6 @@
 import { AxiosError } from 'axios';
 import { Login, SignUp, Introduce, Nickname } from '@/types/Index';
 import { api } from './Api';
-import { Platform } from '@/types/Index';
 
 export const login = async (data: Login) => {
   try {
@@ -86,21 +85,6 @@ export const logout = async () => {
     }
 
     return { success: false, message: '로그아웃 중 오류가 발생했습니다.' };
-  }
-};
-
-export const oauthRedirection = async (platform: Platform) => {
-  try {
-    const response = await api.get(`auth/${platform}/redirect`);
-
-    if (response.data.success) {
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-    }
-
-    return { success: false, message: response.data.message };
-  } catch {
-    return { success: false, message: '소셜 리다이렉트 처리 중 오류가 발생했습니다.' };
   }
 };
 

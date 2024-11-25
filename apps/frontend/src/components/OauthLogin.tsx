@@ -1,46 +1,33 @@
-// import { oauthRedirection } from '@/services/AuthApi';
-// import { useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-import { Platform } from '@/types/Index';
+import { useEffect } from 'react';
+import { useUser } from './UserContext';
 
-interface OauthLoginProps {
-  platform: Platform;
-}
+const OauthLogin: React.FC = () => {
+  const { setNickname } = useUser();
 
-const OauthLogin: React.FC<OauthLoginProps> = ({ platform }) => {
-  //   const navigate = useNavigate();
+  useEffect(() => {
+    const handleCallback = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const nickname = urlParams.get('nickname');
+      const accessToken = urlParams.get('accessToken');
+      const refreshToken = urlParams.get('refreshToken');
 
-  // useEffect(() => {
-  //     const handleRedirect = async () => {
-  //         try {
-  //             const response = await oauthRedirection(platform);
+      if (accessToken && refreshToken && nickname) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        setNickname(nickname);
 
-  //             if (response.success) {
-  //                 alert(response.message);
-  //                 navigate('/main');
-  //             } else {
-  //                 alert(response.message || '로그인 중 오류가 발생했습니다.');
-  //                 navigate('/');
-  //             }
-  //         } catch (error) {
-  //             if (error instanceof Error) {
-  //                 alert(error.message || '서버와의 연결에 실패했습니다.');
-  //             } else {
-  //                 alert('서버와의 연결에 실패했습니다.');
-  //                 navigate('/');
-  //             }
-  //         }
-  //     };
+        setTimeout(() => {
+          window.location.href = '/main';
+        }, 100);
+      }
+    };
 
-  //     handleRedirect();
-  // }, [navigate]);
+    if (window.location.search.includes('accessToken=')) {
+      handleCallback();
+    }
+  }, []);
 
-  return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>{platform} 로그인 처리 중...</h1>
-      <p>잠시만 기다려 주세요.</p>
-    </div>
-  );
+  return <></>;
 };
 
 export default OauthLogin;
