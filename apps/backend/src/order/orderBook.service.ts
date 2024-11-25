@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RedisClientType } from 'redis';
 import { OrderBookDto } from './dto/orderBook.dto';
-import { OrderType } from './enums/orderType';
+import { OrderType, TradingType } from './enums/orderType';
 import { OrderRepository } from './order.repository';
 import { TransactionDto } from './dto/transaction.dto';
 
@@ -13,42 +13,67 @@ export class OrderBookService {
   ) {}
 
   async addOrder(order: OrderBookDto): Promise<void> {
-    const orderKey = `orderBook:${order.cropId}:${order.orderType}`;
+    // tradingType 추가하여 Redis 키 생성
+    const orderKey = `orderBook:${order.cropId}:${order.orderType}:${order.tradingType}`;
+
+    const score =
+      order.tradingType === 'market'
+        ? order.orderType === OrderType.BUY
+          ? Infinity // 시장가 매수: 높은 우선순위
+          : 0 // 시장가 매도: 낮은 우선순위
+        : (order.price ?? 0); // 지정가 주문: 가격을 점수로 설정
     const orderData = this.serializeOrder(order);
-    await this.redisClient.zAdd(orderKey, { score: order.price, value: orderData });
+    await this.redisClient.zAdd(orderKey, { score, value: orderData });
   }
 
   async updateOrder(
     cropId: number,
     orderType: OrderType,
     orderId: number,
-    filledQuantity: number
+    filledQuantity: number,
+    tradingType: TradingType // TradingType 추가
   ): Promise<void> {
-    const orders =
-      orderType === OrderType.BUY
-        ? await this.getBuyOrdersFromRedis(cropId)
-        : await this.getSellOrdersFromRedis(cropId);
+    // Redis 해당 주문 조회
+    const orders = await this.getOrdersFromRedis(cropId, orderType, tradingType);
     const targetOrder = orders.find(order => order.orderId === orderId);
 
     if (!targetOrder) {
       throw new Error(`주문번호 ${orderId}는 존재하지 않습니다.`);
     }
 
-    targetOrder.unfilledQuantity -= filledQuantity;
-    await this.removeOrder(cropId, orderId, orderType);
+    // 시장가와 지정가 처리 분기
+    if (tradingType === TradingType.LIMIT) {
+      // 지정가 주문: unfilledQuantity 감소
+      targetOrder.unfilledQuantity = (targetOrder.unfilledQuantity || 0) - filledQuantity;
+    } else if (tradingType === TradingType.MARKET) {
+      // 시장가 주문: quantity 감소
+      targetOrder.quantity = (targetOrder.quantity || 0) - filledQuantity;
+    }
 
-    if (targetOrder.unfilledQuantity > 0) {
+    // Redis 기존 주문 삭제
+    await this.removeOrder(cropId, orderId, orderType, tradingType);
+
+    // 주문의 남은 수량이 있으면 다시 추가
+    const remainingQuantity =
+      tradingType === TradingType.LIMIT ? targetOrder.unfilledQuantity : targetOrder.quantity;
+
+    if ((remainingQuantity || 0) > 0) {
       await this.addOrder(targetOrder);
     }
   }
 
-  async removeOrder(cropId: number, orderId: number, orderType: 'buy' | 'sell'): Promise<void> {
-    const orderKey = `orderBook:${cropId}:${orderType}`;
+  async removeOrder(
+    cropId: number,
+    orderId: number,
+    orderType: OrderType,
+    tradingType: TradingType
+  ): Promise<void> {
+    const orderKey = `orderBook:${cropId}:${orderType}:${tradingType}`;
     const orders = await this.redisClient.zRange(orderKey, 0, -1);
 
-    const orderToRemove = orders.find(order => this.deserializeOrder(order).orderId === orderId);
-    if (orderToRemove) {
-      await this.redisClient.zRem(orderKey, orderToRemove);
+    const targetOrder = orders.find(order => this.deserializeOrder(order).orderId === orderId);
+    if (targetOrder) {
+      await this.redisClient.zRem(orderKey, targetOrder);
     }
   }
 
@@ -57,15 +82,29 @@ export class OrderBookService {
   }
 
   async getBuyOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {
-    const orderKey = `orderBook:${cropId}:buy`;
-    const orders = await this.redisClient.zRange(orderKey, 0, -1);
-    return orders.map((order: string) => this.deserializeOrder(order));
+    const limitOrders = await this.getOrdersFromRedis(cropId, OrderType.BUY, TradingType.LIMIT);
+    const marketOrders = await this.getOrdersFromRedis(cropId, OrderType.BUY, TradingType.MARKET);
+    return [...marketOrders, ...limitOrders]; // 시장가 주문을 우선 처리
   }
 
   async getSellOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {
-    const orderKey = `orderBook:${cropId}:sell`;
+    const limitOrders = await this.getOrdersFromRedis(cropId, OrderType.SELL, TradingType.LIMIT);
+    const marketOrders = await this.getOrdersFromRedis(cropId, OrderType.SELL, TradingType.MARKET);
+    return [...marketOrders, ...limitOrders]; // 시장가 주문을 우선 처리
+  }
+
+  private async getOrdersFromRedis(
+    cropId: number,
+    orderType: OrderType,
+    tradingType: TradingType
+  ): Promise<OrderBookDto[]> {
+    const orderKey = this.getOrderKey(cropId, orderType, tradingType);
     const orders = await this.redisClient.zRange(orderKey, 0, -1);
-    return orders.map((order: string) => this.deserializeOrder(order));
+    return orders.map(order => this.deserializeOrder(order));
+  }
+
+  private getOrderKey(cropId: number, orderType: OrderType, tradingType: TradingType): string {
+    return `orderBook:${cropId}:${orderType}:${tradingType}`;
   }
 
   private serializeOrder(order: OrderBookDto): string {
@@ -74,6 +113,10 @@ export class OrderBookService {
   }
 
   private deserializeOrder(orderData: string): OrderBookDto {
-    return JSON.parse(orderData) as OrderBookDto;
+    const parsedOrder = JSON.parse(orderData) as OrderBookDto;
+    return {
+      ...parsedOrder,
+      time: new Date(parsedOrder.time) // 문자열을 Date 객체로 변환
+    };
   }
 }

@@ -11,6 +11,8 @@ import { transactionResponseDecorator } from './decorator/getTransactions.decora
 import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
 import { AccountService } from '../account/account.service';
 import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard';
+import { MarketOrderDto } from './dto/marketOrder.dto';
+import { toOrderType, toTradingType } from './enums/orderType';
 
 @Controller('api/order')
 export class OrderController {
@@ -25,34 +27,67 @@ export class OrderController {
   @UseGuards(HasSufficientCashGuard)
   @ApiOperation({ summary: '구매 주문 생성' })
   @orderResponseDecorator()
-  async createBuyOrder(@Body() limitOrderDto: LimitOrderDto) {
-    const orderDto = DtoTransformer.toOrderDto(limitOrderDto);
+  async createLimitBuyOrder(@Body() limitOrderDto: LimitOrderDto) {
+    const orderDto = DtoTransformer.mapToOrderDto(limitOrderDto);
     await this.orderService.saveOrder(orderDto);
     await this.accountService.updateCashByPlacingOrder(
-      limitOrderDto.memberId,
-      limitOrderDto.quantity * limitOrderDto.price,
-      limitOrderDto.orderType
+      orderDto.memberId,
+      orderDto.quantity! * orderDto.price!,
+      orderDto.orderType
     );
 
     await this.machineService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
-  //TODO 판매 주문 생성시 보유 작물 수량 체크하고 pending 상태 구현
   @Post('sell/limit')
   @UseGuards(HasSufficientCropGuard)
   @ApiOperation({ summary: '판매 주문 생성' })
   @orderResponseDecorator()
-  async createSellOrder(@Body() limitOrderDto: LimitOrderDto) {
-    const orderDto = DtoTransformer.toOrderDto(limitOrderDto);
+  async createLimitSellOrder(@Body() limitOrderDto: LimitOrderDto) {
+    const orderDto = DtoTransformer.mapToOrderDto(limitOrderDto);
     await this.orderService.saveOrder(orderDto);
     await this.accountService.updateCropByPlacingSellOrder(
-      limitOrderDto.memberId,
-      limitOrderDto.cropId,
-      limitOrderDto.quantity
+      orderDto.memberId,
+      orderDto.cropId,
+      orderDto.quantity!
     );
 
     await this.machineService.matchOrders(limitOrderDto.cropId);
+    return successhandler(successMessage.CREATE_ORDER_SUCCESS);
+  }
+
+  @Post('buy/market')
+  @UseGuards(HasSufficientCashGuard)
+  @ApiOperation({ summary: '시장가 구매 주문 생성' })
+  @orderResponseDecorator()
+  async createMarketBuyOrder(@Body() marketOrderDto: MarketOrderDto) {
+    const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto);
+    await this.orderService.saveOrder(orderDto);
+    await this.accountService.updateCashByPlacingOrder(
+      orderDto.memberId,
+      orderDto.totalAmount!,
+      orderDto.orderType
+    );
+
+    await this.machineService.matchOrders(marketOrderDto.cropId);
+    return successhandler(successMessage.CREATE_ORDER_SUCCESS);
+  }
+
+  @Post('sell/market')
+  @UseGuards(HasSufficientCropGuard)
+  @ApiOperation({ summary: '시장가 판매 주문 생성' })
+  @orderResponseDecorator()
+  async createMarketSellOrder(@Body() marketOrderDto: MarketOrderDto) {
+    const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto);
+    await this.orderService.saveOrder(orderDto);
+    await this.accountService.updateCropByPlacingSellOrder(
+      orderDto.memberId,
+      orderDto.cropId,
+      orderDto.quantity!
+    );
+
+    await this.machineService.matchOrders(marketOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -69,9 +104,24 @@ export class OrderController {
   @ApiResponse({ status: 200, description: '주문 취소 성공' })
   async cancelOrder(
     @Body()
-    { cropId, orderId, orderType }: { cropId: number; orderId: number; orderType: 'buy' | 'sell' }
+    {
+      cropId,
+      orderId,
+      orderType,
+      tradingType
+    }: {
+      cropId: number;
+      orderId: number;
+      orderType: 'buy' | 'sell';
+      tradingType: 'limit' | 'market';
+    }
   ) {
-    await this.orderBookService.removeOrder(cropId, orderId, orderType);
+    await this.orderBookService.removeOrder(
+      cropId,
+      orderId,
+      toOrderType(orderType),
+      toTradingType(tradingType)
+    );
     return successhandler(successMessage.DELETE_ORDER_SUCCESS);
   }
 }

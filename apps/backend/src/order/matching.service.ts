@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { OrderStatus, OrderType, TradingType } from './enums/orderType';
 import { OrderBookService } from './orderBook.service';
-import { OrderStatus, OrderType } from './enums/orderType';
 import { OrderService } from './order.service';
 import { MarketService } from '../market/market.service';
 import { AccountService } from '../account/account.service';
+import { OrderBookDto } from './dto/orderBook.dto';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MatchingService {
@@ -25,114 +26,221 @@ export class MatchingService {
       const sellOrder = sellOrders[sellIndex];
       const buyOrder = buyOrders[buyIndex];
 
-      if (sellOrder.price > buyOrder.price) {
+      // 1. 시장가 매수 처리
+      if (buyOrder.tradingType === TradingType.MARKET) {
+        if (!sellOrder) {
+          await this.handlePendingRollback(
+            cropId,
+            buyOrder.memberId,
+            buyOrder.unfilledQuantity!,
+            OrderType.BUY
+          );
+          buyIndex++;
+          continue;
+        }
+
+        const availableQuantity = Math.min(
+          sellOrder.unfilledQuantity!,
+          Math.floor(buyOrder.totalAmount! / sellOrder.price!)
+        );
+        const matchedAmount = availableQuantity * sellOrder.price!;
+
+        buyOrder.filledQuantity += availableQuantity;
+        buyOrder.totalAmount! -= matchedAmount;
+        sellOrder.unfilledQuantity! -= availableQuantity;
+
+        await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
+
+        if (sellOrder.unfilledQuantity! <= 0) sellIndex++;
+        if (buyOrder.totalAmount! <= 0 || availableQuantity === 0) {
+          await this.orderBookService.removeOrder(
+            cropId,
+            buyOrder.orderId,
+            OrderType.BUY,
+            TradingType.MARKET
+          );
+          buyIndex++;
+        }
+        continue;
+      }
+
+      // 2. 시장가 매도 처리
+      if (sellOrder.tradingType === TradingType.MARKET) {
+        if (!buyOrder) {
+          await this.handlePendingRollback(
+            cropId,
+            sellOrder.memberId,
+            sellOrder.quantity!,
+            OrderType.SELL
+          );
+          sellIndex++;
+          continue;
+        }
+
+        const availableQuantity = Math.min(buyOrder.unfilledQuantity!, sellOrder.quantity!);
+
+        sellOrder.filledQuantity += availableQuantity;
+        sellOrder.quantity! -= availableQuantity;
+        buyOrder.unfilledQuantity! -= availableQuantity;
+
+        await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
+
+        if (buyOrder.unfilledQuantity! <= 0) buyIndex++;
+        if (sellOrder.quantity! <= 0 || availableQuantity === 0) {
+          await this.orderBookService.removeOrder(
+            cropId,
+            sellOrder.orderId,
+            OrderType.SELL,
+            TradingType.MARKET
+          );
+          sellIndex++;
+        }
+        continue;
+      }
+
+      // 3. 지정가 매칭
+      if (sellOrder.price! > buyOrder.price!) {
         break;
       }
 
-      const matchedQuantity = Math.min(sellOrder.unfilledQuantity, buyOrder.unfilledQuantity);
+      const matchedQuantity = Math.min(sellOrder.unfilledQuantity!, buyOrder.unfilledQuantity!);
 
-      //TODO DB 트랜잭션 업데이트,체결 이벤트 발생
-      // 1. 주문 DB 업데이트 v
-      // 2. 체결 트랜잭션 DB 생성 및 저장 v
-      // 3. 회원 DB 현금 업데이트 v
-      // 4. 회원 DB 작물 업데이트 v
-      // 5. 레디스 오더북 수정 v
-      // 6. 현재 가격 업데이트 (레디스) v
-      // 7. 체결 이벤트 발생
-      // 이후 트랜잭션 적용 및 분리 예정
+      sellOrder.unfilledQuantity! -= matchedQuantity;
+      buyOrder.unfilledQuantity! -= matchedQuantity;
+      sellOrder.filledQuantity += matchedQuantity;
+      buyOrder.filledQuantity += matchedQuantity;
 
-      // 1. 주문 DB 업데이트
-      if (sellOrder.unfilledQuantity <= matchedQuantity) {
-        await this.orderService.updateOrder(
-          sellOrder.orderId,
-          OrderStatus.COMPLETED,
-          sellOrder.filledQuantity + matchedQuantity,
-          sellOrder.unfilledQuantity - matchedQuantity
-        );
-      } else if (sellOrder.unfilledQuantity > matchedQuantity) {
-        await this.orderService.updateOrder(
-          sellOrder.orderId,
-          OrderStatus.PARTIALLY_FILLED,
-          sellOrder.filledQuantity + matchedQuantity,
-          sellOrder.unfilledQuantity - matchedQuantity
-        );
-      }
+      await this.processOrderMatch(buyOrder, sellOrder, matchedQuantity);
 
-      if (buyOrder.unfilledQuantity === matchedQuantity) {
-        await this.orderService.updateOrder(
-          buyOrder.orderId,
-          OrderStatus.COMPLETED,
-          buyOrder.filledQuantity + matchedQuantity,
-          buyOrder.unfilledQuantity - matchedQuantity
-        );
-      } else if (buyOrder.unfilledQuantity > matchedQuantity) {
-        await this.orderService.updateOrder(
-          buyOrder.orderId,
-          OrderStatus.PARTIALLY_FILLED,
-          buyOrder.filledQuantity + matchedQuantity,
-          buyOrder.unfilledQuantity - matchedQuantity
-        );
-      }
+      if (sellOrder.unfilledQuantity! <= 0) sellIndex++;
+      if (buyOrder.unfilledQuantity! <= 0) buyIndex++;
+    }
 
-      // 2. 체결 트랜잭션 DB 생성 및 저장
-      await this.orderService.saveTransaction(sellOrder, buyOrder.price, matchedQuantity);
-      await this.orderService.saveTransaction(buyOrder, buyOrder.price, matchedQuantity);
-
-      // 3-1. 판매 회원 DB 현금 업데이트
-      await this.accountService.updateCashByCompletingOrder(
-        sellOrder.memberId,
-        sellOrder.price * matchedQuantity,
-        OrderType.SELL
-      );
-      // 3-2 구매 회원 DB 현금 업데이트
-      await this.accountService.updateCashByCompletingOrder(
+    // 잔여 시장가 주문 처리 및 롤백
+    while (buyIndex < buyOrders.length && buyOrders[buyIndex].tradingType === TradingType.MARKET) {
+      const buyOrder = buyOrders[buyIndex];
+      await this.handlePendingRollback(
+        cropId,
         buyOrder.memberId,
-        buyOrder.price * matchedQuantity,
+        buyOrder.unfilledQuantity!,
         OrderType.BUY
       );
-
-      // 4-1. 판매 회원 DB 작물 업데이트
-      await this.accountService.updateCropByCompletingSellOrder(
-        sellOrder.memberId,
+      await this.orderBookService.removeOrder(
         cropId,
-        matchedQuantity
-      );
-
-      // 4-2. 구매 회원 DB 작물 업데이트
-      await this.accountService.updateCropByCompletingBuyOrder(
-        sellOrder.memberId,
-        cropId,
-        matchedQuantity
-      );
-
-      // 4. 레디스 오더북 수정
-      await this.orderBookService.updateOrder(
-        cropId,
-        OrderType.BUY,
         buyOrder.orderId,
-        matchedQuantity
+        OrderType.BUY,
+        TradingType.MARKET
       );
-      await this.orderBookService.updateOrder(
+      buyIndex++;
+    }
+
+    while (
+      sellIndex < sellOrders.length &&
+      sellOrders[sellIndex].tradingType === TradingType.MARKET
+    ) {
+      const sellOrder = sellOrders[sellIndex];
+      await this.handlePendingRollback(
         cropId,
-        OrderType.SELL,
-        sellOrder.orderId,
-        matchedQuantity
+        sellOrder.memberId,
+        sellOrder.quantity!,
+        OrderType.SELL
       );
+      await this.orderBookService.removeOrder(
+        cropId,
+        sellOrder.orderId,
+        OrderType.SELL,
+        TradingType.MARKET
+      );
+      sellIndex++;
+    }
+  }
 
-      // 4. 현재 가격 업데이트 (레디스)
-      const cropPrice = {
-        crop: cropId,
-        price: buyOrder.price
-      };
-      await this.marketService.setCropPrice(cropPrice);
+  private async processOrderMatch(
+    buyOrder: OrderBookDto,
+    sellOrder: OrderBookDto,
+    matchedQuantity: number
+  ): Promise<void> {
+    const price = this.determineMatchPrice(buyOrder, sellOrder);
 
-      if (sellOrder.unfilledQuantity <= matchedQuantity) {
-        sellIndex++;
-      }
+    await this.orderService.updateOrder(
+      sellOrder.orderId,
+      sellOrder.unfilledQuantity! > 0 ? OrderStatus.PARTIALLY_FILLED : OrderStatus.COMPLETED,
+      sellOrder.filledQuantity,
+      sellOrder.unfilledQuantity!,
+      sellOrder.tradingType
+    );
 
-      if (buyOrder.unfilledQuantity <= matchedQuantity) {
-        buyIndex++;
+    await this.orderService.updateOrder(
+      buyOrder.orderId,
+      buyOrder.unfilledQuantity! > 0 ? OrderStatus.PARTIALLY_FILLED : OrderStatus.COMPLETED,
+      buyOrder.filledQuantity,
+      buyOrder.unfilledQuantity!,
+      buyOrder.tradingType
+    );
+
+    await this.orderService.saveTransaction(sellOrder, price, matchedQuantity);
+    await this.orderService.saveTransaction(buyOrder, price, matchedQuantity);
+
+    await this.accountService.updateCashByCompletingOrder(
+      sellOrder.memberId,
+      price * matchedQuantity,
+      OrderType.SELL
+    );
+    await this.accountService.updateCashByCompletingOrder(
+      buyOrder.memberId,
+      price * matchedQuantity,
+      OrderType.BUY
+    );
+    await this.accountService.updateCropByCompletingSellOrder(
+      sellOrder.memberId,
+      sellOrder.cropId,
+      matchedQuantity
+    );
+    await this.accountService.updateCropByCompletingBuyOrder(
+      buyOrder.memberId,
+      buyOrder.cropId,
+      matchedQuantity
+    );
+
+    await this.orderBookService.updateOrder(
+      sellOrder.cropId,
+      OrderType.SELL,
+      sellOrder.orderId,
+      matchedQuantity,
+      sellOrder.tradingType
+    );
+    await this.orderBookService.updateOrder(
+      buyOrder.cropId,
+      OrderType.BUY,
+      buyOrder.orderId,
+      matchedQuantity,
+      buyOrder.tradingType
+    );
+
+    const cropPrice = { crop: sellOrder.cropId, price };
+    await this.marketService.setCropPrice(cropPrice);
+  }
+
+  private async handlePendingRollback(
+    cropId: number,
+    memberId: number,
+    quantity: number,
+    orderType: OrderType
+  ): Promise<void> {
+    if (quantity > 0) {
+      if (orderType === OrderType.BUY) {
+        await this.accountService.rollbackPendingCrop(cropId, memberId, quantity);
+      } else if (orderType === OrderType.SELL) {
+        await this.accountService.rollbackPendingCash(memberId, quantity);
       }
     }
+  }
+
+  private determineMatchPrice(buyOrder: OrderBookDto, sellOrder: OrderBookDto): number {
+    if (sellOrder.tradingType === TradingType.MARKET && sellOrder.price) return sellOrder.price;
+    if (buyOrder.tradingType === TradingType.MARKET && buyOrder.price) return buyOrder.price;
+    if (sellOrder.price) return sellOrder.price;
+    if (buyOrder.price) return buyOrder.price;
+    throw new Error('체결 가격을 결정할 수 없습니다.');
   }
 }
