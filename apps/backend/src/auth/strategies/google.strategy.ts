@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { Strategy } from 'passport-google-oauth20';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -14,14 +14,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-  async validate(
-    profile: { emails?: { value: string }[]; displayName: string },
-    done: VerifyCallback
-  ): Promise<void> {
-    const email = profile.emails?.[0]?.value;
-    const name = profile.displayName;
-
-    const user = { email, name };
-    done(null, user);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async validate(...profile: any[]) {
+    const { displayName, emails } = profile[2];
+    const user = { email: emails, name: displayName };
+    return user;
   }
 }

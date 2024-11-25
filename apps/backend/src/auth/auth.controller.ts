@@ -54,8 +54,8 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  async googleRedirect(@Req() googleLoginDto: GoogleLoginDto, @Res() response: Response) {
-    const redirectURL = await this.authService.googleLogin(googleLoginDto);
+  async googleRedirect(@User() user: GoogleLoginDto, @Res() response: Response) {
+    const redirectURL = await this.authService.googleLogin(user);
     return response.redirect(redirectURL);
   }
 
@@ -65,8 +65,8 @@ export class AuthController {
 
   @Get('kakao/redirect')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoRedirect(@Req() kakaoLoginDto: KakaoLoginDto, @Res() response: Response) {
-    const redirectURL = await this.authService.kakaoLogin(kakaoLoginDto);
+  async kakaoRedirect(@User() user: KakaoLoginDto, @Res() response: Response) {
+    const redirectURL = await this.authService.kakaoLogin(user);
     return response.redirect(redirectURL);
   }
 
