@@ -43,6 +43,6 @@ export class RankService {
     const totalmembers = await this.redisClient.zCard('ranking');
     if (!rank) return { rank: -1, percentage: null };
     const percentage = ((rank + 1) / totalmembers) * 100;
-    return { rank: rank + 1, percentage: percentage.toFixed(0) };
+    return { rank: rank + 1, percentage: percentage == 0 ? 1 : percentage.toFixed(0) };
   }
 }
