@@ -1,36 +1,29 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  OnModuleDestroy,
-  OnModuleInit
-} from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
+import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import { Response } from 'express';
 import { DatabaseService } from 'src/database/database.service';
 import { mailQueries } from './mail.queries';
 import { successhandler, successMessage } from 'src/global/successhandler';
 import { map, BehaviorSubject } from 'rxjs';
-import { MailRedisUtil } from './util/mailRedisUtil';
 import { createClient, RedisClientType } from 'redis';
 import { ConfigService } from '@nestjs/config';
 import * as os from 'os';
 
 @Injectable()
-export class MailService implements OnModuleInit, OnModuleDestroy {
-  constructor(
-    private readonly databaseService: DatabaseService,
-    private readonly mailRedisUtil: MailRedisUtil
-  ) {}
+export class MailService implements OnModuleInit {
   private subscriber: RedisClientType;
   private publisher: RedisClientType;
   private sseSubjects: Map<number, BehaviorSubject<string>> = new Map();
-  private configService: ConfigService;
   private myIp: string;
 
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService
+  ) {}
+
   async onModuleInit() {
-    this.subscriber = createClient({ url: this.configService.get<string>('REDIS_URL') });
-    this.publisher = createClient({ url: this.configService.get<string>('REDIS_URL') });
+    const redisUrl = this.configService.get<string>('REDIS_URL');
+    this.subscriber = createClient({ url: redisUrl });
+    this.publisher = createClient({ url: redisUrl });
 
     await this.subscriber.connect();
     await this.publisher.connect();
@@ -49,21 +42,19 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
 
     this.subscriber.subscribe('notifications', message => {
       const parsedMessage = JSON.parse(message);
-      const clientId = parsedMessage.clientId;
-      const data = parsedMessage.data;
-
-      if (this.sseSubjects.has(clientId)) {
-        this.sseSubjects.get(clientId)?.next(data);
+      const memberId = parsedMessage.memberId;
+      if (this.sseSubjects.has(memberId)) {
+        const data = {
+          check: true,
+          time: new Date()
+        };
+        const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
+        this.sseSubjects.get(memberId)?.next(JSON.stringify(body));
       }
     });
   }
 
-  async onModuleDestroy() {
-    await this.subscriber.quit();
-    await this.publisher.quit();
-  }
-
-  async addClient(memberId: number, res: Response) {
+  async connectSse(memberId: number, res: Response) {
     const checkUnread = await this.databaseService.query(mailQueries.checkUnreadQuery, [memberId]);
     const data = {
       check: checkUnread.rows[0].result,
@@ -88,14 +79,14 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
 
     res.on('close', () => {
       this.sseSubjects.delete(memberId);
-      this.mailRedisUtil.deleteSseRedis(String(memberId));
+      this.publisher.del(`member:${memberId}`);
       res.end();
     });
 
     return userSubject.asObservable().pipe(map(message => ({ data: message })));
   }
 
-  async sendMessage(memberId: number, msg: string) {
+  async sendMessage(memberId: number) {
     const serverInfo = await this.publisher.get(`member:${memberId}`);
     if (!serverInfo) {
       console.log(`${memberId}번 유저에 대해서 알림을 보낼 수 없어요. 연결이 안됐거등요.`);
@@ -105,71 +96,15 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
     if (serverInfo === this.myIp) {
       const subject = this.sseSubjects.get(memberId);
       if (subject) {
-        subject.next(msg);
+        const data = {
+          check: true,
+          time: new Date()
+        };
+        const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
+        subject.next(JSON.stringify(body));
       }
     } else {
-      await this.publisher.publich('server-events', JSON.stringify({ memberId, msg }));
-    }
-  }
-
-  async connectSseAndInitiate(memberId: number, res: Response) {
-    const checkUnread = await this.databaseService.query(mailQueries.checkUnreadQuery, [memberId]);
-    const data = {
-      check: checkUnread.rows[0].result,
-      time: new Date()
-    };
-    const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
-
-    if (!this.sseSubjects.has(memberId)) {
-      const newSubject = new BehaviorSubject<string>(JSON.stringify(body));
-      this.sseSubjects.set(memberId, newSubject);
-    }
-
-    const userSubject = this.sseSubjects.get(memberId);
-    if (!userSubject) {
-      throw new HttpException(
-        '유저 서브젝트가 제대로 생성되지 않았습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-
-    this.mailRedisUtil.registerSseRedis(String(memberId));
-
-    res.on('close', () => {
-      this.sseSubjects.delete(memberId);
-      this.mailRedisUtil.deleteSseRedis(String(memberId));
-      res.end();
-    });
-
-    return userSubject.asObservable().pipe(map(message => ({ data: message })));
-  }
-
-  async startAlarm(memberId: number) {
-    const ip = await this.mailRedisUtil.getSseRedis(String(memberId));
-    if (ip === null) {
-      throw new HttpException('레디스에 정보 없음.', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    const url = `${ip}:8080/api/mail/call/${memberId}`;
-    try {
-      await fetch(url);
-    } catch (error) {
-      throw new Error(`API 호출 실패: ${error.message}`);
-    }
-  }
-
-  @OnEvent('sendAlarm')
-  async handleAlarmEventObs(memberId: number) {
-    const userSubject = this.sseSubjects.get(memberId);
-
-    if (userSubject) {
-      const data = {
-        check: true,
-        time: new Date()
-      };
-      const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
-      userSubject.next(JSON.stringify(body));
-    } else {
-      throw new Error(`잘못된 알람 생성 요청입니다.`);
+      await this.publisher.publish('notifications', JSON.stringify({ memberId }));
     }
   }
 

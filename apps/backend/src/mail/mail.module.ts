@@ -9,6 +9,7 @@ import { MailRedisUtil } from './util/mailRedisUtil';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     DatabaseModule,
     EventEmitterModule.forRoot(),
     JwtModule.registerAsync({
