@@ -81,21 +81,24 @@ export class AuthService {
 
   private async verifyUser(email: string, nickname: string) {
     const existingUser = await this.databaseService.query(authQueries.findByEmailQuery, [email]);
-    if (existingUser?.rows?.length) return existingUser.rows[0];
+    if (existingUser?.rowCount === 1) return existingUser.rows[0];
+
     const hashedPassword = await bcrypt.hash('default', 10);
+
     const newMember = await this.databaseService.query(authQueries.signUpQuery, [
       email,
       hashedPassword,
       nickname
     ]);
+
     return newMember.rows[0];
   }
 
   async SocialLogin(email: string, nickname: string) {
     const member = await this.verifyUser(email, nickname);
     const { accessToken, refreshToken } = await this.generateTokens(
-      member.rows[0].member_id,
-      member.rows[0].nickname
+      member.member_id,
+      member.nickname
     );
     const redirectUrl = `http://localhost:3000?accessToken=${accessToken}&refreshToken=${refreshToken}&nickname=${nickname}`;
     return redirectUrl;
