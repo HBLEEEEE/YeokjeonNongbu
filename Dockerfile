@@ -1,5 +1,5 @@
-# Node.js 20 이미지 설정
-FROM node:20
+# 1단계: 빌드 스테이지 (멀티 스테이지 빌드)
+FROM node:20-alpine AS builder
 
 # pnpm 설치
 RUN npm install -g pnpm
@@ -13,14 +13,22 @@ RUN pnpm install
 
 # 프론트엔드 파일 복사 및 빌드
 WORKDIR /app/apps/frontend
-COPY apps/frontend ./
+COPY apps/frontend ./ 
 RUN pnpm install
 RUN pnpm run build
 
 # 백엔드 파일 복사 및 의존성 설치
 WORKDIR /app/apps/backend
-COPY apps/backend ./
+COPY apps/backend ./ 
 RUN pnpm install
+
+# 2단계: 실행 이미지
+FROM node:20-alpine
+
+# 작업 디렉토리 설정 및 복사
+WORKDIR /app
+RUN npm install -g pnpm
+COPY --from=builder /app /app
 
 # 프론트엔드와 백엔드 포트 노출 설정
 EXPOSE 3000 8080
