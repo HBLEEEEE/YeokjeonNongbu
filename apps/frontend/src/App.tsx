@@ -9,6 +9,7 @@ import CropMarket from '@/pages/CropMarket';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PrivateRoute from '@/components/ProtectRoute';
+import OauthLogin from '@/components/OauthLogin';
 import { UserProvider } from '@/components/UserContext';
 
 interface LayoutProps {
@@ -36,6 +37,8 @@ const Layout: React.FC<LayoutProps> = ({ path, children }) => {
 
 const routes = [
   { path: '/', element: <Intro /> },
+  { path: 'auth/kakao/redirect', element: <OauthLogin platform="kakao" /> },
+  { path: 'auth/google/redirect', element: <OauthLogin platform="google" /> },
   ...[
     { path: '/main', element: <PrivateRoute element={<Main />} /> },
     { path: '/lottery', element: <PrivateRoute element={<Lottery />} /> },
