@@ -29,11 +29,18 @@ export class MatchingService {
       // 1. 시장가 매수 처리
       if (buyOrder.tradingType === TradingType.MARKET) {
         if (!sellOrder) {
+          // 매수 불가: 롤백 및 삭제 처리
           await this.handlePendingRollback(
             cropId,
             buyOrder.memberId,
-            buyOrder.unfilledQuantity!,
+            buyOrder.totalAmount!, // totalAmount 기반
             OrderType.BUY
+          );
+          await this.orderBookService.removeOrder(
+            cropId,
+            buyOrder.orderId,
+            OrderType.BUY,
+            TradingType.MARKET
           );
           buyIndex++;
           continue;
@@ -67,11 +74,18 @@ export class MatchingService {
       // 2. 시장가 매도 처리
       if (sellOrder.tradingType === TradingType.MARKET) {
         if (!buyOrder) {
+          // 매도 불가: 롤백 및 삭제 처리
           await this.handlePendingRollback(
             cropId,
             sellOrder.memberId,
-            sellOrder.quantity!,
+            sellOrder.quantity!, // quantity 기반
             OrderType.SELL
+          );
+          await this.orderBookService.removeOrder(
+            cropId,
+            sellOrder.orderId,
+            OrderType.SELL,
+            TradingType.MARKET
           );
           sellIndex++;
           continue;
@@ -100,7 +114,7 @@ export class MatchingService {
 
       // 3. 지정가 매칭
       if (sellOrder.price! > buyOrder.price!) {
-        break;
+        break; // 더 이상 매칭 불가
       }
 
       const matchedQuantity = Math.min(sellOrder.unfilledQuantity!, buyOrder.unfilledQuantity!);
@@ -122,7 +136,7 @@ export class MatchingService {
       await this.handlePendingRollback(
         cropId,
         buyOrder.memberId,
-        buyOrder.unfilledQuantity!,
+        buyOrder.totalAmount!, // 남은 totalAmount 롤백
         OrderType.BUY
       );
       await this.orderBookService.removeOrder(
@@ -142,7 +156,7 @@ export class MatchingService {
       await this.handlePendingRollback(
         cropId,
         sellOrder.memberId,
-        sellOrder.quantity!,
+        sellOrder.quantity!, // 남은 quantity 롤백
         OrderType.SELL
       );
       await this.orderBookService.removeOrder(
@@ -224,14 +238,14 @@ export class MatchingService {
   private async handlePendingRollback(
     cropId: number,
     memberId: number,
-    quantity: number,
+    amountOrQuantity: number,
     orderType: OrderType
   ): Promise<void> {
-    if (quantity > 0) {
+    if (amountOrQuantity > 0) {
       if (orderType === OrderType.BUY) {
-        await this.accountService.rollbackPendingCrop(cropId, memberId, quantity);
+        await this.accountService.rollbackPendingCash(memberId, amountOrQuantity);
       } else if (orderType === OrderType.SELL) {
-        await this.accountService.rollbackPendingCash(memberId, quantity);
+        await this.accountService.rollbackPendingCrop(cropId, memberId, amountOrQuantity);
       }
     }
   }
