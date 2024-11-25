@@ -65,6 +65,7 @@ export const logout = async () => {
     if (response.data.code === 200) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('nickname');
 
       return {
         success: true,
