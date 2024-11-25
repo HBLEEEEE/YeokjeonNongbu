@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit
+} from '@nestjs/common';
 import { Response } from 'express';
 import { DatabaseService } from 'src/database/database.service';
 import { mailQueries } from './mail.queries';
@@ -9,7 +15,7 @@ import { ConfigService } from '@nestjs/config';
 import * as os from 'os';
 
 @Injectable()
-export class MailService implements OnModuleInit {
+export class MailService implements OnModuleInit, OnModuleDestroy {
   private subscriber: RedisClientType;
   private publisher: RedisClientType;
   private sseSubjects: Map<number, BehaviorSubject<string>> = new Map();
@@ -19,6 +25,13 @@ export class MailService implements OnModuleInit {
     private readonly databaseService: DatabaseService,
     private readonly configService: ConfigService
   ) {}
+
+  onModuleDestroy() {
+    const keys = this.sseSubjects.keys();
+    for (const key in keys) {
+      this.publisher.del(key);
+    }
+  }
 
   async onModuleInit() {
     const redisUrl = this.configService.get<string>('REDIS_URL');
@@ -76,6 +89,8 @@ export class MailService implements OnModuleInit {
     }
 
     await this.publisher.set(`member:${memberId}`, this.myIp);
+    const testCall = await this.publisher.get(`member:${memberId}`);
+    console.log(testCall);
 
     res.on('close', () => {
       this.sseSubjects.delete(memberId);
