@@ -3,9 +3,15 @@ import { ApiProperty } from '@nestjs/swagger';
 export class GetRankDataDto {
   @ApiProperty({
     description: '순위',
-    example: '5'
+    example: 33
   })
   rank: number;
+
+  @ApiProperty({
+    description: '백분율',
+    example: 50
+  })
+  percentage: number | null;
 }
 
 export class GetRankSuccessResponseDto {
