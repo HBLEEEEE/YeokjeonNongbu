@@ -9,12 +9,15 @@ import { GoogleLoginDto } from './dto/googleLogin.dto';
 import { KakaoLoginDto } from './dto/kakaoLogin.dto';
 import { RedisClientType } from 'redis';
 import { Nullable, Optional } from '../global/utils/dataCustomType';
+import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly jwtService: JwtService,
+    private configService: ConfigService,
     @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType
   ) {}
 
@@ -110,9 +113,19 @@ export class AuthService {
     return this.SocialLogin(email, name);
   }
 
+  async googleRedirect(response: Response) {
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=${this.configService.get<string>('GOOGLE_CALLBACK_URL')}&client_id=${this.configService.get<string>('GOOGLE_CLIENT_ID')}&scope=email%20profile`;
+    return response.redirect(googleAuthUrl);
+  }
+
   async kakaoLogin(kakaoLoginDto: KakaoLoginDto) {
     const { email, nickname } = kakaoLoginDto;
     return this.SocialLogin(email, nickname);
+  }
+
+  async kakaoRedirect(response: Response) {
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${this.configService.get<string>('KAKAO_REST_API_KEY')}&redirect_uri=${this.configService.get<string>('KAKAO_CALLBACK_URL')}&scope=profile,email`;
+    return response.redirect(kakaoAuthUrl);
   }
 
   async logout(token: Optional<string>) {

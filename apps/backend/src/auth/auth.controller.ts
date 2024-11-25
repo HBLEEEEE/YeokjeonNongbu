@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -52,7 +52,9 @@ export class AuthController {
   @Get('google')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: '구글 로그인 API' })
-  async googleLogin() {}
+  async googleLogin(@Req() response: Response) {
+    return this.authService.googleRedirect(response);
+  }
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
@@ -66,7 +68,9 @@ export class AuthController {
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
   @ApiOperation({ summary: '카카오 로그인 API' })
-  async kakaoLogin() {}
+  async kakaoLogin(@Req() response: Response) {
+    return this.authService.kakaoRedirect(response);
+  }
 
   @Get('kakao/redirect')
   @UseGuards(AuthGuard('kakao'))
