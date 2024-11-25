@@ -6,6 +6,7 @@ import { useUser } from '@/components/UserContext';
 const Ranking: React.FC = () => {
   const [myRank, setMyRank] = useState(0);
   const [rankList, setRankList] = useState<Rank[]>([]);
+  const [percentage, setPercentage] = useState<number>(0);
   const [error1, setError1] = useState<string | null>(null);
   const [error2, setError2] = useState<string | null>(null);
   const { nickname, totalAssets } = useUser();
@@ -34,6 +35,7 @@ const Ranking: React.FC = () => {
         const response = await getMyRank();
         if (response.success) {
           setMyRank(response.rank || 0);
+          setPercentage(response.percentage);
           setError2(null);
         } else {
           setError2(response.message || '데이터 로딩 중 오류가 발생했습니다.');
@@ -108,10 +110,12 @@ const Ranking: React.FC = () => {
             <>
               <div>
                 <p className="text-xl font-medium">내등수</p>
-                <p className="text-2xl font-bold text-red-soft">{myRank}</p>
+                <p className="text-2xl font-bold text-red-soft">
+                  {myRank === -1 ? 'UnRank' : myRank}
+                </p>
               </div>
               <div>
-                <p className="text-3xl font-bold">상위 56%</p>
+                <p className="text-3xl font-bold">상위 {myRank === -1 ? '-' : `${percentage}%`}</p>
               </div>
               <div>
                 <p className="text-xl font-semibold">{nickname}</p>

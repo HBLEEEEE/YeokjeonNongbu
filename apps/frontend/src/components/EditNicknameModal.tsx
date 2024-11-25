@@ -1,31 +1,43 @@
 import { useState } from 'react';
 import CloseIcon from './CloseIcon';
+import { updateNickname } from '@/services/AuthApi';
+import { useUser } from './UserContext';
 
 interface EditNicknameModalProps {
   isOpen: boolean;
-  id: string;
-  setId: React.Dispatch<React.SetStateAction<string>>;
   modalOpen: () => void;
 }
 
-const EditNicknameModal: React.FC<EditNicknameModalProps> = ({ isOpen, id, setId, modalOpen }) => {
-  const [tempId, setTempId] = useState<string>('농부왕');
+const EditNicknameModal: React.FC<EditNicknameModalProps> = ({ isOpen, modalOpen }) => {
+  const { nickname, setNickname } = useUser();
+  const [tmpNickname, setTmpNickname] = useState<string>(nickname);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleNicknameChange = () => {
-    if (tempId.length < 2) {
-      setErrorMessage('닉네임은 최소 2자 이상이어야 합니다.');
+  const handleNicknameChange = async () => {
+    if (tmpNickname === nickname) {
+      modalOpen();
       return;
     }
 
-    setErrorMessage(null);
-    setId(tempId);
+    try {
+      const response = await updateNickname({ nickname: tmpNickname });
+      if (response.success) {
+        setErrorMessage(null);
+        setNickname(tmpNickname);
 
-    modalOpen();
+        modalOpen();
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message || '서버와의 연결에 실패했습니다.');
+      } else {
+        setErrorMessage('서버와의 연결에 실패했습니다.');
+      }
+    }
   };
 
   const handleCancelEdit = () => {
-    setTempId(id);
+    setTmpNickname(nickname);
     setErrorMessage(null);
     modalOpen();
   };
@@ -42,9 +54,9 @@ const EditNicknameModal: React.FC<EditNicknameModalProps> = ({ isOpen, id, setId
           <div className="flex flex-col px-4 gap-2">
             <p className="font-bold text-lg">변경할 닉네임을 작성해주세요!</p>
             <input
-              onChange={e => setTempId(e.target.value)}
+              onChange={e => setTmpNickname(e.target.value)}
               className="rounded px-4 py-1 text-base text-center min-w-[200px] "
-              value={tempId}
+              value={tmpNickname}
             />
             {errorMessage && <div className="text-sm text-red-600">{errorMessage}</div>}
           </div>

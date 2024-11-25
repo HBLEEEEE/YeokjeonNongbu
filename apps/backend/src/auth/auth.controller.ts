@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -14,7 +14,6 @@ import { UpdateIntroduceDto } from './dto/updateIntroduce.dto';
 import { UpdateNicknameDto } from './dto/updateNickname.dto';
 import { signUpResponseDecorator } from './decorator/signUp.decorator';
 import { loginResponseDecorator } from './decorator/login.decorator';
-import { oauthResponseDecorator } from './decorator/oauth.decorator';
 import { logoutResponseDecorator } from './decorator/logout.decorator';
 import { updateIntroduceResponseDecorator } from './decorator/updateIntroduce.decorator';
 import { updateNicknameResponseDecorator } from './decorator/updateNickname.decorator';
@@ -51,34 +50,24 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: '구글 로그인 API' })
-  async googleLogin(@Req() response: Response) {
-    return this.authService.googleRedirect(response);
-  }
+  async googleLogin() {}
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: '구글 로그인 리다이렉션 API' })
-  @oauthResponseDecorator()
-  async googleRedirect(@Req() googleLoginDto: GoogleLoginDto) {
-    const tokens = await this.authService.googleLogin(googleLoginDto);
-    return successhandler(successMessage.LOGIN_SUCCESS, tokens);
+  async googleRedirect(@User() user: GoogleLoginDto, @Res() response: Response) {
+    const redirectURL = await this.authService.googleLogin(user);
+    return response.redirect(redirectURL);
   }
 
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
-  @ApiOperation({ summary: '카카오 로그인 API' })
-  async kakaoLogin(@Req() response: Response) {
-    return this.authService.kakaoRedirect(response);
-  }
+  async kakaoLogin() {}
 
   @Get('kakao/redirect')
   @UseGuards(AuthGuard('kakao'))
-  @ApiOperation({ summary: '카카오 로그인 리다이렉션 API' })
-  @oauthResponseDecorator()
-  async kakaoRedirect(@Req() kakaoLoginDto: KakaoLoginDto) {
-    const tokens = await this.authService.kakaoLogin(kakaoLoginDto);
-    return successhandler(successMessage.LOGIN_SUCCESS, tokens);
+  async kakaoRedirect(@User() user: KakaoLoginDto, @Res() response: Response) {
+    const redirectURL = await this.authService.kakaoLogin(user);
+    return response.redirect(redirectURL);
   }
 
   @Patch('introduce')

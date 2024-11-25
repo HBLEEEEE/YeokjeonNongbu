@@ -47,6 +47,14 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
     }
   };
 
+  const handleGoogle = async () => {
+    window.location.href = 'http://localhost:8080/api/auth/google';
+  };
+
+  const handleKakao = async () => {
+    window.location.href = 'http://localhost:8080/api/auth/kakao';
+  };
+
   return (
     <>
       <img src="/icon.png" className="max-w-[200px] max-h-[200px] mb-4"></img>
@@ -88,12 +96,15 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
 
       <div className="flex items-center w-full text-black text-xs font-semibold my-4 select-none">
         <span className="flex-grow h-px bg-black mx-4"></span>
-        social login
+        소셜 로그인
         <span className="flex-grow h-px bg-black mx-4"></span>
       </div>
 
       <div className="flex flex-row my-2 gap-16">
-        <button className="rounded-full border-none w-[40px] h-[40px] overflow-hidden bg-gray-200 flex items-center justify-center">
+        <button
+          className="rounded-full border-none w-[40px] h-[40px] overflow-hidden bg-gray-200 flex items-center justify-center"
+          onClick={handleGoogle}
+        >
           <img
             src="https://d1nuzc1w51n1es.cloudfront.net/d99d8628713bb69bd142.png"
             alt="google login"
@@ -101,7 +112,10 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
           />
         </button>
 
-        <button className="rounded-full border-none w-[40px] h-[40px] overflow-hidden bg-gray-200 flex items-center justify-center">
+        <button
+          className="rounded-full border-none w-[40px] h-[40px] overflow-hidden bg-gray-200 flex items-center justify-center"
+          onClick={handleKakao}
+        >
           <img
             src="https://d1nuzc1w51n1es.cloudfront.net/c9b51919f15c93b05ae8.png"
             alt="kakao login"
@@ -110,12 +124,15 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
         </button>
       </div>
 
-      <p
-        className="my-2 cursor-pointer hover:underline text-xs text-black font-semibold"
-        onClick={() => setModalStep(ModalStep.SignUpStep1)}
-      >
-        Don't have an account?
-      </p>
+      <div className="flex flex-row my-2 gap-2">
+        <p className="my-2 text-xs text-black font-semibold">역전농부는 처음이신가요?</p>
+        <p
+          className="my-2 cursor-pointer hover:underline text-xs text-blue-600 font-semibold"
+          onClick={() => setModalStep(ModalStep.SignUpStep1)}
+        >
+          회원가입
+        </p>
+      </div>
     </>
   );
 };
