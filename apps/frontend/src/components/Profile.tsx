@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import EditIcon from '@/components/EditIcon';
 import SaveIcon from './SaveIcon';
 import { updateIntroduce } from '@/services/AuthApi';
 import { getMyRank } from '@/services/RankApi';
+import { AlertContext } from '@/components/AlertContext';
 
 interface ProfileProps {
   id: string;
@@ -16,6 +17,7 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [myRank, setMyRank] = useState<number>(0);
   const [error, setError] = useState<string | null>('데이터 로딩 중 오류가 발생했습니다.');
+  const { alert } = useContext(AlertContext);
 
   useEffect(() => {
     const fetchMyRank = async () => {
@@ -23,16 +25,11 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
         const response = await getMyRank();
         if (response.success) {
           setMyRank(response.rank || 0);
-          setError(null);
         } else {
           setError(response.message || '데이터 로딩 중 오류가 발생했습니다.');
         }
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message || '서버와의 연결에 실패했습니다.');
-        } else {
-          setError('서버와의 연결에 실패했습니다.');
-        }
+      } catch {
+        setError('서버와의 연결에 실패했습니다.');
       }
     };
 
@@ -58,9 +55,11 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
       const response = await updateIntroduce({ introduce: newIntroduce });
       if (response.success) {
         setIntroduce(newIntroduce);
+      } else {
+        await alert(response.message || '소개글 변경에 실패했습니다. 다시 시도해주세요.');
       }
     } catch {
-      alert('소개글 변경에 실패했습니다. 다시 시도해주세요.');
+      await alert('소개글 변경에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
