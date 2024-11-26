@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Res, Sse, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Res, Sse, UseGuards } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailService } from './mail.service';
 import { Response } from 'express';
@@ -23,17 +23,14 @@ export class MailController {
   @checkResponseDecorator()
   initialConnectSse(@User() user: { memberId: number }, @Res() res: Response) {
     const { memberId } = user;
-    return this.mailService.connectSseAndInitiate(memberId, res);
+    return this.mailService.connectSse(memberId, res);
   }
 
-  @Get('event/:memberId')
-  eventAlarm(@Param('memberId') memberId: number) {
-    this.mailService.startAlarm(memberId);
-  }
-
-  @Get('call/:memberId')
-  triggerAlarm(@Param('memberId') memberId: number) {
-    this.eventEmitter.emit('sendAlarm', memberId);
+  @UseGuards(JwtAuthGuard)
+  @Get('call')
+  triggerAlarm(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    this.mailService.sendMessage(memberId);
   }
 
   @UseGuards(JwtAuthGuard)

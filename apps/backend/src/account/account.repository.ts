@@ -144,4 +144,34 @@ export class AccountRepository {
       quantity: result.rows[0].available_quantity || 0
     };
   }
+
+  async decrementPendingCrop(memberId: number, cropId: number, quantity: number): Promise<void> {
+    if (quantity <= 0) {
+      throw new Error('반드시 0보다 큰 값을 감소해야 합니다.');
+    }
+    const query = `
+            UPDATE member_crops
+            SET pending_quantity   = GREATEST(pending_quantity - $1, 0),
+                available_quantity = available_quantity + $1
+            WHERE member_id = $2
+              AND crop_id = $3
+        `;
+    const values = [quantity, memberId, cropId];
+    await this.databaseService.query(query, values);
+  }
+
+  async incrementCash(memberId: number, amount: number): Promise<void> {
+    if (amount <= 0) {
+      throw new Error('반드시 0보다 큰 값을 증가해야 합니다.');
+    }
+
+    const query = `
+            UPDATE members
+            SET available_cash = available_cash + $1,
+                pending_cash   = pending_cash - $1
+            WHERE member_id = $2
+        `;
+    const values = [amount, memberId];
+    await this.databaseService.query(query, values);
+  }
 }
