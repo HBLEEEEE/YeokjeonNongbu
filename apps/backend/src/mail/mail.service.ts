@@ -13,6 +13,7 @@ import { map, BehaviorSubject } from 'rxjs';
 import { createClient, RedisClientType } from 'redis';
 import { ConfigService } from '@nestjs/config';
 import * as os from 'os';
+import { MailCreateUtil } from './util/mailCreateUtil';
 
 @Injectable()
 export class MailService implements OnModuleInit, OnModuleDestroy {
@@ -23,7 +24,8 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly databaseService: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly mailCreateUtil: MailCreateUtil
   ) {}
 
   onModuleDestroy() {
@@ -126,8 +128,30 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
   async getMailsByMemberId(memberId: number) {
     try {
       const response = await this.databaseService.query(mailQueries.getAllMailQuery, [memberId]);
+      const processedMails = await Promise.all(
+        response.rows.map(async mail => {
+          const { mail_id, action, param1, param2, param3, content, created_at, read_status } =
+            mail;
+
+          const formattedContent = await this.mailCreateUtil.createMailString(
+            action,
+            param1?.toString() || '',
+            param2?.toString() || '',
+            param3?.toString() || '',
+            content || '' // Use provided content if available
+          );
+
+          return {
+            mail_id,
+            content: formattedContent,
+            created_at,
+            read_status
+          };
+        })
+      );
+
       await this.databaseService.query(mailQueries.makeReadedQuery, [memberId]);
-      return response.rows;
+      return processedMails;
     } catch (error) {
       throw new HttpException('메일 기록을 가져오는 도중에 에러 발생 : ', error);
     }

@@ -5,6 +5,7 @@ import { DatabaseModule } from 'src/database/database.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MailCreateUtil } from './util/mailCreateUtil';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     })
   ],
   controllers: [MailController],
-  providers: [MailService]
+  providers: [MailService, MailCreateUtil]
 })
 export class MailModule {}
