@@ -173,4 +173,24 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
       throw new HttpException('메일 기록을 삭제하는 도중에 에러 발생 : ', error);
     }
   }
+
+  async createMailByOtherService(
+    member_id: number,
+    action: number,
+    param1: number | null = null,
+    param2: number | null = null,
+    param3: number | null = null,
+    content: string | null = null
+  ) {
+    await this.databaseService.query(mailQueries.InsertMailQuery, [
+      member_id,
+      action,
+      param1,
+      param2,
+      param3,
+      content
+    ]);
+
+    this.sendMessage(member_id);
+  }
 }
