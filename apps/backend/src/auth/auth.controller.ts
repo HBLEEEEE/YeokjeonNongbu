@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { User } from '../global/utils/memberData';
 import { successhandler, successMessage } from '../global/successhandler';
-import { JwtAuthGuard } from '../global/utils/jwtAuthGuard';
+import { Public } from '../global/utils/jwtAuthGuard';
 import { SignUpDto } from './dto/signUp.dto';
 import { LoginDto } from './dto/login.dto';
 import { GoogleLoginDto } from './dto/googleLogin.dto';
@@ -22,6 +22,7 @@ import { updateNicknameResponseDecorator } from './decorator/updateNickname.deco
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('signup')
   @ApiOperation({ summary: '회원가입 API' })
   @signUpResponseDecorator()
@@ -30,6 +31,7 @@ export class AuthController {
     return successhandler(successMessage.SIGNUP_SUCCESS);
   }
 
+  @Public()
   @Post('login')
   @ApiOperation({ summary: '로그인 API' })
   @loginResponseDecorator()
@@ -39,7 +41,6 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '로그아웃 API' })
   @logoutResponseDecorator()
   async logout(@Req() req: Request) {
@@ -48,10 +49,12 @@ export class AuthController {
     return successhandler(successMessage.LOGOUT_SUCCESS);
   }
 
+  @Public()
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleLogin() {}
 
+  @Public()
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   async googleRedirect(@User() user: GoogleLoginDto, @Res() response: Response) {
@@ -59,10 +62,12 @@ export class AuthController {
     return response.redirect(redirectURL);
   }
 
+  @Public()
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
   async kakaoLogin() {}
 
+  @Public()
   @Get('kakao/redirect')
   @UseGuards(AuthGuard('kakao'))
   async kakaoRedirect(@User() user: KakaoLoginDto, @Res() response: Response) {
@@ -71,7 +76,6 @@ export class AuthController {
   }
 
   @Patch('introduce')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '유저 소개글 변경 API' })
   @updateIntroduceResponseDecorator()
   async updateIntroduce(
@@ -85,7 +89,6 @@ export class AuthController {
   }
 
   @Patch('nickname')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '유저 닉네임 변경 API' })
   @updateNicknameResponseDecorator()
   async updateNickname(
