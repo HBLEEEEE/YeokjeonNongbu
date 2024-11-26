@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import CloseIcon from './CloseIcon';
 import { updateNickname } from '@/services/AuthApi';
 import { useUser } from './UserContext';
+import { AlertContext } from '@/components/AlertContext';
 
 interface EditNicknameModalProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface EditNicknameModalProps {
 const EditNicknameModal: React.FC<EditNicknameModalProps> = ({ isOpen, modalOpen }) => {
   const { nickname, setNickname } = useUser();
   const [tmpNickname, setTmpNickname] = useState<string>(nickname);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { alert } = useContext(AlertContext);
 
   const handleNicknameChange = async () => {
     if (tmpNickname === nickname) {
@@ -22,23 +23,18 @@ const EditNicknameModal: React.FC<EditNicknameModalProps> = ({ isOpen, modalOpen
     try {
       const response = await updateNickname({ nickname: tmpNickname });
       if (response.success) {
-        setErrorMessage(null);
         setNickname(tmpNickname);
-
         modalOpen();
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message || '서버와의 연결에 실패했습니다.');
       } else {
-        setErrorMessage('서버와의 연결에 실패했습니다.');
+        await alert(response.message || '닉네임 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
+    } catch {
+      await alert('닉네임 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
   const handleCancelEdit = () => {
     setTmpNickname(nickname);
-    setErrorMessage(null);
     modalOpen();
   };
 
@@ -58,7 +54,6 @@ const EditNicknameModal: React.FC<EditNicknameModalProps> = ({ isOpen, modalOpen
               className="rounded px-4 py-1 text-base text-center min-w-[200px] "
               value={tmpNickname}
             />
-            {errorMessage && <div className="text-sm text-red-600">{errorMessage}</div>}
           </div>
           <div className="flex flex-row justify-end gap-4 mt-8">
             <button

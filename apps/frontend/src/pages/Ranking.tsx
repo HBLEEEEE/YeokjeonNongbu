@@ -21,12 +21,8 @@ const Ranking: React.FC = () => {
         } else {
           setError1(response.message || '데이터 로딩 중 오류가 발생했습니다.');
         }
-      } catch (error) {
-        if (error instanceof Error) {
-          setError1(error.message || '서버와의 연결에 실패했습니다.');
-        } else {
-          setError1('서버와의 연결에 실패했습니다.');
-        }
+      } catch {
+        setError1('서버와의 연결에 실패했습니다.');
       }
     };
 
@@ -40,12 +36,8 @@ const Ranking: React.FC = () => {
         } else {
           setError2(response.message || '데이터 로딩 중 오류가 발생했습니다.');
         }
-      } catch (error) {
-        if (error instanceof Error) {
-          setError2(error.message || '서버와의 연결에 실패했습니다.');
-        } else {
-          setError2('서버와의 연결에 실패했습니다.');
-        }
+      } catch {
+        setError2('서버와의 연결에 실패했습니다.');
       }
     };
 
