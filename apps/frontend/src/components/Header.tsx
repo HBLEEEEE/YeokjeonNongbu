@@ -1,64 +1,114 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
+import { EventSourcePolyfill } from 'event-source-polyfill';
 import AlarmModal from '@/components/AlarmModal';
 import BarModal from '@/components/BarModal';
 import { Alarm } from '@/types/Index';
 import { useUser } from '@/components/UserContext';
+import { getAlarm, clearAlarm } from '@/services/MailApi';
+import { AlertContext } from '@/components/AlertContext';
 
 const Header: React.FC = () => {
-  const [alarms, setAlarms] = useState<Alarm[]>([
-    {
-      mailId: 1,
-      content: '당근을 500원에 20개를 매수하셨습니다.',
-      createAt: '2024-11-20T11:16:00.000Z',
-      readStatus: false
-    },
-    {
-      mailId: 2,
-      content: '당근을 500원에 20개를 매수하셨습니다.',
-      createAt: '2024-11-20T11:00:00.000Z',
-      readStatus: false
-    },
-    {
-      mailId: 3,
-      content: '당근을 500원에 20개를 매수하셨습니다.',
-      createAt: '2024-11-20T10:00:00.000Z',
-      readStatus: false
-    },
-    {
-      mailId: 4,
-      content: '당근을 500원에 20개를 매수하셨습니다.',
-      createAt: '2024-11-19T15:00:00.000Z',
-      readStatus: false
-    },
-    {
-      mailId: 5,
-      content: '당근을 500원에 20개를 매수하셨습니다.',
-      createAt: '2024-10-11T15:00:00.000Z',
-      readStatus: false
-    },
-    {
-      mailId: 6,
-      content: '당근을 500원에 20개를 매수하셨습니다.',
-      createAt: '2023-11-11T15:00:00.000Z',
-      readStatus: false
-    }
-  ]);
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [isAlarmOpen, setIsAlarmOpen] = useState<boolean>(false);
   const [isBarOpen, setIsBarOpen] = useState<boolean>(false);
+  const [isNewAlarm, setIsNewAlarm] = useState<boolean>(false);
   const { nickname, totalAssets } = useUser();
+  const { alert } = useContext(AlertContext);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectDelay = 3000;
+
+  const isJson = (data: string) => {
+    try {
+      JSON.parse(data);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const fetchAlarm = async () => {
+    try {
+      const response = await getAlarm();
+      if (response.success) {
+        setAlarms(response.alarm);
+        setError(null);
+      } else {
+        setError(response.message || '데이터 로딩 중 오류가 발생했습니다.');
+      }
+    } catch {
+      setError('서버와의 연결에 실패했습니다.');
+    }
+  };
+
+  const createEventSource = () => {
+    const EventSource = EventSourcePolyfill || window.EventSource;
+
+    const eventSource = new EventSource('http://localhost:8080/api/mail/check', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    });
+
+    eventSource.onmessage = (event: MessageEvent) => {
+      if (isJson(event.data)) {
+        const parsedData = JSON.parse(event.data);
+
+        if (parsedData.data.check) {
+          setIsNewAlarm(true);
+          fetchAlarm();
+        }
+      }
+    };
+
+    eventSource.onerror = () => {
+      eventSource.close();
+      eventSourceRef.current = null;
+      setTimeout(() => {
+        eventSourceRef.current = createEventSource();
+      }, reconnectDelay);
+    };
+
+    return eventSource;
+  };
 
   const clearAllAlarms = () => {
-    setAlarms([]);
+    const deleteAlarm = async () => {
+      try {
+        const response = await clearAlarm();
+        if (response.success) {
+          setAlarms([]);
+        } else {
+          await alert(response.message || '알림 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+      } catch {
+        await alert('알림 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    };
+
+    deleteAlarm();
   };
 
   const toggleAlarmModal = () => {
     if (!isBarOpen) setIsAlarmOpen(!isAlarmOpen);
+    setIsNewAlarm(false);
   };
 
   const toggleBarModal = () => {
     if (!isAlarmOpen) setIsBarOpen(!isBarOpen);
   };
+
+  useEffect(() => {
+    fetchAlarm();
+
+    eventSourceRef.current = createEventSource();
+
+    return () => {
+      eventSourceRef.current?.close();
+      eventSourceRef.current = null;
+    };
+  }, []);
 
   return (
     <header className="fixed top-[30px] left-0 w-full flex items-center justify-between px-16 z-[50] select-none">
@@ -79,8 +129,12 @@ const Header: React.FC = () => {
       <div className="flex items-center gap-8">
         <div
           onClick={toggleAlarmModal}
-          className="bg-alarm bg-no-repeat bg-contain w-[50px] h-[50px] cursor-pointer"
-        ></div>
+          className="relative bg-alarm bg-no-repeat bg-contain w-[55px] h-[50px] cursor-pointer"
+        >
+          {isNewAlarm && (
+            <span className="absolute top-2 right-0 w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-lg"></span>
+          )}
+        </div>
 
         <div
           onClick={toggleBarModal}
@@ -90,6 +144,8 @@ const Header: React.FC = () => {
 
       <AlarmModal
         alarms={alarms}
+        setIsNewAlarm={setIsNewAlarm}
+        error={error}
         isOpen={isAlarmOpen}
         closeModal={() => setIsAlarmOpen(false)}
         clearAllAlarms={clearAllAlarms}

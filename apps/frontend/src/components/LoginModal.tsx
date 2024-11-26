@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
 import { login } from '@/services/AuthApi';
 import { useUser } from '@/components/UserContext';
+import { AlertContext } from '@/components/AlertContext';
 
 interface LoginProps {
   setModalStep: (step: ModalStep) => void;
@@ -12,38 +13,33 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { setNickname } = useUser();
+  const { alert } = useContext(AlertContext);
 
   const handleLogin = async () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!email || !emailRegex.test(email)) {
-      setErrorMessage('유효한 이메일을 입력해주세요.');
+      setError('유효한 이메일을 입력해주세요.');
       return;
     }
 
     if (!email || !password) {
-      setErrorMessage('이메일과 비밀번호를 모두 입력해주세요.');
+      setError('이메일과 비밀번호를 모두 입력해주세요.');
       return;
     }
 
     try {
       const response = await login({ email, password });
       if (response.success) {
-        alert(response.message);
         setNickname(response.nickname);
-        setErrorMessage(null);
         navigate('/main');
       } else {
-        setErrorMessage(response.message || '로그인 중 오류가 발생했습니다.');
+        await alert(response.message || '로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message || '서버와의 연결에 실패했습니다.');
-      } else {
-        setErrorMessage('서버와의 연결에 실패했습니다.');
-      }
+    } catch {
+      await alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -85,7 +81,7 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
         />
       </div>
 
-      {errorMessage && <div className="text-sm text-red-600 mb-4">{errorMessage}</div>}
+      {error && <div className="text-sm text-red-600 mb-4">{error}</div>}
 
       <button
         className="m-2 p-2 bg-brown-dark text-light-gray rounded-lg min-w-[300px] min-h-[40px]"

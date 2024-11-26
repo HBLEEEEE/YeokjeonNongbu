@@ -11,6 +11,7 @@ import Footer from '@/components/Footer';
 import PrivateRoute from '@/components/ProtectRoute';
 import OauthLogin from '@/components/OauthLogin';
 import { UserProvider } from '@/components/UserContext';
+import { AlertDialog } from './components/AlertContext';
 
 interface LayoutProps {
   path: string;
@@ -54,13 +55,15 @@ const router = createBrowserRouter(routes);
 
 function App() {
   return (
-    <div className="bg-bg-color min-h-screen">
-      <UserProvider>
-        <AnimatePresence>
-          <RouterProvider router={router} />
-        </AnimatePresence>
-      </UserProvider>
-    </div>
+    <AlertDialog>
+      <div className="bg-bg-color min-h-screen">
+        <UserProvider>
+          <AnimatePresence>
+            <RouterProvider router={router} />
+          </AnimatePresence>
+        </UserProvider>
+      </div>
+    </AlertDialog>
   );
 }
 

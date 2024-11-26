@@ -47,7 +47,7 @@ const OwnCrop: React.FC = () => {
             <th>보유가액</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="md:h-24 lg:h-26 xl:h-28 ">
           {currentCrops.map(({ crop, ownedAmount, ownedValue }, idx) => (
             <tr key={idx}>
               <td>{crop}</td>

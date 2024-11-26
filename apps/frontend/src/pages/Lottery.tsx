@@ -38,12 +38,8 @@ const Lottery: React.FC = () => {
       } else {
         setError(response.message || '오류가 발생했습니다.');
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message || '서버와의 연결에 실패했습니다.');
-      } else {
-        setError('서버와의 연결에 실패했습니다.');
-      }
+    } catch {
+      setError('서버와의 연결에 실패했습니다.');
     }
   };
 
