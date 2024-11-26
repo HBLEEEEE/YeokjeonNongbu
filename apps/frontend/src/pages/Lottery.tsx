@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import LotteryTicket from '@/components/LotteryTicket';
-import LotteryModal from '@/components/LotteryModal';
-import LotteryButtons from '@/components/LotteryButtons';
+import LotteryTicket from '@/components/Lottery/LotteryTicket';
+import LotteryModal from '@/components/Lottery/LotteryModal';
+import LotteryButtons from '@/components/Lottery/LotteryButtons';
 import UseLotteryModal from '@/hooks/UseLotteryModal';
 import UseLotteryCanvas from '@/hooks/UseLotteryCanvas';
 import { getLottoResult } from '@/services/LotteryApi';
-import { useUser } from '@/components/UserContext';
+import { useUser } from '@/components/public/UserContext';
 import { PRICE } from '@/constants/LotteryConstants';
 
 const Lottery: React.FC = () => {

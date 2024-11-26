@@ -1,8 +1,8 @@
 import { useContext, useState } from 'react';
-import CloseIcon from './CloseIcon';
+import CloseIcon from '@/components/Icons/CloseIcon';
 import { updateNickname } from '@/services/AuthApi';
-import { useUser } from './UserContext';
-import { AlertContext } from '@/components/AlertContext';
+import { useUser } from '@/components/public/UserContext';
+import { AlertContext } from '@/components/public/AlertContext';
 
 interface EditNicknameModalProps {
   isOpen: boolean;

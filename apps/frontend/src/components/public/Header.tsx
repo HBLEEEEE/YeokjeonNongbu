@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef, useContext } from 'react';
 import { EventSourcePolyfill } from 'event-source-polyfill';
-import AlarmModal from '@/components/AlarmModal';
-import BarModal from '@/components/BarModal';
+import AlarmModal from '@/components/public/AlarmModal';
+import BarModal from '@/components/public/BarModal';
 import { Alarm } from '@/types/Index';
-import { useUser } from '@/components/UserContext';
+import { useUser } from '@/components/public/UserContext';
 import { getAlarm, clearAlarm } from '@/services/MailApi';
-import { AlertContext } from '@/components/AlertContext';
+import { AlertContext } from '@/components/public/AlertContext';
 
 const Header: React.FC = () => {
   const [alarms, setAlarms] = useState<Alarm[]>([]);

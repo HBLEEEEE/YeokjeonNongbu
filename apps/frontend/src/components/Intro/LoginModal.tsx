@@ -2,8 +2,8 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
 import { login } from '@/services/AuthApi';
-import { useUser } from '@/components/UserContext';
-import { AlertContext } from '@/components/AlertContext';
+import { useUser } from '@/components/public/UserContext';
+import { AlertContext } from '@/components/public/AlertContext';
 
 interface LoginProps {
   setModalStep: (step: ModalStep) => void;

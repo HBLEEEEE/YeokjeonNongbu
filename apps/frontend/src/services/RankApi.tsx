@@ -6,7 +6,7 @@ export const getTop5 = async () => {
     const response = await api.get('rank/top5');
 
     if (response.data.code === 200) {
-      const { top5 } = response.data.data;
+      const top5 = response.data.data;
 
       return {
         success: true,

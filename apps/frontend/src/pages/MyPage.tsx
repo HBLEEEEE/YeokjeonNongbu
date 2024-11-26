@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Transaction, ApiCrop, Crop } from '@/types/Index';
 import GetFarmImg from '@/utils/GetFarmImg';
-import Profile from '@/components/Profile';
-import CropList from '@/components/CropList';
-import TransactionTable from '@/components/TransactionTable';
-import Pagination from '@/components/Pagination';
-import EditNicknameModal from '@/components/EditNicknameModal';
+import Profile from '@/components/MyPage/Profile';
+import CropList from '@/components/MyPage/CropList';
+import TransactionTable from '@/components/MyPage/TransactionTable';
+import EditNicknameModal from '@/components/MyPage/EditNicknameModal';
+import Pagination from '@/components/MyPage/Pagination';
 import { ITEMS_PER_PAGE } from '@/constants/TransactionContants';
-import { useUser } from '@/components/UserContext';
+import { useUser } from '@/components/public/UserContext';
 
 const cropImages: Record<string, string> = {
   당근: '/carrot.png',

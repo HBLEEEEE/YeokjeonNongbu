@@ -6,12 +6,12 @@ import Lottery from '@/pages/Lottery';
 import MyPage from '@/pages/MyPage';
 import Ranking from '@/pages/Ranking';
 import CropMarket from '@/pages/CropMarket';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/components/public/Header';
+import Footer from '@/components/public/Footer';
 import PrivateRoute from '@/components/ProtectRoute';
-import OauthLogin from '@/components/OauthLogin';
-import { UserProvider } from '@/components/UserContext';
-import { AlertDialog } from './components/AlertContext';
+import OauthLogin from '@/components/Intro/OauthLogin';
+import { UserProvider } from '@/components/public/UserContext';
+import { AlertDialog } from './components/public/AlertContext';
 
 interface LayoutProps {
   path: string;

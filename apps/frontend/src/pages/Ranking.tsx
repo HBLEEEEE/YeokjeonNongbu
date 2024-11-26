@@ -1,7 +1,7 @@
 import { Rank } from '@/types/Index';
 import { getTop5, getMyRank } from '@/services/RankApi';
 import { useEffect, useState } from 'react';
-import { useUser } from '@/components/UserContext';
+import { useUser } from '@/components/public/UserContext';
 
 const Ranking: React.FC = () => {
   const [myRank, setMyRank] = useState(0);

@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useContext } from 'react';
-import EditIcon from '@/components/EditIcon';
-import SaveIcon from './SaveIcon';
+import EditIcon from '@/components/Icons/EditIcon';
+import SaveIcon from '@/components/Icons/SaveIcon';
 import { updateIntroduce } from '@/services/AuthApi';
 import { getMyRank } from '@/services/RankApi';
-import { AlertContext } from '@/components/AlertContext';
+import { AlertContext } from '@/components/public/AlertContext';
 
 interface ProfileProps {
   id: string;
@@ -25,6 +25,7 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
         const response = await getMyRank();
         if (response.success) {
           setMyRank(response.rank || 0);
+          setError(null);
         } else {
           setError(response.message || '데이터 로딩 중 오류가 발생했습니다.');
         }

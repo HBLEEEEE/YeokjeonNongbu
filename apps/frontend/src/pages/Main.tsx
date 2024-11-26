@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import GetFarmImg from '@/utils/GetFarmImg';
-import { useUser } from '@/components/UserContext';
+import { useUser } from '@/components/public/UserContext';
 
 const Main: React.FC = () => {
   const { totalAssets } = useUser();

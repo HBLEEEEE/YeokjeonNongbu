@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '@/services/AuthApi';
-import { AlertContext } from '@/components/AlertContext';
+import { AlertContext } from '@/components/public/AlertContext';
 import { useContext } from 'react';
 
 interface BarProps {
