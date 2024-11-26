@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { OrderBookService } from './orderBook.service';
 import DtoTransformer from './utils/dtoTransformer';
@@ -13,6 +13,8 @@ import { AccountService } from '../account/account.service';
 import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard';
 import { MarketOrderDto } from './dto/marketOrder.dto';
 import { toOrderType, toTradingType } from './enums/orderType';
+import { JwtAuthGuard } from '../global/utils/jwtAuthGuard';
+import { User } from '../global/utils/memberData';
 
 @Controller('api/order')
 export class OrderController {
@@ -25,10 +27,15 @@ export class OrderController {
 
   @Post('buy/limit')
   @UseGuards(HasSufficientCashGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '구매 주문 생성' })
   @orderResponseDecorator()
-  async createLimitBuyOrder(@Body() limitOrderDto: LimitOrderDto) {
-    const orderDto = DtoTransformer.mapToOrderDto(limitOrderDto);
+  async createLimitBuyOrder(
+    @User() user: { memberId: number },
+    @Body() limitOrderDto: LimitOrderDto
+  ) {
+    const { memberId } = user;
+    const orderDto = DtoTransformer.mapToOrderDto(limitOrderDto, memberId);
     await this.orderService.saveOrder(orderDto);
     await this.accountService.updateCashByPlacingOrder(
       orderDto.memberId,
@@ -42,10 +49,15 @@ export class OrderController {
 
   @Post('sell/limit')
   @UseGuards(HasSufficientCropGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '판매 주문 생성' })
   @orderResponseDecorator()
-  async createLimitSellOrder(@Body() limitOrderDto: LimitOrderDto) {
-    const orderDto = DtoTransformer.mapToOrderDto(limitOrderDto);
+  async createLimitSellOrder(
+    @User() user: { memberId: number },
+    @Body() limitOrderDto: LimitOrderDto
+  ) {
+    const { memberId } = user;
+    const orderDto = DtoTransformer.mapToOrderDto(limitOrderDto, memberId);
     await this.orderService.saveOrder(orderDto);
     await this.accountService.updateCropByPlacingSellOrder(
       orderDto.memberId,
@@ -59,10 +71,15 @@ export class OrderController {
 
   @Post('buy/market')
   @UseGuards(HasSufficientCashGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '시장가 구매 주문 생성' })
   @orderResponseDecorator()
-  async createMarketBuyOrder(@Body() marketOrderDto: MarketOrderDto) {
-    const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto);
+  async createMarketBuyOrder(
+    @User() user: { memberId: number },
+    @Body() marketOrderDto: MarketOrderDto
+  ) {
+    const { memberId } = user;
+    const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto, memberId);
     await this.orderService.saveOrder(orderDto);
     await this.accountService.updateCashByPlacingOrder(
       orderDto.memberId,
@@ -76,10 +93,15 @@ export class OrderController {
 
   @Post('sell/market')
   @UseGuards(HasSufficientCropGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '시장가 판매 주문 생성' })
   @orderResponseDecorator()
-  async createMarketSellOrder(@Body() marketOrderDto: MarketOrderDto) {
-    const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto);
+  async createMarketSellOrder(
+    @User() user: { memberId: number },
+    @Body() marketOrderDto: MarketOrderDto
+  ) {
+    const { memberId } = user;
+    const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto, memberId);
     await this.orderService.saveOrder(orderDto);
     await this.accountService.updateCropByPlacingSellOrder(
       orderDto.memberId,
@@ -92,17 +114,21 @@ export class OrderController {
   }
 
   @Get('')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '각 회원 체결 내역 조회' })
   @transactionResponseDecorator()
-  async getTransactionsByMemberId(@Query('memberId') memberId: number) {
+  async getTransactionsByMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
     const transactions = await this.orderBookService.getTransactionsByMemberId(memberId);
     return successhandler(successMessage.GET_TRANSACTION_SUCCESS, transactions);
   }
 
   @Post('cancel')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '주문 취소' })
   @ApiResponse({ status: 200, description: '주문 취소 성공' })
   async cancelOrder(
+    @User() user: { memberId: number },
     @Body()
     {
       cropId,
@@ -122,6 +148,7 @@ export class OrderController {
       toOrderType(orderType),
       toTradingType(tradingType)
     );
+    await this.orderService.cancelOrder(orderId);
     return successhandler(successMessage.DELETE_ORDER_SUCCESS);
   }
 }

@@ -1,21 +1,23 @@
-// export class MailCreateUtil{
-//   constructor(){}
+export class MailCreateUtil {
+  constructor() {}
 
-//   async createMailString(action:number, pram1:string, pram2:string, pram3:string, text:string ) {
-//     if(action==1){
-//       return `${pram1}을(를) ${pram2}원에 ${pram3}개 매수했습니다.`
-//     } else if(action==2){
-//       return `${pram1}을(를) ${pram2}원에 ${pram3}개 매도했습니다.`
-//     } else if(action==3){
-//       return `${text}`
-//     } else if(action==4){
-//       return `${pram1}님이 복권을 구매하여 ${pram2}등에 당첨됐습니다.`
-//     } else if(action==5){
-//       return `${pram1}님께서 당신의 농장에 방문하셨습니다.`
-//     } else if(action==6){
-//       return `${pram1}등을 달성하셨습니다.`
-//     } else if(action==2){
-//       return `${pram1}님께서 총 자산 ${pram2}원에 도달하셨습니다.`
-//     }
-//   }
-// }
+  private readonly templates: Record<number, (params: string[]) => string> = {
+    1: ([item, price, quantity]) => `${item}을(를) ${price}원에 ${quantity}개 매수했습니다.`,
+    2: ([item, price, quantity]) => `${item}을(를) ${price}원에 ${quantity}개 매도했습니다.`,
+    3: ([text]) => `${text}`, // Custom text
+    4: ([user, rank]) => `${user}님이 복권을 구매하여 ${rank}등에 당첨됐습니다.`,
+    5: ([user]) => `${user}님께서 당신의 농장에 방문하셨습니다.`,
+    6: ([rank]) => `${rank}등을 달성하셨습니다.`,
+    7: ([user, total]) => `${user}님께서 총 자산 ${total}원에 도달하셨습니다.`
+  };
+
+  async createMailString(action: number, ...args: (string | string[])[]): Promise<string> {
+    const templateFn = this.templates[action];
+    if (!templateFn) {
+      throw new Error(`Invalid action type: ${action}`);
+    }
+
+    const params = Array.isArray(args[0]) ? args[0] : args;
+    return templateFn(params as string[]);
+  }
+}

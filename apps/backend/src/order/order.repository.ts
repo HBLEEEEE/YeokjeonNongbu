@@ -96,18 +96,18 @@ export class OrderRepository {
     const query =
       tradingType === TradingType.MARKET
         ? `
-                  UPDATE orders
-                  SET status          = $1,
-                      filled_quantity = $2
-                  WHERE order_id = $3
-          `
+                        UPDATE orders
+                        SET status          = $1,
+                            filled_quantity = $2
+                        WHERE order_id = $3
+                `
         : `
-                  UPDATE orders
-                  SET status            = $1,
-                      filled_quantity   = $2,
-                      unfilled_quantity = $3
-                  WHERE order_id = $4
-          `;
+                        UPDATE orders
+                        SET status            = $1,
+                            filled_quantity   = $2,
+                            unfilled_quantity = $3
+                        WHERE order_id = $4
+                `;
 
     const values =
       tradingType === TradingType.MARKET
@@ -161,5 +161,16 @@ export class OrderRepository {
       createdAt: data.created_at,
       amount: data.amount
     }));
+  }
+
+  async cancelOrder(orderId: number): Promise<void> {
+    const query = `
+            DELETE
+            FROM orders
+            WHERE order_id = $1
+        `;
+
+    const values = [orderId];
+    await this.databaseService.query(query, values);
   }
 }
