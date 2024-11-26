@@ -9,6 +9,7 @@ import { MailCreateUtil } from './util/mailCreateUtil';
 @Module({
   imports: [ConfigModule.forRoot(), DatabaseModule, EventEmitterModule.forRoot()],
   controllers: [MailController],
-  providers: [MailService, MailCreateUtil]
+  providers: [MailService, MailCreateUtil],
+  exports: [MailCreateUtil]
 })
 export class MailModule {}

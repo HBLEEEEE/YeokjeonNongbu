@@ -5,6 +5,7 @@ import { MarketService } from '../market/market.service';
 import { AccountService } from '../account/account.service';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { Injectable } from '@nestjs/common';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class MatchingService {
@@ -12,7 +13,8 @@ export class MatchingService {
     private readonly orderBookService: OrderBookService,
     private readonly orderService: OrderService,
     private readonly marketService: MarketService,
-    private readonly accountService: AccountService
+    private readonly accountService: AccountService,
+    private readonly mailService: MailService
   ) {}
 
   async matchOrders(cropId: number): Promise<void> {
@@ -198,6 +200,28 @@ export class MatchingService {
       buyOrder.memberId,
       buyOrder.cropId,
       matchedQuantity
+    );
+
+    // 체결 이벤트 알림 전달
+
+    // 매수자 알림 생성
+    await this.mailService.createMailByOtherService(
+      buyOrder.memberId,
+      1,
+      buyOrder.cropId,
+      price,
+      matchedQuantity,
+      null
+    );
+
+    // 매도자 알림 생성
+    await this.mailService.createMailByOtherService(
+      sellOrder.memberId,
+      2,
+      sellOrder.cropId,
+      price,
+      matchedQuantity,
+      null
     );
 
     // 지정가 거래만 Redis 업데이트
