@@ -9,13 +9,22 @@ import { MarketModule } from '../market/market.module';
 import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
 import { AccountModule } from '../account/account.module';
 import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard';
-import { AuthModule } from '../auth/auth.module'; // AuthModule import
 import { RedisModule } from '../redis/redis.module';
+import { MailService } from '../mail/mail.service';
+import { MailModule } from '../mail/mail.module';
+import { ConfigModule } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from '../global/utils/jwtAuthGuard';
-import { JwtService } from '@nestjs/jwt'; // RedisModule import
 
 @Module({
-  imports: [DatabaseModule, MarketModule, AccountModule, AuthModule, RedisModule],
+  imports: [
+    ConfigModule.forRoot(),
+    DatabaseModule,
+    MarketModule,
+    AccountModule,
+    RedisModule,
+    MailModule
+  ],
   controllers: [OrderController],
   providers: [
     OrderService,
@@ -24,8 +33,9 @@ import { JwtService } from '@nestjs/jwt'; // RedisModule import
     MatchingService,
     HasSufficientCashGuard,
     HasSufficientCropGuard,
-    JwtAuthGuard,
-    JwtService
+    MailService,
+    JwtService,
+    JwtAuthGuard
   ]
 })
 export class OrderModule {}
