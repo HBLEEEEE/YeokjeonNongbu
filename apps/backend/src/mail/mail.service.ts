@@ -101,8 +101,6 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
     }
 
     await this.publisher.set(`sseRedisMember:${memberId}`, this.myIp);
-    const testCall = await this.publisher.get(`sseRedisMember:${memberId}`);
-    console.log(testCall);
 
     res.on('close', () => {
       this.sseSubjects.delete(memberId);
@@ -116,7 +114,6 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
   async sendMessage(memberId: number) {
     const serverInfo = await this.publisher.get(`sseRedisMember:${memberId}`);
     if (!serverInfo) {
-      console.log(`${memberId}번 유저에 대해서 알림을 보낼 수 없어요. 연결이 안됐거등요.`);
       return;
     }
 
