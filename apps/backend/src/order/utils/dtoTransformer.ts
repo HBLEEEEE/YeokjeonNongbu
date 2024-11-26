@@ -23,34 +23,34 @@ export default class DtoTransformer {
     };
   }
 
-  static mapToOrderDto(orderDto: LimitOrderDto | MarketOrderDto): OrderDto {
+  static mapToOrderDto(orderDto: LimitOrderDto | MarketOrderDto, memberId: number): OrderDto {
     // 지정가 주문 처리
     if (orderDto.tradingType === TradingType.LIMIT) {
       if (orderDto.orderType === OrderType.BUY) {
-        return this.toLimitBuyOrderDto(orderDto as LimitOrderDto);
+        return this.toLimitBuyOrderDto(orderDto as LimitOrderDto, memberId);
       }
       if (orderDto.orderType === OrderType.SELL) {
-        return this.toLimitSellOrderDto(orderDto as LimitOrderDto);
+        return this.toLimitSellOrderDto(orderDto as LimitOrderDto, memberId);
       }
     }
 
     // 시장가 주문 처리
     if (orderDto.tradingType === TradingType.MARKET) {
       if (orderDto.orderType === OrderType.BUY) {
-        return this.toMarketBuyOrderDto(orderDto as MarketOrderDto);
+        return this.toMarketBuyOrderDto(orderDto as MarketOrderDto, memberId);
       }
       if (orderDto.orderType === OrderType.SELL) {
-        return this.toMarketSellOrderDto(orderDto as MarketOrderDto);
+        return this.toMarketSellOrderDto(orderDto as MarketOrderDto, memberId);
       }
     }
 
     throw new Error('잘못된 주문 유형입니다.');
   }
 
-  private static toLimitBuyOrderDto(orderDto: LimitOrderDto): OrderDto {
+  private static toLimitBuyOrderDto(orderDto: LimitOrderDto, memberId: number): OrderDto {
     return {
       cropId: orderDto.cropId,
-      memberId: orderDto.memberId,
+      memberId: memberId,
       orderType: OrderType.BUY,
       tradingType: TradingType.LIMIT,
       time: new Date(),
@@ -63,10 +63,10 @@ export default class DtoTransformer {
     };
   }
 
-  private static toLimitSellOrderDto(orderDto: LimitOrderDto): OrderDto {
+  private static toLimitSellOrderDto(orderDto: LimitOrderDto, memberId: number): OrderDto {
     return {
       cropId: orderDto.cropId,
-      memberId: orderDto.memberId,
+      memberId: memberId,
       orderType: OrderType.SELL,
       tradingType: TradingType.LIMIT,
       time: new Date(),
@@ -79,10 +79,10 @@ export default class DtoTransformer {
     };
   }
 
-  private static toMarketBuyOrderDto(orderDto: MarketOrderDto): OrderDto {
+  private static toMarketBuyOrderDto(orderDto: MarketOrderDto, memberId: number): OrderDto {
     return {
       cropId: orderDto.cropId,
-      memberId: orderDto.memberId,
+      memberId: memberId,
       orderType: OrderType.BUY,
       tradingType: TradingType.MARKET,
       time: new Date(),
@@ -95,10 +95,10 @@ export default class DtoTransformer {
     };
   }
 
-  private static toMarketSellOrderDto(orderDto: MarketOrderDto): OrderDto {
+  private static toMarketSellOrderDto(orderDto: MarketOrderDto, memberId: number): OrderDto {
     return {
       cropId: orderDto.cropId,
-      memberId: orderDto.memberId,
+      memberId: memberId,
       orderType: OrderType.SELL,
       tradingType: TradingType.MARKET,
       time: new Date(),

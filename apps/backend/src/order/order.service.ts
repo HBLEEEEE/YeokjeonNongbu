@@ -70,4 +70,8 @@ export class OrderService {
       tradingType
     );
   }
+
+  async cancelOrder(orderId: number): Promise<void> {
+    await this.orderRepository.cancelOrder(orderId);
+  }
 }
