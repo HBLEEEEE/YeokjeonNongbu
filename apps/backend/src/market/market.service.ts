@@ -1,39 +1,40 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RedisClientType } from 'redis';
 import { CropPrice } from './dto/cropPrice.dto';
+import { CropInfo } from './dto/crop.Info';
+import { MarketRepository } from './market.repository';
 
 @Injectable()
 export class MarketService {
   private readonly redisKey = 'crop:price';
 
-  constructor(@Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType) {}
+  constructor(
+    @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType,
+    private readonly marketRepository: MarketRepository
+  ) {}
 
   async setCropPrice(data: CropPrice): Promise<void> {
-    await this.redisClient.hSet(this.redisKey, data.crop.toString(), data.price.toString());
+    await this.redisClient.hSet(this.redisKey, data.cropId.toString(), data.price.toString());
   }
 
-  async getCropPrice(crop: number): Promise<CropPrice | null> {
-    const price = await this.redisClient.hGet(this.redisKey, crop.toString());
+  async getCropPrice(cropId: number): Promise<CropPrice | null> {
+    const price = await this.marketRepository.getCropPrice(cropId);
 
     if (!price) {
       return null;
     }
-    return { crop, price: parseFloat(price) };
+    return price;
   }
 
-  async getCropIdFromName(crop: string): Promise<number> {
-    const cropId = await this.redisClient.hGet(this.redisKey, crop);
-    if (!cropId) {
-      return -1;
-    }
-    return parseInt(cropId);
-  }
-
-  async getAllCropPrices(): Promise<CropPrice[]> {
-    const prices = await this.redisClient.hGetAll(this.redisKey);
-    return Object.entries(prices).map(([crop, price]) => ({
-      crop: parseInt(crop),
-      price: parseFloat(price)
+  async getAllCropPrices() {
+    const prices = await this.marketRepository.getAllCropsPrice();
+    return prices.map(data => ({
+      cropId: data.cropId,
+      price: data.price
     }));
+  }
+
+  async getCropsInfo(): Promise<CropInfo[]> {
+    return await this.marketRepository.getAllCropsInfo();
   }
 }

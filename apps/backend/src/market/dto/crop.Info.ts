@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CropPrice {
+export class CropInfo {
   @ApiProperty({ description: '작물 ID', example: 1 })
   cropId: number;
 
-  @ApiProperty({ description: '작물 가격', example: 100 })
-  price: number;
+  @ApiProperty({ description: '작물 이름', example: 'apple' })
+  cropName: string;
 }
