@@ -5,9 +5,6 @@ export class TransactionDto {
   @ApiProperty({ description: '거래 ID', example: 1 })
   orderId: number;
 
-  @ApiProperty({ description: '회원 ID', example: 1 })
-  memberId: number;
-
   @ApiProperty({ description: '상품 ID', example: 1 })
   cropId: number;
 
