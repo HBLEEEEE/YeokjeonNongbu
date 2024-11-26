@@ -14,6 +14,7 @@ import { createClient, RedisClientType } from 'redis';
 import { ConfigService } from '@nestjs/config';
 import * as os from 'os';
 import { MailCreateUtil } from './util/mailCreateUtil';
+import { Nullable } from 'src/global/utils/dataCustomType';
 
 @Injectable()
 export class MailService implements OnModuleInit, OnModuleDestroy {
@@ -177,10 +178,10 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
   async createMailByOtherService(
     member_id: number,
     action: number,
-    param1: number | null = null,
-    param2: number | null = null,
-    param3: number | null = null,
-    content: string | null = null
+    param1: Nullable<number>,
+    param2: Nullable<number>,
+    param3: Nullable<number>,
+    content: Nullable<string>
   ) {
     await this.databaseService.query(mailQueries.InsertMailQuery, [
       member_id,
