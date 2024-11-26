@@ -7,5 +7,7 @@ export const mailQueries = {
   createMailQuery:
     'INSERT INTO mails(member_id, content, created_at, read_status) VALUES ($1, $2, NOW(), FALSE);',
   deleteMailQuery: 'DELETE FROM mails WHERE member_id = $1',
-  getMemberQuery: 'SELECT EXISTS (SELECT 1 FROM mails WHERE member_id = $1) AS result'
+  getMemberQuery: 'SELECT EXISTS (SELECT 1 FROM mails WHERE member_id = $1) AS result',
+  getCropName: 'SELECT crop_name	FROM public.crops WHERE crop_id = $1',
+  getMemberNickNameByMemberID: 'SELECT nickname FROM members WHERE member_id = $1'
 };

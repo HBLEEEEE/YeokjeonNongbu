@@ -130,8 +130,17 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
       const response = await this.databaseService.query(mailQueries.getAllMailQuery, [memberId]);
       const processedMails = await Promise.all(
         response.rows.map(async mail => {
-          const { mail_id, action, param1, param2, param3, content, created_at, read_status } =
-            mail;
+          // eslint-disable-next-line prefer-const
+          let { mail_id, action, param1, param2, param3, content, created_at, read_status } = mail;
+
+          if (action === 1 || action === 2) {
+            param1 = (await this.databaseService.query(mailQueries.getCropName, [param1])).rows[0]
+              .crop_name;
+          } else if (action === 4 || action === 5 || action || 7) {
+            param1 = (
+              await this.databaseService.query(mailQueries.getMemberNickNameByMemberID, [param1])
+            ).rows[0];
+          }
 
           const formattedContent = await this.mailCreateUtil.createMailString(
             action,

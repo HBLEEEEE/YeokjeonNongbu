@@ -4,7 +4,7 @@ export class MailCreateUtil {
   private readonly templates: Record<number, (params: string[]) => string> = {
     1: ([item, price, quantity]) => `${item}을(를) ${price}원에 ${quantity}개 매수했습니다.`,
     2: ([item, price, quantity]) => `${item}을(를) ${price}원에 ${quantity}개 매도했습니다.`,
-    3: ([text]) => `${text}`, // Custom text
+    3: params => `${params[params.length - 1]}`,
     4: ([user, rank]) => `${user}님이 복권을 구매하여 ${rank}등에 당첨됐습니다.`,
     5: ([user]) => `${user}님께서 당신의 농장에 방문하셨습니다.`,
     6: ([rank]) => `${rank}등을 달성하셨습니다.`,
