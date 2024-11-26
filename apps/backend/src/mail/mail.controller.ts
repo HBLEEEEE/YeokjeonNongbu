@@ -1,10 +1,9 @@
-import { Controller, Delete, Get, Res, Sse, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Res, Sse } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailService } from './mail.service';
 import { Response } from 'express';
 import { successhandler, successMessage } from 'src/global/successhandler';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
 import { checkResponseDecorator } from './decorator/check.decorator';
 import { deleteMailResponseDecorator, mailResponseDecorator } from './decorator/mail.decorator';
 import { User } from 'src/global/utils/memberData';
@@ -17,7 +16,6 @@ export class MailController {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Sse('check')
   @ApiOperation({ summary: '알림 연결 요청 API' })
   @checkResponseDecorator()
@@ -26,14 +24,12 @@ export class MailController {
     return this.mailService.connectSse(memberId, res);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('call')
   triggerAlarm(@User() user: { memberId: number }) {
     const { memberId } = user;
     this.mailService.sendMessage(memberId);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: '알림 조회 요청 API' })
   @mailResponseDecorator()
@@ -43,7 +39,6 @@ export class MailController {
     return successhandler(successMessage.GET_MAIL_SUCCESS, data);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Delete()
   @deleteMailResponseDecorator()
   @ApiOperation({ summary: '알림 삭제 요청 API' })
