@@ -75,8 +75,8 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.intervalConnect = setInterval(() => {
-      this.sseSubjects.forEach(subject => subject.next('false'));
-    }, 90 * 1000);
+      this.sseSubjects.forEach(subject => subject.next('Periodically Check Response'));
+    }, 30 * 1000);
   }
 
   async connectSse(memberId: number, res: Response) {
