@@ -88,13 +88,13 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
       );
     }
 
-    await this.publisher.set(`member:${memberId}`, this.myIp);
-    const testCall = await this.publisher.get(`member:${memberId}`);
+    await this.publisher.set(`sseRedisMember:${memberId}`, this.myIp);
+    const testCall = await this.publisher.get(`sseRedisMember:${memberId}`);
     console.log(testCall);
 
     res.on('close', () => {
       this.sseSubjects.delete(memberId);
-      this.publisher.del(`member:${memberId}`);
+      this.publisher.del(`sseRedisMember:${memberId}`);
       res.end();
     });
 
@@ -102,7 +102,7 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
   }
 
   async sendMessage(memberId: number) {
-    const serverInfo = await this.publisher.get(`member:${memberId}`);
+    const serverInfo = await this.publisher.get(`sseRedisMember:${memberId}`);
     if (!serverInfo) {
       console.log(`${memberId}번 유저에 대해서 알림을 보낼 수 없어요. 연결이 안됐거등요.`);
       return;
