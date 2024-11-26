@@ -131,8 +131,16 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
       const response = await this.databaseService.query(mailQueries.getAllMailQuery, [memberId]);
       const processedMails = await Promise.all(
         response.rows.map(async mail => {
-          // eslint-disable-next-line prefer-const
-          let { mail_id, action, param1, param2, param3, content, created_at, read_status } = mail;
+          const {
+            mail_id: mailId,
+            action,
+            content,
+            param2,
+            param3,
+            created_at: createdAt,
+            read_status: readStatus
+          } = mail;
+          let { param1 } = mail;
 
           if (action === 1 || action === 2) {
             param1 = (await this.databaseService.query(mailQueries.getCropName, [param1])).rows[0]
@@ -152,10 +160,10 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
           );
 
           return {
-            mail_id,
+            mailId,
             content: formattedContent,
-            created_at,
-            read_status
+            createdAt,
+            readStatus
           };
         })
       );
