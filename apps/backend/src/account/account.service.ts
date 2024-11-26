@@ -59,4 +59,12 @@ export class AccountService {
   async getCropFromMemberId(memberId: number, cropId: number): Promise<AccountCropDto> {
     return await this.accountRepository.getCropsByMemberId(memberId, cropId);
   }
+
+  async rollbackPendingCrop(cropId: number, memberId: number, quantity: number): Promise<void> {
+    await this.accountRepository.decrementPendingCrop(memberId, cropId, quantity);
+  }
+
+  async rollbackPendingCash(memberId: number, amount: number): Promise<void> {
+    await this.accountRepository.incrementCash(memberId, amount);
+  }
 }

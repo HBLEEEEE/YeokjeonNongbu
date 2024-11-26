@@ -14,7 +14,6 @@ export class HasSufficientCropGuard implements CanActivate {
     if (tradingType === 'limit') {
       hasEnoughCrop = await this.canLimitSellOrder(cropId, memberId, quantity);
     } else if (tradingType === 'market') {
-      // TODO : 시장가 주문 기능 보안 예정
       hasEnoughCrop = await this.canMarketSellOrder(cropId, memberId, quantity);
     }
 
