@@ -147,7 +147,7 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
             param1?.toString() || '',
             param2?.toString() || '',
             param3?.toString() || '',
-            content || '' // Use provided content if available
+            content || ''
           );
 
           return {

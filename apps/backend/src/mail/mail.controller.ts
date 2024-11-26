@@ -25,6 +25,7 @@ export class MailController {
   }
 
   @Get('call')
+  @ApiOperation({ summary: '알림 강제 발생 API(토큰만 넣으세요)' })
   triggerAlarm(@User() user: { memberId: number }) {
     const { memberId } = user;
     this.mailService.sendMessage(memberId);
