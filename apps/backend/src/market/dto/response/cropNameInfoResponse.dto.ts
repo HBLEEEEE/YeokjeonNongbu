@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CropInfo } from '../crop.Info';
 
-export class CropInfoResponseDto {
+export class CropNameInfoResponseDto {
   @ApiProperty({ example: 200, description: '응답 코드' })
   code: number;
 

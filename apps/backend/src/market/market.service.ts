@@ -14,35 +14,27 @@ export class MarketService {
   ) {}
 
   async setCropPrice(data: CropPrice): Promise<void> {
-    await this.redisClient.hSet(this.redisKey, data.cropId, data.price.toString());
+    await this.redisClient.hSet(this.redisKey, data.cropId.toString(), data.price.toString());
   }
 
   async getCropPrice(cropId: number): Promise<CropPrice | null> {
-    const price = await this.redisClient.hGet(this.redisKey, cropId.toString());
+    const price = await this.marketRepository.getCropPrice(cropId);
 
     if (!price) {
       return null;
     }
-    return { cropId, price: parseFloat(price) };
+    return price;
   }
 
-  async getCropIdFromName(crop: string): Promise<number> {
-    const cropId = await this.redisClient.hGet(this.redisKey, crop);
-    if (!cropId) {
-      return -1;
-    }
-    return parseInt(cropId);
-  }
-
-  async getAllCropPrices(): Promise<CropPrice[]> {
-    const prices = await this.redisClient.hGetAll(this.redisKey);
-    return Object.entries(prices).map(([cropId, price]) => ({
-      cropId: parseInt(cropId),
-      price: parseFloat(price)
+  async getAllCropPrices() {
+    const prices = await this.marketRepository.getAllCropsPrice();
+    return prices.map(data => ({
+      cropId: data.cropId,
+      price: data.price
     }));
   }
 
   async getCropsInfo(): Promise<CropInfo[]> {
-    return await this.marketRepository.getCropsInfo();
+    return await this.marketRepository.getAllCropsInfo();
   }
 }

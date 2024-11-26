@@ -23,7 +23,9 @@ export const successMessage = {
   GET_ACCOUNT_CASH_SUCCESS: { code: 200, message: '회원 잔고 조회 성공' },
   GET_TOP5_RANK_SUCCESS: { code: 200, message: '상위 5명을 조회했습니다.' },
   GET_RANK_SUCCESS: { code: 200, message: '현재 랭킹을 조회했습니다.' },
-  GET_CROPS_INFO_SUCCESS: { code: 200, message: '작물 정보 조회 성공' }
+  GET_CROPS_NAME_INFO_SUCCESS: { code: 200, message: '작물 정보 조회 성공' },
+  GET_CROP_PRICE_INFO_SUCCESS: { code: 200, message: '작물 가격 정보 조회 성공' },
+  GET_ALL_CROP_PRICE_INFO_SUCCESS: { code: 200, message: '작물 가격 정보 조회 성공' }
 };
 
 export function successhandler<T>(success: SuccessMessage, data: Nullable<T> = null) {

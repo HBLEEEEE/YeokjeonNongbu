@@ -1,28 +1,37 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { MarketService } from './market.service';
 import { Public } from '../global/utils/jwtAuthGuard';
-import { mailResponseDecorator } from './decorator/crop.decorator';
+import {
+  cropNameInfoResponseDecorator,
+  cropPriceInfoResponseDecorator
+} from './decorator/crop.decorator';
 import { successhandler, successMessage } from '../global/successhandler';
 
 @Controller('api/market')
 export class MarketController {
   constructor(private readonly marketService: MarketService) {}
 
-  @Get('price/:crop')
-  async getPrice(@Param('crop') crop: number) {
-    return this.marketService.getCropPrice(crop);
+  @Get('crop/price/:cropId')
+  @Public()
+  @cropPriceInfoResponseDecorator()
+  async getPrice(@Param('cropId') crop: number) {
+    const data = await this.marketService.getCropPrice(crop);
+    return successhandler(successMessage.GET_CROP_PRICE_INFO_SUCCESS, data);
   }
 
   @Get('crop/prices')
+  @Public()
+  @cropPriceInfoResponseDecorator()
   async getAllPrices() {
-    return this.marketService.getAllCropPrices();
+    const data = await this.marketService.getAllCropPrices();
+    return successhandler(successMessage.GET_ALL_CROP_PRICE_INFO_SUCCESS, data);
   }
 
   @Get('crops')
   @Public()
-  @mailResponseDecorator()
+  @cropNameInfoResponseDecorator()
   async getCropsInfo() {
     const data = await this.marketService.getCropsInfo();
-    return successhandler(successMessage.GET_CROPS_INFO_SUCCESS, data);
+    return successhandler(successMessage.GET_CROPS_NAME_INFO_SUCCESS, data);
   }
 }
