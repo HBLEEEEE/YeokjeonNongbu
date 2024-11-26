@@ -13,7 +13,6 @@ import { AccountService } from '../account/account.service';
 import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard';
 import { MarketOrderDto } from './dto/marketOrder.dto';
 import { toOrderType, toTradingType } from './enums/orderType';
-import { JwtAuthGuard } from '../global/utils/jwtAuthGuard';
 import { User } from '../global/utils/memberData';
 
 @Controller('api/order')
@@ -27,7 +26,6 @@ export class OrderController {
 
   @Post('buy/limit')
   @UseGuards(HasSufficientCashGuard)
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '구매 주문 생성' })
   @orderResponseDecorator()
   async createLimitBuyOrder(
@@ -49,7 +47,6 @@ export class OrderController {
 
   @Post('sell/limit')
   @UseGuards(HasSufficientCropGuard)
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '판매 주문 생성' })
   @orderResponseDecorator()
   async createLimitSellOrder(
@@ -71,7 +68,6 @@ export class OrderController {
 
   @Post('buy/market')
   @UseGuards(HasSufficientCashGuard)
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '시장가 구매 주문 생성' })
   @orderResponseDecorator()
   async createMarketBuyOrder(
@@ -93,7 +89,6 @@ export class OrderController {
 
   @Post('sell/market')
   @UseGuards(HasSufficientCropGuard)
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '시장가 판매 주문 생성' })
   @orderResponseDecorator()
   async createMarketSellOrder(
@@ -114,7 +109,6 @@ export class OrderController {
   }
 
   @Get('')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '각 회원 체결 내역 조회' })
   @transactionResponseDecorator()
   async getTransactionsByMemberId(@User() user: { memberId: number }) {
@@ -124,7 +118,6 @@ export class OrderController {
   }
 
   @Post('cancel')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '주문 취소' })
   @ApiResponse({ status: 200, description: '주문 취소 성공' })
   async cancelOrder(

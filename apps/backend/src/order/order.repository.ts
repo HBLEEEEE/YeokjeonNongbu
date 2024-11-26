@@ -153,7 +153,6 @@ export class OrderRepository {
 
     return result.rows.map(data => ({
       orderId: data.order_id,
-      memberId: data.member_id,
       cropId: data.crop_id,
       tradingType: data.trading_type,
       price: data.price,

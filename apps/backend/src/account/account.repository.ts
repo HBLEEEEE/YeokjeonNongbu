@@ -19,7 +19,6 @@ export class AccountRepository {
 
     const result = await this.databaseService.query(query, values);
     return {
-      memberId: memberId,
       availableCash: result.rows[0].available_cash,
       pendingCash: result.rows[0].pending_cash,
       totalCash: result.rows[0].total_cash
@@ -133,13 +132,11 @@ export class AccountRepository {
 
     if (!result || result.rows.length === 0) {
       return {
-        memberId: memberId,
         cropId: cropId,
         quantity: 0
       };
     }
     return {
-      memberId: memberId,
       cropId: cropId,
       quantity: result.rows[0].available_quantity || 0
     };
