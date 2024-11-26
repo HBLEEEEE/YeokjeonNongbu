@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useUser } from './UserContext';
+import { useUser } from '@/components/public/UserContext';
 
 const OauthLogin: React.FC = () => {
   const { setNickname } = useUser();

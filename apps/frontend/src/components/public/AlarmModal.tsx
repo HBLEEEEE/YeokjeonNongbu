@@ -1,4 +1,4 @@
-import CloseIcon from './CloseIcon';
+import CloseIcon from '@/components/Icons/CloseIcon';
 import { Alarm } from '@/types/Index';
 
 interface AlarmModalProps {

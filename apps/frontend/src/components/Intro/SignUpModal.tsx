@@ -2,8 +2,8 @@ import { useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
 import { signUp, login } from '@/services/AuthApi';
-import { useUser } from './UserContext';
-import { AlertContext } from '@/components/AlertContext';
+import { useUser } from '@/components/public/UserContext';
+import { AlertContext } from '@/components/public/AlertContext';
 
 interface SignUpModalProps {
   step: number;

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import CropSelector from '@/components/CropSelector';
-import AskingPrice from '@/components/AskingPrice';
-import Chart from '@/components/Chart';
-import TradeSection from '@/components/TradeSection';
-import WoodBoard from '@/components/WoodBoard';
-import OwnCrop from '@/components/OwnCrop';
+import CropSelector from '@/components/CropMarket/CropSelector';
+import AskingPrice from '@/components/CropMarket/AskingPrice';
+import Chart from '@/components/CropMarket/Chart';
+import TradeSection from '@/components/CropMarket/TradeSection';
+import WoodBoard from '@/components/CropMarket/WoodBoard';
+import OwnCrop from '@/components/CropMarket/OwnCrop';
 
 const data1Min = [
   { x: '2024-11-20T09:00:00', y: 100 },

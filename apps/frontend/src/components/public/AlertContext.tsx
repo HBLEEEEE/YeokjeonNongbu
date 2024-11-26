@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react';
-import Alert from '@/components/Alert';
+import Alert from '@/components/public/Alert';
 
 type Type = {
   alert: (message?: string) => Promise<boolean>;
