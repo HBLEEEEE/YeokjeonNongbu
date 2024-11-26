@@ -5,10 +5,20 @@ import { AccountRepository } from './account.repository';
 import { DatabaseModule } from '../database/database.module';
 import { HasSufficientCashGuard } from './guards/hasSufficientCashGuard';
 import { HasSufficientCropGuard } from './guards/hasSufficientCropGuard';
+import { AuthModule } from '../auth/auth.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   controllers: [AccountController],
-  providers: [AccountService, AccountRepository, HasSufficientCashGuard, HasSufficientCropGuard],
+  providers: [
+    AccountService,
+    AccountRepository,
+    HasSufficientCashGuard,
+    HasSufficientCropGuard,
+    AuthModule,
+    JwtService
+  ],
+
   exports: [AccountService],
   imports: [DatabaseModule]
 })

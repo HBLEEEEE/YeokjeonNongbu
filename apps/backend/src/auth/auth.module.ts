@@ -6,6 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { KakaoStrategy } from './strategies/kakao.strategy';
+import { JwtAuthGuard } from 'src/global/utils/jwtAuthGuard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -20,7 +22,15 @@ import { KakaoStrategy } from './strategies/kakao.strategy';
       })
     })
   ],
-  providers: [AuthService, GoogleStrategy, KakaoStrategy],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    KakaoStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
+    }
+  ],
   controllers: [AuthController]
 })
 export class AuthModule {}
