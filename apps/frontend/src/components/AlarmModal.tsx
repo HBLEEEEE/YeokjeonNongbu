@@ -1,4 +1,3 @@
-import React from 'react';
 import CloseIcon from './CloseIcon';
 import { Alarm } from '@/types/Index';
 
