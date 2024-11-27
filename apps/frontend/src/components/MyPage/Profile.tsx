@@ -41,7 +41,7 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
         if (response.success) {
           setIntroduce(response.introduce || '');
           setTmpIntro(response.introduce || '');
-          // setError2(null);
+          setError2(null);
         } else {
           setError2(response.message || '데이터 로딩 중 오류가 발생했습니다.');
         }
