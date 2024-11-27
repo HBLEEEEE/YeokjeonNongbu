@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { MarketService } from './market.service';
 import {
   cropNameInfoResponseDecorator,
@@ -12,9 +12,8 @@ export class MarketController {
 
   @Get('crop/price/:cropId')
   @cropPriceInfoResponseDecorator()
-  async getPrice(@Param('cropId') cropId: string) {
-    const parsedCropId = parseInt(cropId, 10);
-    const data = await this.marketService.getCropPrice(parsedCropId);
+  async getPrice(@Param('cropId', ParseIntPipe) cropId: number) {
+    const data = await this.marketService.getCropPrice(cropId);
     return successhandler(successMessage.GET_CROP_PRICE_INFO_SUCCESS, data);
   }
 
