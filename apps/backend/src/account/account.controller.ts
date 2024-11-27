@@ -4,7 +4,8 @@ import { ApiOperation } from '@nestjs/swagger';
 import {
   accountCashDecorator,
   accountCropDecorator,
-  accountCropsDecorator
+  accountCropsDecorator,
+  accountCropValueDecorator
 } from './decorator/account.decorator';
 import { successhandler, successMessage } from '../global/successhandler';
 import { User } from '../global/utils/memberData';
@@ -24,6 +25,27 @@ export class AccountController {
     const { memberId } = user;
     const cash = await this.accountService.getCashFromMemberId(memberId);
     return successhandler(successMessage.GET_ACCOUNT_CASH_SUCCESS, cash);
+  }
+
+  @Get('crops/value')
+  @ApiOperation({ summary: '회원의 총 보유 작물 가치 조회' })
+  @accountCropValueDecorator()
+  async getCropsValueFromMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    const cropsByMember = await this.accountService.getCropsFromMemberId(memberId);
+    const cropPrices = await this.marketService.getAllCropPrices();
+    const data = cropsByMember.reduce((acc, crop) => {
+      const cropData = cropPrices.find(cropData => cropData.cropId === crop.cropId);
+
+      if (!cropData) {
+        return acc;
+      } else {
+        return acc + cropData.price * crop.quantity;
+      }
+    }, 0);
+
+    const totalValue = { value: data };
+    return successhandler(successMessage.GET_ACCOUNT_CROP_VALUE_SUCCESS, totalValue);
   }
 
   @Get('crop/:cropId')
@@ -53,6 +75,6 @@ export class AccountController {
         quantity: memberCrop?.quantity || 0
       };
     });
-    return successhandler(successMessage.GET_ACCOUNT_CROPS_SUCCESS, crops);
+    return successhandler(successMessage.GET_ACCOUNT_CROP_SUCCESS, crops);
   }
 }

@@ -162,14 +162,41 @@ export class OrderRepository {
     }));
   }
 
-  async cancelOrder(orderId: number): Promise<void> {
+  async getOrderById(memberId: number, orderId: number): Promise<OrderDto> {
     const query = `
-            DELETE
+            SELECT *
             FROM orders
             WHERE order_id = $1
+              AND member_Id = $2
+        `;
+    const values = [orderId, memberId];
+    const result = await this.databaseService.query(query, values);
+
+    const data = result.rows[0];
+    return {
+      cropId: data.crop_id,
+      memberId: data.member_id,
+      orderType: data.order_type,
+      tradingType: data.trading_type,
+      quantity: data.quantity,
+      price: data.price,
+      status: data.status,
+      filledQuantity: data.filled_quantity,
+      unfilledQuantity: data.unfilled_quantity,
+      totalAmount: data.total_amount,
+      time: data.time
+    };
+  }
+
+  async cancelOrder(memberId: number, orderId: number): Promise<void> {
+    const query = `
+            UPDATE orders
+            SET status = 'canceled'
+            WHERE order_id = $1
+              AND member_id = $2
         `;
 
-    const values = [orderId];
+    const values = [orderId, memberId];
     await this.databaseService.query(query, values);
   }
 }

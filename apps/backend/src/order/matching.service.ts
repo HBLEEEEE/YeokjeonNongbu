@@ -118,6 +118,7 @@ export class MatchingService {
         }
         // Redis 주문 제거
         await this.orderBookService.removeOrder(
+          buyOrder.memberId,
           cropId,
           buyOrder.orderId,
           OrderType.BUY,
@@ -140,6 +141,7 @@ export class MatchingService {
         }
         // Redis 주문 제거
         await this.orderBookService.removeOrder(
+          sellOrder.memberId,
           cropId,
           sellOrder.orderId,
           OrderType.SELL,
@@ -227,6 +229,7 @@ export class MatchingService {
     // 지정가 거래만 Redis 업데이트
     if (sellOrder.unfilledQuantity! > 0 && sellOrder.tradingType === TradingType.LIMIT) {
       await this.orderBookService.updateOrder(
+        sellOrder.memberId,
         sellOrder.cropId,
         OrderType.SELL,
         sellOrder.orderId,
@@ -236,6 +239,7 @@ export class MatchingService {
     }
     if (buyOrder.unfilledQuantity! > 0 && buyOrder.tradingType === TradingType.LIMIT) {
       await this.orderBookService.updateOrder(
+        sellOrder.memberId,
         buyOrder.cropId,
         OrderType.BUY,
         buyOrder.orderId,
@@ -246,6 +250,7 @@ export class MatchingService {
 
     if (buyOrder.tradingType == 'limit' && buyOrder.unfilledQuantity! === 0) {
       await this.orderBookService.removeOrder(
+        buyOrder.memberId,
         buyOrder.cropId,
         buyOrder.orderId,
         OrderType.BUY,
@@ -255,6 +260,7 @@ export class MatchingService {
 
     if (buyOrder.tradingType == 'limit' && sellOrder.unfilledQuantity! === 0) {
       await this.orderBookService.removeOrder(
+        sellOrder.memberId,
         sellOrder.cropId,
         sellOrder.orderId,
         OrderType.SELL,

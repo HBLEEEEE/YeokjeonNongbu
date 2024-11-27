@@ -26,6 +26,7 @@ export class OrderBookService {
   }
 
   async updateOrder(
+    memberId: number,
     cropId: number,
     orderType: OrderType,
     orderId: number,
@@ -46,7 +47,7 @@ export class OrderBookService {
       );
       // 미체결 수량이 0인 경우 Redis 삭제
       if (targetOrder.unfilledQuantity === 0) {
-        await this.removeOrder(cropId, orderId, orderType, tradingType);
+        await this.removeOrder(memberId, cropId, orderId, orderType, tradingType);
       } else {
         await this.addOrder(targetOrder);
       }
@@ -67,6 +68,7 @@ export class OrderBookService {
   }
 
   async removeOrder(
+    memberId: number,
     cropId: number,
     orderId: number,
     orderType: OrderType,
@@ -75,7 +77,11 @@ export class OrderBookService {
     const orderKey = `orderBook:${cropId}:${orderType}:${tradingType}`;
     const orders = await this.redisClient.zRange(orderKey, 0, -1);
 
-    const targetOrder = orders.find(order => this.deserializeOrder(order).orderId === orderId);
+    const targetOrder = orders.find(
+      order =>
+        this.deserializeOrder(order).orderId === orderId &&
+        this.deserializeOrder(order).memberId === memberId
+    );
     if (targetOrder) {
       await this.redisClient.zRem(orderKey, targetOrder);
     }

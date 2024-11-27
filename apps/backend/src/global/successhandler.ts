@@ -26,8 +26,9 @@ export const successMessage = {
   GET_CROPS_NAME_INFO_SUCCESS: { code: 200, message: '작물 정보 조회 성공' },
   GET_CROP_PRICE_INFO_SUCCESS: { code: 200, message: '작물 가격 정보 조회 성공' },
   GET_ALL_CROP_PRICE_INFO_SUCCESS: { code: 200, message: '작물 가격 정보 조회 성공' },
-  GET_ACCOUNT_CROPS_SUCCESS: { code: 200, message: '회원 작물 조회 성공' },
-  GET_ACCOUNT_CROP_SUCCESS: { code: 200, message: '회원 작물 조회 성공' }
+  GET_ACCOUNT_CROP_SUCCESS: { code: 200, message: '회원 작물 조회 성공' },
+  GET_ACCOUNT_CROP_VALUE_SUCCESS: { code: 200, message: '회원의 총 보유 작물 가치 조회 성공' },
+  GET_INTRODUCE_SUCCESS: { code: 200, message: '소개글 조회 성공' }
 };
 
 export function successhandler<T>(success: SuccessMessage, data: Nullable<T> = null) {

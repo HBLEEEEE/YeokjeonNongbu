@@ -17,6 +17,7 @@ import { loginResponseDecorator } from './decorator/login.decorator';
 import { logoutResponseDecorator } from './decorator/logout.decorator';
 import { updateIntroduceResponseDecorator } from './decorator/updateIntroduce.decorator';
 import { updateNicknameResponseDecorator } from './decorator/updateNickname.decorator';
+import { accountIntroduceDecorator } from './decorator/getIntroduce.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -86,6 +87,16 @@ export class AuthController {
     const { introduce } = updateIntroduceDto;
     await this.authService.updateIntroduce(memberId, introduce);
     return successhandler(successMessage.INTRODUCE_UPDATE_SUCCESS);
+  }
+
+  @Get('introduce')
+  @ApiOperation({ summary: '회원의 소개글 조회' })
+  @accountIntroduceDecorator()
+  async getIntroduceFromMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    const data = await this.authService.getIntroduce(memberId);
+    const introduce = { introduce: data };
+    return successhandler(successMessage.GET_INTRODUCE_SUCCESS, introduce);
   }
 
   @Patch('nickname')

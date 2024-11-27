@@ -138,6 +138,11 @@ export class AuthService {
     await this.databaseService.query(authQueries.updateInroduceQuery, [introduce, memberId]);
   }
 
+  async getIntroduce(memberId: number): Promise<string> {
+    const data = await this.databaseService.query(authQueries.getIntroduceQuery, [memberId]);
+    return data.rows[0].introduce;
+  }
+
   async updateNickname(memberId: number, nickname: Nullable<string>) {
     if (!nickname || nickname.length < 2 || nickname.length > 10)
       throw new HttpException('닉네임은 2자에서 10자 사이로 입력해주세요.', HttpStatus.BAD_REQUEST);
