@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AccountCropDto } from './accountCrop.dto';
+import { GetCropsByMemberDto } from '../getCropsByMember.dto';
 
-export class GetCropByMemberResponseDto {
+export class GetCropsByMemberResponseDto {
   @ApiProperty({
     description: '응답 코드',
     example: 200
@@ -16,7 +16,8 @@ export class GetCropByMemberResponseDto {
 
   @ApiProperty({
     description: '응답 데이터',
-    type: AccountCropDto
+    type: GetCropsByMemberDto,
+    isArray: true
   })
-  data: AccountCropDto;
+  data: GetCropsByMemberDto;
 }
