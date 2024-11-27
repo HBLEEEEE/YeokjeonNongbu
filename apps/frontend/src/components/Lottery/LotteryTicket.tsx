@@ -25,7 +25,7 @@ const LotteryTicket: React.FC<LotteryTicketProps> = ({ isCanvasVisible, canvasRe
       {isCanvasVisible && (
         <div className="absolute top-[20px] left-[280px] w-[500px] h-[270px]">
           <div className="absolute flex flex-col top-0 left-0 w-full h-full flex items-center justify-center text-2xl font-bold bg-white text-black rounded-lg">
-            <p>{rank === 5 ? '실패!' : '성공!'}</p>
+            <p>{rank === 5 ? '실패!' : `${rank}등 성공!`}</p>
             {rank !== 5 && <p>+ {WINNINGS[rank][0]}원!</p>}
           </div>
           <canvas
