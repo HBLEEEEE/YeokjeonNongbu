@@ -17,7 +17,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async validate(...profile: any[]) {
     const { displayName, emails } = profile[2];
-    const user = { email: emails, name: displayName };
+    const user = { email: emails[0].value, name: displayName };
     return user;
   }
 }
