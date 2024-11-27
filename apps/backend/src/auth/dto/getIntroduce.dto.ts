@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetMemberIntroduceResponseDto {
+export class GetIntroduceDto {
   @ApiProperty({ example: 200, description: '응답 코드' })
   code: number;
 
