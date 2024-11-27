@@ -187,4 +187,15 @@ export class AccountRepository {
     const values = [amount, memberId];
     await this.databaseService.query(query, values);
   }
+
+  async getIntroduce(memberId: number): Promise<string> {
+    const query = `
+            SELECT introduce
+            FROM members
+            WHERE member_id = $1
+        `;
+    const values = [memberId];
+    const result = await this.databaseService.query(query, values);
+    return result.rows[0].introduce;
+  }
 }

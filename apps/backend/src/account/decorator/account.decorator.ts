@@ -4,6 +4,7 @@ import { GetCashResponseDto } from '../dto/getCashResponse.dto';
 import { GetCropsByMemberResponseDto } from '../dto/response/getCropsByMemberResponse.dto';
 import { GetCropByMemberResponseDto } from '../dto/response/getCropByMemberResponse.dto';
 import { MemberTotalCropValueResponseDto } from '../dto/response/memberTotalCropValueResponse.dto';
+import { GetMemberIntroduceResponseDto } from '../dto/response/getMemberIntroduceResponse.dto';
 
 export function accountCashDecorator() {
   return applyDecorators(
@@ -41,6 +42,16 @@ export function accountCropValueDecorator() {
       status: 200,
       description: '회원의 총 보유 작물 가치 조회',
       type: MemberTotalCropValueResponseDto
+    })
+  );
+}
+
+export function accountIntroduceDecorator() {
+  return applyDecorators(
+    ApiResponse({
+      status: 200,
+      description: '회원 소개 조회 성공',
+      type: GetMemberIntroduceResponseDto
     })
   );
 }

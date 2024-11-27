@@ -5,7 +5,8 @@ import {
   accountCashDecorator,
   accountCropDecorator,
   accountCropsDecorator,
-  accountCropValueDecorator
+  accountCropValueDecorator,
+  accountIntroduceDecorator
 } from './decorator/account.decorator';
 import { successhandler, successMessage } from '../global/successhandler';
 import { User } from '../global/utils/memberData';
@@ -76,5 +77,15 @@ export class AccountController {
       };
     });
     return successhandler(successMessage.GET_ACCOUNT_CROP_SUCCESS, crops);
+  }
+
+  @Get('introduce')
+  @ApiOperation({ summary: '회원의 소개글 조회' })
+  @accountIntroduceDecorator()
+  async getIntroduceFromMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    const data = await this.accountService.getIntroduce(memberId);
+    const introduce = { introduce: data };
+    return successhandler(successMessage.GET_INTRODUCE_SUCCESS, introduce);
   }
 }
