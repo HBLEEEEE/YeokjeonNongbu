@@ -3,17 +3,17 @@ import { OrderService } from './order.service';
 import { OrderBookService } from './orderBook.service';
 import DtoTransformer from './utils/dtoTransformer';
 import { LimitOrderDto } from './dto/limitOrder.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation } from '@nestjs/swagger';
 import { MatchingService } from './matching.service';
 import { successhandler, successMessage } from '../global/successhandler';
-import { orderResponseDecorator } from './decorator/order.decorator';
+import { cancelOrderResponseDecorator, orderResponseDecorator } from './decorator/order.decorator';
 import { transactionResponseDecorator } from './decorator/getTransactions.decorator';
 import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
 import { AccountService } from '../account/account.service';
 import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard';
 import { MarketOrderDto } from './dto/marketOrder.dto';
-import { toOrderType, toTradingType } from './enums/orderType';
 import { User } from '../global/utils/memberData';
+import { CancelOrderDto } from './dto/cancelOrder.dto';
 
 @Controller('api/order')
 export class OrderController {
@@ -119,29 +119,13 @@ export class OrderController {
 
   @Post('cancel')
   @ApiOperation({ summary: '주문 취소' })
-  @ApiResponse({ status: 200, description: '주문 취소 성공' })
-  async cancelOrder(
-    @User() user: { memberId: number },
-    @Body()
-    {
-      cropId,
-      orderId,
-      orderType,
-      tradingType
-    }: {
-      cropId: number;
-      orderId: number;
-      orderType: 'buy' | 'sell';
-      tradingType: 'limit' | 'market';
-    }
-  ) {
-    await this.orderBookService.removeOrder(
-      cropId,
-      orderId,
-      toOrderType(orderType),
-      toTradingType(tradingType)
-    );
-    await this.orderService.cancelOrder(orderId);
+  @cancelOrderResponseDecorator()
+  async cancelOrder(@User() user: { memberId: number }, @Body() cancelOrderDto: CancelOrderDto) {
+    const { memberId } = user;
+    const { cropId, orderId, orderType, tradingType } = cancelOrderDto;
+
+    await this.orderBookService.removeOrder(memberId, cropId, orderId, orderType, tradingType);
+    await this.orderService.cancelOrder(memberId, orderId, cropId, orderType);
     return successhandler(successMessage.DELETE_ORDER_SUCCESS);
   }
 }
