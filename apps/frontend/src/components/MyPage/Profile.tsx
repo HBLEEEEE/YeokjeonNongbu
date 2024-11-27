@@ -41,7 +41,7 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
         if (response.success) {
           setIntroduce(response.introduce || '');
           setTmpIntro(response.introduce || '');
-          setError2(null);
+          // setError2(null);
         } else {
           setError2(response.message || '데이터 로딩 중 오류가 발생했습니다.');
         }
@@ -99,25 +99,31 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
         <p className="text-lg font-bold">{id}</p>
         <EditIcon onClick={modalOpen}></EditIcon>
       </div>
-      <div className="flex w-full bg-light-red mt-2 flex-grow rounded-md text-center justify-center p-2">
-        <textarea
-          ref={textareaRef}
-          placeholder="한줄 소개를 입력해보세요!"
-          className="bg-light-red text-red-soft select-none font-bold p-1 mt-2 mx-2 w-full resize-none rounded border-none focus:outline-none cursor-default"
-          value={tmpIntro}
-          onChange={(e) => setTmpIntro(e.target.value)}
-          readOnly={!isEditable}
-        />
-        {isEditable ? (
-          <>
-            <SaveIcon onClick={editIntroduce} />
-          </>
-        ) : (
-          <>
-            <EditIcon onClick={editIntroduce} />
-          </>
-        )}
-      </div>
+      {error2 ? (
+        <div className="flex w-full mt-2 flex-grow rounded-md text-center justify-center p-2">
+          <p className="absolute text-black font-bold">{error2}</p>
+        </div>
+      ) : (
+        <div className="flex w-full bg-light-red mt-2 flex-grow rounded-md text-center justify-center p-2">
+          <textarea
+            ref={textareaRef}
+            placeholder="한줄 소개를 입력해보세요!"
+            className="bg-light-red text-red-soft select-none font-bold p-1 mt-2 mx-2 w-full resize-none rounded border-none focus:outline-none cursor-default"
+            value={tmpIntro}
+            onChange={(e) => setTmpIntro(e.target.value)}
+            readOnly={!isEditable}
+          />
+          {isEditable ? (
+            <>
+              <SaveIcon onClick={editIntroduce} />
+            </>
+          ) : (
+            <>
+              <EditIcon onClick={editIntroduce} />
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
