@@ -54,13 +54,13 @@ export class AccountRepository {
     if (orderType === OrderType.BUY) {
       query = `
                 UPDATE members
-                SET pending_cash = pending_cash - $1,
+                SET pending_cash = pending_cash - $1
                 WHERE member_id = $2
             `;
     } else if (orderType === OrderType.SELL) {
       query = `
                 UPDATE members
-                SET available_cash = available_cash + $1,
+                SET available_cash = available_cash + $1
                 WHERE member_id = $2
             `;
     }
@@ -93,7 +93,7 @@ export class AccountRepository {
   ): Promise<void> {
     const query = `
             UPDATE member_crops
-            SET pending_quantity = pending_quantity - $3,
+            SET pending_quantity = pending_quantity - $3
             WHERE member_id = $1
               AND crop_id = $2
         `;

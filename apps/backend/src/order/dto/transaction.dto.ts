@@ -1,4 +1,4 @@
-import { TradingType } from '../enums/orderType';
+import { OrderType } from '../enums/orderType';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TransactionDto {
@@ -9,7 +9,7 @@ export class TransactionDto {
   cropId: number;
 
   @ApiProperty({ description: '거래 유형', example: 'buy' })
-  tradingType: TradingType;
+  orderType: OrderType;
 
   @ApiProperty({ description: '거래 가격', example: 100 })
   price: number;

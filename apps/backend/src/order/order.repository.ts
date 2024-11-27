@@ -123,7 +123,7 @@ export class OrderRepository {
     matchedQuantity: number
   ): Promise<void> {
     const query = `
-            INSERT INTO transactions (order_id, member_id, crop_id, trading_type, price, total_price, amount)
+            INSERT INTO transactions (order_id, member_id, crop_id, order_type, price, total_price, amount)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
         `;
 
@@ -131,7 +131,7 @@ export class OrderRepository {
       order.orderId,
       order.memberId,
       order.cropId,
-      order.tradingType,
+      order.orderType,
       price,
       price * matchedQuantity,
       matchedQuantity
@@ -154,7 +154,7 @@ export class OrderRepository {
     return result.rows.map(data => ({
       orderId: data.order_id,
       cropId: data.crop_id,
-      tradingType: data.trading_type,
+      orderType: data.order_type,
       price: data.price,
       totalPrice: data.total_price,
       createdAt: data.created_at,
