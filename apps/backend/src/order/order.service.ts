@@ -3,14 +3,16 @@ import { OrderBookService } from './orderBook.service';
 import { OrderRepository } from './order.repository';
 import { OrderDto } from './dto/order.dto';
 import DtoTransformer from './utils/dtoTransformer';
-import { OrderStatus, TradingType } from './enums/orderType';
+import { OrderStatus, OrderType, TradingType } from './enums/orderType';
 import { OrderBookDto } from './dto/orderBook.dto';
+import { AccountService } from '../account/account.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly orderBookService: OrderBookService,
-    private readonly orderRepository: OrderRepository
+    private readonly orderRepository: OrderRepository,
+    private readonly accountService: AccountService
   ) {}
 
   async saveOrder(orderDto: OrderDto): Promise<number[]> {
@@ -71,7 +73,35 @@ export class OrderService {
     );
   }
 
-  async cancelOrder(orderId: number): Promise<void> {
-    await this.orderRepository.cancelOrder(orderId);
+  async cancelOrder(
+    memberId: number,
+    orderId: number,
+    cropId: number,
+    orderType: OrderType
+  ): Promise<void> {
+    await this.rollbackMemberData(memberId, orderId, cropId, orderType);
+    await this.orderRepository.cancelOrder(memberId, orderId);
+  }
+
+  private async rollbackMemberData(
+    memberId: number,
+    orderId: number,
+    cropId: number,
+    orderType: OrderType
+  ): Promise<void> {
+    const order = await this.orderRepository.getOrderById(memberId, orderId);
+
+    if (orderType === OrderType.BUY) {
+      await this.accountService.rollbackPendingCash(
+        memberId,
+        order.price! * order.unfilledQuantity!
+      );
+      return;
+    }
+
+    if (orderType === OrderType.SELL) {
+      await this.accountService.rollbackPendingCrop(memberId, cropId, order.unfilledQuantity!);
+      return;
+    }
   }
 }

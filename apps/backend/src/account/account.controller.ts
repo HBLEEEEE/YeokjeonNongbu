@@ -53,6 +53,6 @@ export class AccountController {
         quantity: memberCrop?.quantity || 0
       };
     });
-    return successhandler(successMessage.GET_ACCOUNT_CROPS_SUCCESS, crops);
+    return successhandler(successMessage.GET_ACCOUNT_CROP_SUCCESS, crops);
   }
 }

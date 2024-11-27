@@ -13,6 +13,8 @@ import { RedisModule } from '../redis/redis.module';
 import { MailService } from '../mail/mail.service';
 import { MailModule } from '../mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
+import { AccountService } from '../account/account.service';
+import { AccountRepository } from '../account/account.repository';
 
 @Module({
   imports: [
@@ -31,7 +33,9 @@ import { ConfigModule } from '@nestjs/config';
     MatchingService,
     HasSufficientCashGuard,
     HasSufficientCropGuard,
-    MailService
+    MailService,
+    AccountService,
+    AccountRepository
   ]
 })
 export class OrderModule {}
