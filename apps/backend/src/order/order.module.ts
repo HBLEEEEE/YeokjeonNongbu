@@ -13,8 +13,6 @@ import { RedisModule } from '../redis/redis.module';
 import { MailService } from '../mail/mail.service';
 import { MailModule } from '../mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { JwtAuthGuard } from '../global/utils/jwtAuthGuard';
 
 @Module({
   imports: [
@@ -33,9 +31,7 @@ import { JwtAuthGuard } from '../global/utils/jwtAuthGuard';
     MatchingService,
     HasSufficientCashGuard,
     HasSufficientCropGuard,
-    MailService,
-    JwtService,
-    JwtAuthGuard
+    MailService
   ]
 })
 export class OrderModule {}
