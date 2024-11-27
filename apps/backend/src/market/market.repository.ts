@@ -13,8 +13,12 @@ export class MarketRepository {
         `;
 
     const result = await this.databaseService.query(query);
+    const data = result.rows;
 
-    return result.rows;
+    return data.map(data => ({
+      cropId: data.crop_id,
+      cropName: data.crop_name
+    }));
   }
 
   async getAllCropsPrice(): Promise<CropPrice[]> {
