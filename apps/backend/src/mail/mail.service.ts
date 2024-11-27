@@ -192,10 +192,10 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
   async createMailByOtherService(
     member_id: number,
     action: number,
-    param1: Nullable<number>,
-    param2: Nullable<number>,
-    param3: Nullable<number>,
-    content: Nullable<string>
+    param1: Nullable<number> = null,
+    param2: Nullable<number> = null,
+    param3: Nullable<number> = null,
+    content: Nullable<string> = null
   ) {
     await this.databaseService.query(mailQueries.InsertMailQuery, [
       member_id,
