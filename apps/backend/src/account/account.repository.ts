@@ -111,8 +111,7 @@ export class AccountRepository {
             INSERT INTO member_crops (member_id, crop_id, available_quantity)
             VALUES ($1, $2, $3) ON CONFLICT (member_id, crop_id)
     DO
-            UPDATE SET available_quantity = member_crops.available_quantity + $3,
-                        total_quantity = member_crops.total_quantity + $3;
+            UPDATE SET available_quantity = member_crops.available_quantity + $3
         `;
 
     const values = [memberId, cropId, quantity];
