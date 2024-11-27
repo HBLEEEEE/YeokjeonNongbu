@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { lottoQueries } from './lotto.queries';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import seedrandom = require('seedrandom');
+import * as seedrandom from 'seedrandom';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
