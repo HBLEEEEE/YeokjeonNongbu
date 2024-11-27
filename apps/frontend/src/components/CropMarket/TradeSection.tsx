@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import Trade from './Trade';
 import Pending from './Pending';
+import { CropData } from '@/types/Crop';
 
-const TradeSection: React.FC = () => {
+interface TradeProps {
+  currentCrop: number;
+  crops: CropData[];
+}
+
+const TradeSection: React.FC<TradeProps> = ({ currentCrop, crops }) => {
   const [tradeType, setTradeType] = useState<string>('매수');
   const [orderType, setOrderType] = useState<string>('지정가');
 
@@ -34,7 +40,13 @@ const TradeSection: React.FC = () => {
           ))}
         </div>
         {tradeType !== '대기' ? (
-          <Trade tradeType={tradeType} orderType={orderType} setOrderType={setOrderType} />
+          <Trade
+            trade={tradeType}
+            order={orderType}
+            setOrderType={setOrderType}
+            currentCrop={currentCrop}
+            crops={crops}
+          />
         ) : (
           <Pending />
         )}

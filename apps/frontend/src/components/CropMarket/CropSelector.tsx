@@ -1,44 +1,39 @@
-const cropImages: Record<string, string> = {
-  당근: '/carrot.png',
-  수박: '/watermelon.png',
-  사과: '/apple.png',
-  포도: '/grape.png',
-  버섯: '/mushroom.png'
-};
-
-const crops: string[] = ['당근', '사과', '수박', '포도', '버섯'];
+import { CropData } from '@/types/Crop';
+import { cropList } from '@/constants/CropConstants';
 
 interface CropSelectorProps {
-  currentCrop: string;
-  onSelect: (crop: string) => void;
+  currentCrop: number;
+  onSelect: (crop: number) => void;
   activeInterval: string;
   handleIntervalChange: (interval: string) => void;
+  crops: CropData[];
 }
 
 const CropSelector: React.FC<CropSelectorProps> = ({
   currentCrop,
   onSelect,
   activeInterval,
-  handleIntervalChange
+  handleIntervalChange,
+  crops
 }) => {
   return (
     <div className="w-full flex flex-row flex-wrap md:gap-1 lg:gap-4 xl:gap-8 2xl:gap-10">
       {crops.map(crop => (
         <button
-          key={crop}
-          onClick={() => onSelect(crop)}
+          key={crop.cropId}
+          onClick={() => onSelect(crop.cropId)}
           className={`flex items-center gap-2 px-2 border-b-4 ${
-            crop === currentCrop
+            crop.cropId === currentCrop
               ? 'border-orange-500'
               : 'border-transparent hover:border-orange-500'
           }`}
         >
           <span
-            className={`md:text-xs lg:text-sm text-sm font-medium ${crop === currentCrop ? 'text-orange-500' : ''}`}
+            className={`md:text-xs lg:text-sm text-sm font-medium ${crop.cropId === currentCrop ? 'text-orange-500' : ''}`}
           >
-            {crop}
+            {cropList[crop.cropName]}
           </span>
-          <img src={`${cropImages[crop]}`} alt={crop} className="w-8 h-8" />
+          <img src={`/${crop.cropName}.png`} alt={crop.cropName} className="w-8 h-8" />
         </button>
       ))}
       <div className="ml-auto">

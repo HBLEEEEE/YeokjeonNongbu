@@ -1,10 +1,20 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { getCash, getOwnCropsValue } from '@/services/AccountApi';
+import { isLoggedIn } from '@/services/AuthApi';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface UserContextType {
   nickname: string;
+  availableCash: number;
   totalAssets: number;
+  totalCash: number;
+  currentValue: number;
   setNickname: (nickname: string) => void;
+  setAvailableCash: (availableCash: number) => void;
+  setTotalCash: (totalCash: number) => void;
+  setCurrentValue: (currentValue: number) => void;
   setTotalAssets: (totalAssets: number) => void;
+  fetch: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -13,26 +23,75 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
-// 수정 필요
-// localstorage 보다 서버에 요청해서 받아오는 코드 + 페이지 넘어갈 때마다 reload 시키는 코드로 변경
-// 지금은 user1으로 로그인 및 로그아웃 -> user2로 로그인시 이상하게 동작
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [nickname, setNickname] = useState<string>(() => {
     const savedNickname = localStorage.getItem('nickname');
     return savedNickname || '';
   });
-  const [totalAssets, setTotalAssets] = useState<number>(() => {
-    const savedTotalAssets = localStorage.getItem('totalAssets');
-    return savedTotalAssets ? parseFloat(savedTotalAssets) : 0;
-  });
+  const [availableCash, setAvailableCash] = useState<number>(0);
+  const [totalCash, setTotalCash] = useState<number>(0);
+  const [currentValue, setCurrentValue] = useState<number>(0);
+  const [totalAssets, setTotalAssets] = useState<number>(0);
+  const location = useLocation();
+
+  const fetchCash = useCallback(async () => {
+    try {
+      const response = await getCash();
+      if (response.success && response.totalCash && response.availableCash) {
+        setAvailableCash(response.availableCash);
+        setTotalCash(response.totalCash);
+      }
+    } catch (error) {
+      console.error('fetch 에러', error);
+    }
+  }, []);
+
+  const fetchCurrentValue = useCallback(async () => {
+    try {
+      const response = await getOwnCropsValue();
+      if (response.success && response.value) {
+        setCurrentValue(response.value);
+      }
+    } catch (error) {
+      console.error('fetch 에러', error);
+    }
+  }, []);
+
+  const fetch = () => {
+    fetchCash();
+    fetchCurrentValue();
+  };
 
   useEffect(() => {
     if (nickname) localStorage.setItem('nickname', nickname);
-    if (totalAssets !== 0) localStorage.setItem('totalAssets', totalAssets.toString());
-  }, [nickname, totalAssets]);
+  }, [nickname]);
+
+  useEffect(() => {
+    setTotalAssets(totalCash + currentValue);
+  }, [totalCash, currentValue]);
+
+  useEffect(() => {
+    if (isLoggedIn()) {
+      fetch();
+    }
+  }, [fetchCash, fetchCurrentValue, location, nickname]);
 
   return (
-    <UserContext.Provider value={{ nickname, totalAssets, setNickname, setTotalAssets }}>
+    <UserContext.Provider
+      value={{
+        nickname,
+        availableCash,
+        totalAssets,
+        totalCash,
+        currentValue,
+        setNickname,
+        setAvailableCash,
+        setTotalAssets,
+        setTotalCash,
+        setCurrentValue,
+        fetch
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
