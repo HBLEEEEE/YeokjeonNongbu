@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef, useContext } from 'react';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import AlarmModal from '@/components/public/AlarmModal';
@@ -18,6 +18,7 @@ const Header: React.FC = () => {
   const { alert } = useContext(AlertContext);
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectDelay = 3000;
+  const location = useLocation();
 
   const isJson = (data: string) => {
     try {
@@ -121,9 +122,11 @@ const Header: React.FC = () => {
           <p>{nickname}</p>
         </section>
 
-        <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
-          <p>￦ {totalAssets.toLocaleString()}</p>
-        </section>
+        {location.pathname !== '/cropmarket' && (
+          <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
+            <p>￦ {totalAssets.toLocaleString()}</p>
+          </section>
+        )}
       </div>
 
       <div className="flex items-center gap-8">
