@@ -1,29 +1,54 @@
-import { Crop } from '@/types/Index';
+import { OwnCropData } from '@/types/Index';
+import { cropList } from "@/constants/CropConstants";
+import { useEffect, useState } from 'react';
+import { getOwnCrops } from '@/services/AccountApi';
 
-interface CropListProps {
-  crops: Crop[];
-  emergencyFund: number;
-}
+const CropList: React.FC = () => {
+  const [ownCrops, setOwnCrops] = useState<OwnCropData[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-const CropList: React.FC<CropListProps> = ({ crops, emergencyFund }) => {
+  useEffect(() => {
+    const fetchOwnCrops = async () => {
+      try {
+        const response = await getOwnCrops();
+        if (response.success && response.ownCrops) {
+          setOwnCrops(response.ownCrops);
+          setError(null);
+        } else {
+          setError(response.message);
+        }
+      } catch {
+        setError('서버와의 연결에 실패했습니다.');
+      }
+    }
+
+    fetchOwnCrops();
+  }, []);
+
   return (
     <div className="mt-3 text-center">
       <p className="text-xl font-bold">보유 작물</p>
-      <div className="grid grid-cols-2 gap-2 mt-3 text-center">
-        {crops.map((crop, index) => (
-          <div key={index} className="flex flex-row items-center gap-3">
-            <p>{crop.name}</p>
-            <img src={crop.image} alt={crop.name} className="w-6 h-6" />
-            <p>x {crop.quantity}</p>
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-row mt-3 text-center gap-1">
-        <p>비상금</p>
-        <img src="/money.png" alt="비상금" className="w-8 h-6" />
-        <p>￦ {emergencyFund.toLocaleString()}</p>
-      </div>
-    </div>
+      {error ? (
+        <div className="flex flex-col items-center text-center rounded-2xl p-4 h-full">
+          <p className="flex text-center items-center text-black text-lg font-bold h-full">{error}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-2 mt-3 text-center">
+          {ownCrops.map((crop, index) => {
+            const cropName = crop.cropName.toLowerCase();
+
+            return (
+              <div key={index} className="flex flex-row items-center gap-3">
+                <p>{cropList[cropName]}</p>
+                <img src={`/${cropName}.png`} alt={crop.cropName} className="w-8 h-8" />
+                <p>x {crop.quantity}</p>
+              </div>
+            );
+          })}
+        </div>
+      )
+      }
+    </div >
   );
 };
 
