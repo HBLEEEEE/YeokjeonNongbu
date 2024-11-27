@@ -71,4 +71,8 @@ export class AccountService {
   async rollbackPendingCash(memberId: number, amount: number): Promise<void> {
     await this.accountRepository.incrementCash(memberId, amount);
   }
+
+  async getIntroduce(memberId: number): Promise<string> {
+    return await this.accountRepository.getIntroduce(memberId);
+  }
 }
