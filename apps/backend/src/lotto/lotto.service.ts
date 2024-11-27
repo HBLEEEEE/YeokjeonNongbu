@@ -3,10 +3,14 @@ import { DatabaseService } from 'src/database/database.service';
 import { lottoQueries } from './lotto.queries';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import seedrandom = require('seedrandom');
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class LottoService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService
+  ) {}
 
   async buyLotto(memberId: number) {
     const data = await this.databaseService.query(lottoQueries.getMemberCash, [memberId]);
@@ -51,7 +55,9 @@ export class LottoService {
       unsoldData.fourth_count +
       unsoldData.fifth_count;
 
-    const rng = seedrandom('my-seed');
+    // LOTTO_SEED
+    // const rng = seedrandom('my-seed');
+    const rng = seedrandom(this.configService.get<string>('LOTTO_SEED'));
     const myChance = Math.floor(rng() * total) + 1;
 
     let step = 0;
