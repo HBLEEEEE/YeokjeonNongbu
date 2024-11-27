@@ -58,8 +58,8 @@ export class LottoService {
       unsoldData.third_count +
       unsoldData.fourth_count +
       unsoldData.fifth_count;
-
-    const rng = seedrandom(`${this.configService.get<string>('LOTTO_SEED')}+${total}`);
+    const inningId = unsoldData.inning_id;
+    const rng = seedrandom(`${this.configService.get<string>('LOTTO_SEED')}+${total}+${inningId}`);
     const myChance = Math.floor(rng() * total) + 1;
     let step = 0;
     let rank = 0;
