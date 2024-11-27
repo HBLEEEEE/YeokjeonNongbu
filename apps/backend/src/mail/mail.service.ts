@@ -42,54 +42,25 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
-    const redisUrl = this.configService.get<string>('REDIS_URL');
-    this.subscriber = createClient({ url: redisUrl });
-    this.publisher = createClient({ url: redisUrl });
-
-    await this.subscriber.connect();
-    await this.publisher.connect();
-
-    const networkInterfaces = os.networkInterfaces();
-    for (const interfaceName in networkInterfaces) {
-      const networkInfo = networkInterfaces[interfaceName];
-      if (networkInfo) {
-        const ipv4 = networkInfo.find(info => info.family === 'IPv4' && !info.internal);
-        if (ipv4) {
-          this.myIp = String(ipv4.address);
-          break;
-        }
-      }
-    }
+    await this.initializeRedisClients();
+    this.myIp = await this.getLocalIpAddress();
 
     this.subscriber.subscribe('notifications', message => {
-      const parsedMessage = JSON.parse(message);
-      const memberId = parsedMessage.memberId;
-      if (this.sseSubjects.has(memberId)) {
-        const data = {
-          check: true,
-          time: new Date()
-        };
-        const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
-        this.sseSubjects.get(memberId)?.next(JSON.stringify(body));
-      }
+      this.handleNotification(message);
     });
 
-    this.intervalConnect = setInterval(() => {
-      this.sseSubjects.forEach(subject => subject.next('Periodically Check Response'));
-    }, 30 * 1000);
+    this.startSendPeriodicChecks();
   }
 
   async connectSse(memberId: number, res: Response) {
-    const checkUnread = await this.databaseService.query(mailQueries.checkUnreadQuery, [memberId]);
-    const data = {
-      check: checkUnread.rows[0].result,
-      time: new Date()
-    };
-    const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
+    const checkUnread = (await this.databaseService.query(mailQueries.checkUnreadQuery, [memberId]))
+      .rows[0].result;
 
     if (!this.sseSubjects.has(memberId)) {
-      const newSubject = new BehaviorSubject<string>(JSON.stringify(body));
-      this.sseSubjects.set(memberId, newSubject);
+      this.sseSubjects.set(
+        memberId,
+        new BehaviorSubject<string>(this.createNotificationPayload(checkUnread))
+      );
     }
 
     const userSubject = this.sseSubjects.get(memberId);
@@ -112,73 +83,27 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
   }
 
   async sendMessage(memberId: number) {
-    const serverInfo = await this.publisher.get(`sseRedisMember:${memberId}`);
-    if (!serverInfo) {
+    const targetIp = await this.publisher.get(`sseRedisMember:${memberId}`);
+    if (!targetIp) {
       return;
     }
 
-    if (serverInfo === this.myIp) {
-      const subject = this.sseSubjects.get(memberId);
-      if (subject) {
-        const data = {
-          check: true,
-          time: new Date()
-        };
-        const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
-        subject.next(JSON.stringify(body));
-      }
+    const isLocal = targetIp === this.myIp;
+    const subject = this.sseSubjects.get(memberId);
+
+    if (isLocal && subject) {
+      subject.next(this.createNotificationPayload(true));
     } else {
       await this.publisher.publish('notifications', JSON.stringify({ memberId }));
     }
   }
 
   async getMailsByMemberId(memberId: number) {
-    try {
-      const response = await this.databaseService.query(mailQueries.getAllMailQuery, [memberId]);
-      const processedMails = await Promise.all(
-        response.rows.map(async mail => {
-          const {
-            mail_id: mailId,
-            action,
-            content,
-            param2,
-            param3,
-            created_at: createdAt,
-            read_status: readStatus
-          } = mail;
-          let { param1 } = mail;
+    const response = await this.databaseService.query(mailQueries.getAllMailQuery, [memberId]);
+    const processedMails = await Promise.all(response.rows.map(mail => this.formatMail(mail)));
 
-          if (action === 1 || action === 2) {
-            param1 = (await this.databaseService.query(mailQueries.getCropName, [param1])).rows[0]
-              .crop_name;
-          } else if (action === 4 || action === 5 || action || 7) {
-            param1 = (
-              await this.databaseService.query(mailQueries.getMemberNickNameByMemberID, [param1])
-            ).rows[0];
-          }
-
-          const formattedContent = await this.mailCreateUtil.createMailString(
-            action,
-            param1?.toString() || '',
-            param2?.toString() || '',
-            param3?.toString() || '',
-            content || ''
-          );
-
-          return {
-            mailId,
-            content: formattedContent,
-            createdAt,
-            readStatus
-          };
-        })
-      );
-
-      await this.databaseService.query(mailQueries.makeReadedQuery, [memberId]);
-      return processedMails;
-    } catch (error) {
-      throw new HttpException('메일 기록을 가져오는 도중에 에러 발생 : ', error);
-    }
+    await this.databaseService.query(mailQueries.makeReadedQuery, [memberId]);
+    return processedMails;
   }
 
   async deleteAllMailByMemberId(memberId: number) {
@@ -189,7 +114,87 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async createMailByOtherService(
+  private async initializeRedisClients() {
+    const redisUrl = this.configService.get<string>('REDIS_URL');
+    this.subscriber = createClient({ url: redisUrl });
+    this.publisher = createClient({ url: redisUrl });
+    await Promise.all([this.subscriber.connect(), this.publisher.connect()]);
+  }
+
+  private getLocalIpAddress() {
+    const networkInterfaces = os.networkInterfaces();
+    for (const interfaceName in networkInterfaces) {
+      const networkInfo = networkInterfaces[interfaceName];
+      const ipv4 = networkInfo?.find(info => info.family === 'IPv4' && !info.internal);
+      if (ipv4) return ipv4.address;
+    }
+    throw new Error('Local IP address not found');
+  }
+
+  private handleNotification(msg: string) {
+    const parsedMessage = JSON.parse(msg);
+    const memberId = parsedMessage.memberId;
+    if (this.sseSubjects.has(memberId)) {
+      const data = {
+        check: true,
+        time: new Date()
+      };
+      const body = successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data);
+      this.sseSubjects.get(memberId)?.next(JSON.stringify(body));
+    }
+  }
+
+  private startSendPeriodicChecks() {
+    this.intervalConnect = setInterval(() => {
+      this.sseSubjects.forEach(subject => subject.next('Periodically Check Response'));
+    }, 30000); // 30 seconds
+  }
+
+  private createNotificationPayload(hasUnread: boolean): string {
+    const data = {
+      check: hasUnread,
+      time: new Date()
+    };
+    return JSON.stringify(successhandler(successMessage.GET_MAIL_ALARM_SUCCESS, data));
+  }
+
+  private async formatMail(mail: any) {
+    const {
+      mail_id: mailId,
+      action,
+      param1,
+      param2,
+      param3,
+      content,
+      created_at: createdAt,
+      read_status: readStatus
+    } = mail;
+
+    const formattedContent = await this.mailCreateUtil.createMailString(
+      action,
+      await this.getActionParam(action, param1),
+      param2,
+      param3,
+      content
+    );
+
+    return { mailId, content: formattedContent, createdAt, readStatus };
+  }
+
+  private async getActionParam(action: number, param1: Nullable<number>) {
+    if ([1, 2].includes(action)) {
+      const result = await this.databaseService.query(mailQueries.getCropName, [param1]);
+      return result.rows[0]?.crop_name || '';
+    } else if ([4, 5, 7].includes(action)) {
+      const result = await this.databaseService.query(mailQueries.getMemberNickNameByMemberID, [
+        param1
+      ]);
+      return result.rows[0]?.nickname || '';
+    }
+    return '';
+  }
+
+  public async createMailByOtherService(
     member_id: number,
     action: number,
     param1: Nullable<number> = null,
