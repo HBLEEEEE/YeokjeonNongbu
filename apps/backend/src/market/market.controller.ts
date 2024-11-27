@@ -14,8 +14,8 @@ export class MarketController {
   @Get('crop/price/:cropId')
   @Public()
   @cropPriceInfoResponseDecorator()
-  async getPrice(@Param('cropId') crop: number) {
-    const data = await this.marketService.getCropPrice(crop);
+  async getPrice(@Param('cropId') cropId: string) {
+    const data = await this.marketService.getCropPrice(parseInt(cropId, 10));
     return successhandler(successMessage.GET_CROP_PRICE_INFO_SUCCESS, data);
   }
 

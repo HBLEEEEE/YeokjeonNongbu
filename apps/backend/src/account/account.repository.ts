@@ -118,7 +118,7 @@ export class AccountRepository {
     await this.databaseService.query(query, values);
   }
 
-  async getCropsByMemberId(memberId: number, cropId: number): Promise<AccountCropDto> {
+  async getCropByMemberId(memberId: number, cropId: number): Promise<AccountCropDto> {
     const query = `
             SELECT crop_id, available_quantity
             FROM member_crops
@@ -140,6 +140,22 @@ export class AccountRepository {
       cropId: cropId,
       quantity: result.rows[0].available_quantity || 0
     };
+  }
+
+  async getCropsByMemberId(memberId: number): Promise<AccountCropDto[]> {
+    const query = `
+            SELECT crop_id, available_quantity
+            FROM member_crops
+            WHERE member_id = $1
+        `;
+
+    const values = [memberId];
+
+    const result = await this.databaseService.query(query, values);
+    return result.rows.map(row => ({
+      cropId: row.crop_id,
+      quantity: parseInt(row.available_quantity)
+    }));
   }
 
   async decrementPendingCrop(memberId: number, cropId: number, quantity: number): Promise<void> {

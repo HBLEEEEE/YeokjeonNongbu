@@ -7,6 +7,7 @@ import { HasSufficientCashGuard } from './guards/hasSufficientCashGuard';
 import { HasSufficientCropGuard } from './guards/hasSufficientCropGuard';
 import { AuthModule } from '../auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
+import { MarketModule } from '../market/market.module';
 
 @Module({
   controllers: [AccountController],
@@ -20,6 +21,6 @@ import { JwtService } from '@nestjs/jwt';
   ],
 
   exports: [AccountService],
-  imports: [DatabaseModule]
+  imports: [DatabaseModule, MarketModule]
 })
 export class AccountModule {}
