@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CropSelector from '@/components/CropMarket/CropSelector';
 import AskingPrice from '@/components/CropMarket/AskingPrice';
 import Chart from '@/components/CropMarket/Chart';
 import TradeSection from '@/components/CropMarket/TradeSection';
 import WoodBoard from '@/components/CropMarket/WoodBoard';
 import OwnCrop from '@/components/CropMarket/OwnCrop';
+import { CropData } from '@/types/Crop';
+import { getCrops } from '@/services/MarketApi';
+import { cropList } from '@/constants/CropConstants';
 
 const data1Min = [
   { x: '2024-11-20T09:00:00', y: 100 },
@@ -22,14 +25,36 @@ const data1Hour = [
 ];
 
 const CropMarket: React.FC = () => {
-  const [crop, setCrop] = useState<string>('당근');
+  const [crop, setCrop] = useState<number>(1);
   const [activeInterval, setActiveInterval] = useState<string>('1min');
   const [timeData, setTimeData] = useState(data1Min);
+  const [crops, setCrops] = useState<CropData[]>([]);
+
+  useEffect(() => {
+    const fetchCrops = async () => {
+      const response = await getCrops();
+      if (response.success && response.crops) {
+        setCrops(
+          response.crops.map(e => ({
+            cropId: e.cropId,
+            cropName: e.cropName.toLowerCase()
+          }))
+        );
+      } else {
+        setCrops([]);
+      }
+    };
+
+    fetchCrops();
+  }, []);
 
   const handleIntervalChange = (interval: string) => {
     setActiveInterval(interval);
     setTimeData(interval === '1min' ? data1Min : data1Hour);
   };
+
+  const cropName = crops.find(c => c.cropId === crop)?.cropName ?? '';
+  const validCropName = cropName && cropList[cropName];
 
   return (
     <main className="flex flex-row justify-center items-center min-h-screen select-none pt-16 gap-4">
@@ -40,6 +65,7 @@ const CropMarket: React.FC = () => {
             onSelect={setCrop}
             activeInterval={activeInterval}
             handleIntervalChange={handleIntervalChange}
+            crops={crops}
           />
           <hr className="w-full bg-black h-[1px]" />
         </div>
@@ -51,9 +77,9 @@ const CropMarket: React.FC = () => {
         <section className="w-[95%] flex flex-row justify-between items-start">
           <WoodBoard>
             <h3 className="flex justify-center lg:text-sm xl:text-base font-bold mb-2">
-              오늘의 {crop} 가격
+              오늘의 {validCropName} 가격
             </h3>
-            <AskingPrice crop={crop} />
+            <AskingPrice validCropName={validCropName} />
           </WoodBoard>
           <WoodBoard>
             <h3 className="flex justify-center lg:text-sm xl:text-base font-bold mb-2">
@@ -64,7 +90,8 @@ const CropMarket: React.FC = () => {
         </section>
       </div>
       <div className="flex flex-col items-center z-[10]">
-        <TradeSection />
+        <TradeSection crops={crops} currentCrop={crop} />
+        <img src="/icon.png" className="w-56 h-56" />
       </div>
     </main>
   );

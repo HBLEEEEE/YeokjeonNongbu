@@ -111,7 +111,7 @@ const Ranking: React.FC = () => {
               </div>
               <div>
                 <p className="text-xl font-semibold">{nickname}</p>
-                <p className="text-xl font-semibold">￦ {(totalAssets).toLocaleString()}</p>
+                <p className="text-xl font-semibold">￦ {totalAssets.toLocaleString()}</p>
               </div>
             </>
           )}

@@ -1,5 +1,5 @@
 import { OwnCropData } from '@/types/Index';
-import { cropList } from "@/constants/CropConstants";
+import { cropList } from '@/constants/CropConstants';
 import { useEffect, useState } from 'react';
 import { getOwnCrops } from '@/services/AccountApi';
 
@@ -20,7 +20,7 @@ const CropList: React.FC = () => {
       } catch {
         setError('서버와의 연결에 실패했습니다.');
       }
-    }
+    };
 
     fetchOwnCrops();
   }, []);
@@ -30,7 +30,9 @@ const CropList: React.FC = () => {
       <p className="text-xl font-bold">보유 작물</p>
       {error ? (
         <div className="flex flex-col items-center text-center rounded-2xl p-4 h-full">
-          <p className="flex text-center items-center text-black text-lg font-bold h-full">{error}</p>
+          <p className="flex text-center items-center text-black text-lg font-bold h-full">
+            {error}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-2 mt-3 text-center">
@@ -46,9 +48,8 @@ const CropList: React.FC = () => {
             );
           })}
         </div>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 };
 

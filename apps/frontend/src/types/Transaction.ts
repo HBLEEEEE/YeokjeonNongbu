@@ -5,5 +5,5 @@ export interface Transaction {
   price: number;
   totalPrice: number;
   createdAt: string;
-  amount:number;
+  amount: number;
 }

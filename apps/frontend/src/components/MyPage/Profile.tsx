@@ -48,7 +48,7 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
       } catch {
         setError2('서버와의 연결에 실패했습니다.');
       }
-    }
+    };
 
     fetchMyRank();
     fetchIntroduce();
@@ -110,7 +110,7 @@ const Profile: React.FC<ProfileProps> = ({ id, modalOpen }) => {
             placeholder="한줄 소개를 입력해보세요!"
             className="bg-light-red text-red-soft select-none font-bold p-1 mt-2 mx-2 w-full resize-none rounded border-none focus:outline-none cursor-default"
             value={tmpIntro}
-            onChange={(e) => setTmpIntro(e.target.value)}
+            onChange={e => setTmpIntro(e.target.value)}
             readOnly={!isEditable}
           />
           {isEditable ? (

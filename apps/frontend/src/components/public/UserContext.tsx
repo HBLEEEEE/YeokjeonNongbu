@@ -38,7 +38,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     try {
       const response = await getCash();
       if (response.success && response.totalCash && response.availableCash) {
-        setAvailableCash(response.availableCash)
+        setAvailableCash(response.availableCash);
         setTotalCash(response.totalCash);
       }
     } catch (error) {
@@ -77,7 +77,21 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }, [fetchCash, fetchCurrentValue, location, nickname]);
 
   return (
-    <UserContext.Provider value={{ nickname, availableCash, totalAssets, totalCash, currentValue, setNickname, setAvailableCash, setTotalAssets, setTotalCash, setCurrentValue, fetch }}>
+    <UserContext.Provider
+      value={{
+        nickname,
+        availableCash,
+        totalAssets,
+        totalCash,
+        currentValue,
+        setNickname,
+        setAvailableCash,
+        setTotalAssets,
+        setTotalCash,
+        setCurrentValue,
+        fetch
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

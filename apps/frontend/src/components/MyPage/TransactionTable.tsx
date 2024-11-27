@@ -35,16 +35,18 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ displayedTransactio
 
           return (
             <tr key={index} className="text-center odd:bg-white even:bg-light-beige">
-              <td className="p-2">{transaction.createdAt? formattedDate : '\u00A0'}</td>
+              <td className="p-2">{transaction.createdAt ? formattedDate : '\u00A0'}</td>
               <td className="p-2">{cropName}</td>
               <td className="p-2">
-                {transaction.orderType === 'sell' ? '매도' : transaction.orderType === 'buy' ? '매수' : '\u00A0'}
+                {transaction.orderType === 'sell'
+                  ? '매도'
+                  : transaction.orderType === 'buy'
+                    ? '매수'
+                    : '\u00A0'}
               </td>
               <td className="p-2">{transaction.amount !== 0 ? transaction.amount : '\u00A0'}</td>
               <td className="p-2">
-                {transaction.price !== 0
-                  ? `${transaction.price.toLocaleString()} 원`
-                  : '\u00A0'}
+                {transaction.price !== 0 ? `${transaction.price.toLocaleString()} 원` : '\u00A0'}
               </td>
               <td className="p-2">
                 {transaction.totalPrice !== 0

@@ -1,10 +1,58 @@
+import { CropData } from '@/types/Crop';
+import { useUser } from '../public/UserContext';
+import { useState } from 'react';
+
 interface TradeProps {
-  tradeType: string;
-  orderType: string;
+  trade: string;
+  order: string;
+  currentCrop: number;
+  crops: CropData[];
   setOrderType: (order: string) => void;
 }
 
-const Trade: React.FC<TradeProps> = ({ tradeType, orderType, setOrderType }) => {
+const Trade: React.FC<TradeProps> = ({ trade, order, currentCrop, crops, setOrderType }) => {
+  const [price, setPrice] = useState<number>(1000);
+  const [quantity, setQuantity] = useState<number>(0);
+  const { availableCash } = useUser();
+
+  const handleIncrease = () => {
+    setPrice(prevPrice => prevPrice + 1000);
+  };
+
+  const handleDecrease = () => {
+    setPrice(prevPrice => (prevPrice - 1000 >= 0 ? prevPrice - 1000 : 0));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPrice(parseInt(e.target.value));
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuantity(parseInt(e.target.value));
+  };
+
+  const handleMaxQuantity = () => {
+    if (price > 0) {
+      setQuantity(Math.floor(availableCash / price));
+    }
+  };
+
+  const handleOrder = async () => {
+    const crop = crops.find(crop => crop.cropId === currentCrop);
+    const cropId = crop?.cropId;
+    console.log(cropId);
+
+    const tradingType = trade === '매수' ? 'buy' : 'sell';
+    console.log(tradingType);
+
+    const orderType = order === '지정가' ? 'limit' : 'market';
+    console.log(orderType);
+
+    console.log(quantity);
+
+    console.log(price);
+  };
+
   return (
     <>
       <div className="flex items-center justify-between mt-4">
@@ -15,7 +63,7 @@ const Trade: React.FC<TradeProps> = ({ tradeType, orderType, setOrderType }) => 
               key={type}
               onClick={() => setOrderType(type)}
               className={`px-2 py-1 rounded-md text-xs ${
-                orderType === type ? 'bg-light-pink' : 'bg-gray-100'
+                order === type ? 'bg-light-pink' : 'bg-gray-100'
               }`}
             >
               {type}
@@ -24,47 +72,68 @@ const Trade: React.FC<TradeProps> = ({ tradeType, orderType, setOrderType }) => 
         </div>
       </div>
 
-      {orderType === '지정가' && (
+      {order === '지정가' && (
         <>
           <div className="flex items-center justify-between mt-4">
-            <span className="font-semibold text-sm">{tradeType}가격</span>
+            <span className="font-semibold text-sm">{trade} 가격</span>
             <div className="flex items-center gap-1">
-              <span className="font-semibold text-sm mr-1">190,000원</span>
-              <button className="px-2 py-1 text-center bg-gray-200 rounded-md text-xs">-</button>
-              <button className="px-2 py-1 text-center bg-gray-200 rounded-md text-xs">+</button>
+              <input
+                type="text"
+                value={price}
+                onChange={handleInputChange}
+                className="w-24 text-center border rounded-md text-sm px-2 py-1"
+              />
+              <button
+                className="px-2 py-1 text-center bg-gray-200 rounded-md text-xs"
+                onClick={handleDecrease}
+              >
+                -
+              </button>
+              <button
+                className="px-2 py-1 text-center bg-gray-200 rounded-md text-xs"
+                onClick={handleIncrease}
+              >
+                +
+              </button>
             </div>
           </div>
           <div className="flex items-center justify-between mt-4">
-            <span className="font-semibold text-sm">수량</span>
+            <span className="font-semibold text-sm">주문 수량</span>
             <div className="flex items-center gap-1">
               <input
                 type="number"
+                value={quantity}
+                onChange={handleQuantityChange}
                 placeholder="0"
                 className="w-14 px-1 py-1 border border-gray rounded text-xs text-center"
               />
-              <button className="px-2 py-1 bg-gray-200 rounded-md font-semibold text-xs">
+              <button
+                className="px-2 py-1 bg-gray-200 rounded-md font-semibold text-xs"
+                onClick={handleMaxQuantity}
+              >
                 최대
               </button>
             </div>
           </div>
           <div className="flex items-center justify-between mt-4">
-            <span className="font-semibold text-sm">잔액</span>
-            <span className="font-semibold text-sm">23,400,000</span>
+            <span className="font-semibold text-sm">주문 가능</span>
+            <span className="font-semibold text-sm">{availableCash.toLocaleString()} 원</span>
           </div>
           <button
             className={`w-full py-2 mt-10 text-white rounded-md font-semibold text-sm ${
-              tradeType === '매수' ? 'bg-red-500' : 'bg-blue-500'
+              trade === '매수' ? 'bg-red-500' : 'bg-blue-500'
             }`}
+            onClick={handleOrder}
           >
-            {tradeType}
+            {trade}
           </button>
         </>
       )}
 
-      {orderType === '시장가' && (
+      {order === '시장가' && (
         <>
           <div className="flex items-center justify-between mt-8">
-            <span className="font-semibold text-sm">주문총액</span>
+            <span className="font-semibold text-sm">주문 수량</span>
             <div className="flex items-center gap-1">
               <input
                 type="number"
@@ -77,15 +146,16 @@ const Trade: React.FC<TradeProps> = ({ tradeType, orderType, setOrderType }) => 
             </div>
           </div>
           <div className="flex items-center justify-between mt-8">
-            <span className="font-semibold text-sm">잔액</span>
-            <span className="font-semibold text-sm">23,400,000</span>
+            <span className="font-semibold text-sm">주문 가능</span>
+            <span className="font-semibold text-sm">{availableCash.toLocaleString()} 원</span>
           </div>
           <button
             className={`w-full py-2 mt-12 text-white rounded-md font-semibold text-sm ${
-              tradeType === '매수' ? 'bg-red-500' : 'bg-blue-600'
+              trade === '매수' ? 'bg-red-500' : 'bg-blue-600'
             }`}
+            onClick={handleOrder}
           >
-            {tradeType}
+            {trade}
           </button>
         </>
       )}

@@ -91,7 +91,7 @@ function App() {
           </BrowserRouter>
         </AnimatePresence>
       </div>
-    </AlertDialog >
+    </AlertDialog>
   );
 }
 

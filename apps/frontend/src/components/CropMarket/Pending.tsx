@@ -34,10 +34,10 @@ const Pending: React.FC = () => {
         <div className="text-center">주문시간</div>
         <div className="text-center">수량</div>
         <div className="text-center">가격</div>
-        <div className="text-center">취소</div>
+        <div className="text-center px-2" />
       </div>
 
-      <div className="max-h-48 overflow-y-auto">
+      <div className="max-h-48 overflow-y-auto scrollbar-hidden">
         {pendingData.map((pending, index) => (
           <div
             key={index}

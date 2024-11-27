@@ -16,17 +16,17 @@ const padTransactionsToPageSize = (transactions: Transaction[]): Transaction[] =
   return padCount === ITEMS_PER_PAGE
     ? transactions
     : [
-      ...transactions,
-      ...Array(padCount).fill({
-        orderId: 0,
-        cropId: 0,
-        orderType: "",
-        price: 0,
-        totalPrice: 0,
-        createdAt: "",
-        amount: 0
-      })
-    ];
+        ...transactions,
+        ...Array(padCount).fill({
+          orderId: 0,
+          cropId: 0,
+          orderType: '',
+          price: 0,
+          totalPrice: 0,
+          createdAt: '',
+          amount: 0
+        })
+      ];
 };
 
 const MyPage: React.FC = () => {
@@ -45,9 +45,9 @@ const MyPage: React.FC = () => {
       const response = await getCrops();
       if (response.success && response.crops) {
         setCrops(
-          response.crops.map((e) => ({
+          response.crops.map(e => ({
             cropId: e.cropId,
-            cropName: e.cropName.toLowerCase(),
+            cropName: e.cropName.toLowerCase()
           }))
         );
       } else {
@@ -96,19 +96,19 @@ const MyPage: React.FC = () => {
             <div>
               {/** totalcash + 현재 가치 */}
               <p className="text-xl font-bold">전체 자산</p>
-              <p className="text-lg">￦ {(totalAssets).toLocaleString()}</p>
+              <p className="text-lg">￦ {totalAssets.toLocaleString()}</p>
             </div>
             <div>
-               {/** 현재 가치 */}
+              {/** 현재 가치 */}
               <p className="text-xl font-bold">작물 현재 가치</p>
-              <p className="text-lg">￦ {(currentValue).toLocaleString()}</p>
+              <p className="text-lg">￦ {currentValue.toLocaleString()}</p>
             </div>
             <div>
-               {/** totalcash */}
+              {/** totalcash */}
               <p className="text-xl font-bold">현금 자산</p>
-              <p className="text-lg">￦ {(totalCash).toLocaleString()}</p>
+              <p className="text-lg">￦ {totalCash.toLocaleString()}</p>
               {/** availableCash */}
-              <p className="text-xs">(가용 현금 ￦{(availableCash).toLocaleString()})</p>
+              <p className="text-xs">(가용 현금 ￦{availableCash.toLocaleString()})</p>
             </div>
           </div>
           <CropList />
@@ -118,7 +118,9 @@ const MyPage: React.FC = () => {
           <h2 className="text-lg font-semibold mb-2">거래 기록</h2>
           {transactions.length === 0 ? (
             <div className="flex flex-col items-center text-center rounded-2xl p-8 h-full w-[350px]">
-              <p className="flex text-center items-center text-black text-lg font-bold h-full">거래 기록이 존재하지 않습니다.</p>
+              <p className="flex text-center items-center text-black text-lg font-bold h-full">
+                거래 기록이 존재하지 않습니다.
+              </p>
             </div>
           ) : (
             <>
@@ -134,7 +136,7 @@ const MyPage: React.FC = () => {
       </div>
 
       {isModal && <EditNicknameModal isOpen={isModal} modalOpen={modalOpen} />}
-    </main >
+    </main>
   );
 };
 
