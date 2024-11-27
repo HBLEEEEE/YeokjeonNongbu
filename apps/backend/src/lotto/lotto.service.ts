@@ -16,10 +16,10 @@ export class LottoService {
     const data = await this.databaseService.query(lottoQueries.getMemberCash, [memberId]);
     let memberCash = Number(data.rows[0].available_cash);
     const prize: Record<number, [number, string]> = {
-      1: [500000, 'first_count'],
-      2: [200000, 'second_count'],
-      3: [140000, 'third_count'],
-      4: [100000, 'fourth_count'],
+      1: [400000, 'first_count'],
+      2: [45000, 'second_count'],
+      3: [10000, 'third_count'],
+      4: [500, 'fourth_count'],
       5: [0, 'fifth_count']
     };
 
@@ -38,11 +38,15 @@ export class LottoService {
     }
 
     let unsoldData = (await this.databaseService.query(lottoQueries.getRemainTickets)).rows[0];
+    if (!unsoldData) {
+      await this.resetLotto();
+      unsoldData = (await this.databaseService.query(lottoQueries.getRemainTickets)).rows[0];
+    }
     const remainCheck = Object.entries(unsoldData)
       .filter(([key]) => key !== 'inning_id')
       .every(([, value]) => value === 0);
 
-    if (remainCheck || !unsoldData) {
+    if (remainCheck) {
       await this.resetLotto();
       unsoldData = (await this.databaseService.query(lottoQueries.getRemainTickets)).rows[0];
     }
@@ -55,11 +59,8 @@ export class LottoService {
       unsoldData.fourth_count +
       unsoldData.fifth_count;
 
-    // LOTTO_SEED
-    // const rng = seedrandom('my-seed');
-    const rng = seedrandom(this.configService.get<string>('LOTTO_SEED'));
+    const rng = seedrandom(`${this.configService.get<string>('LOTTO_SEED')}+${total}`);
     const myChance = Math.floor(rng() * total) + 1;
-
     let step = 0;
     let rank = 0;
     const ranks = [
