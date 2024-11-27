@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Client, QueryResult } from 'pg';
+import { Client, QueryResult, types } from 'pg';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit {
@@ -9,6 +9,10 @@ export class DatabaseService implements OnModuleInit {
   constructor(private configService: ConfigService) {}
 
   onModuleInit() {
+    types.setTypeParser(20, val => {
+      return Number(val);
+    });
+
     this.client = new Client({
       host: this.configService.get<string>('DB_HOST'),
       port: this.configService.get<number>('DB_PORT'),
@@ -16,6 +20,7 @@ export class DatabaseService implements OnModuleInit {
       password: this.configService.get<string>('DB_PASSWORD'),
       database: this.configService.get<string>('DB_NAME')
     });
+
     this.client
       .connect()
       .then(() => console.log('Connected to PostgreSQL database'))

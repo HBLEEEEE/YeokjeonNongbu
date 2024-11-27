@@ -1,6 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { MarketService } from './market.service';
-import { Public } from '../global/utils/jwtAuthGuard';
 import {
   cropNameInfoResponseDecorator,
   cropPriceInfoResponseDecorator
@@ -12,15 +11,14 @@ export class MarketController {
   constructor(private readonly marketService: MarketService) {}
 
   @Get('crop/price/:cropId')
-  @Public()
   @cropPriceInfoResponseDecorator()
   async getPrice(@Param('cropId') cropId: string) {
-    const data = await this.marketService.getCropPrice(parseInt(cropId, 10));
+    const parsedCropId = parseInt(cropId, 10);
+    const data = await this.marketService.getCropPrice(parsedCropId);
     return successhandler(successMessage.GET_CROP_PRICE_INFO_SUCCESS, data);
   }
 
   @Get('crop/prices')
-  @Public()
   @cropPriceInfoResponseDecorator()
   async getAllPrices() {
     const data = await this.marketService.getAllCropPrices();
@@ -28,7 +26,6 @@ export class MarketController {
   }
 
   @Get('crops')
-  @Public()
   @cropNameInfoResponseDecorator()
   async getCropsInfo() {
     const data = await this.marketService.getCropsInfo();

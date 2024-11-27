@@ -154,7 +154,7 @@ export class AccountRepository {
     const result = await this.databaseService.query(query, values);
     return result.rows.map(row => ({
       cropId: row.crop_id,
-      quantity: parseInt(row.available_quantity)
+      quantity: row.available_quantity
     }));
   }
 
