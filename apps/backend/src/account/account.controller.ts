@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { ApiOperation } from '@nestjs/swagger';
 import {
@@ -34,11 +34,7 @@ export class AccountController {
     @Param('cropId', ParseIntPipe) cropId: number
   ) {
     const { memberId } = user;
-    const parsedCropId = cropId;
-    if (isNaN(parsedCropId)) {
-      throw new BadRequestException('cropId는 숫자여야 합니다.');
-    }
-    const crop = await this.accountService.getCropFromMemberId(memberId, parsedCropId);
+    const crop = await this.accountService.getCropFromMemberId(memberId, cropId);
     return successhandler(successMessage.GET_ACCOUNT_CROP_SUCCESS, crop);
   }
 
