@@ -69,6 +69,7 @@ export class MatchingService {
         buyOrder.unfilledQuantity! -= availableQuantity;
 
         await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
+        await this.marketService.setCropPrice({ cropId: cropId, price: sellOrder.price! }); // 가격 업데이트
 
         if (buyOrder.unfilledQuantity! <= 0) buyIndex++;
         if (sellOrder.quantity! <= 0 || availableQuantity === 0) {
@@ -90,6 +91,7 @@ export class MatchingService {
       buyOrder.filledQuantity += matchedQuantity;
 
       await this.processOrderMatch(buyOrder, sellOrder, matchedQuantity);
+      await this.marketService.setCropPrice({ cropId: cropId, price: sellOrder.price! }); // 가격 업데이트
 
       if (sellOrder.unfilledQuantity! <= 0) sellIndex++;
       if (buyOrder.unfilledQuantity! <= 0) buyIndex++;
