@@ -7,7 +7,9 @@ export class HasSufficientCashGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const { tradingType, memberId, price, quantity, totalAmount } = request.body;
+    const user = request.user;
+    const { memberId } = user;
+    const { tradingType, price, quantity, totalAmount } = request.body;
 
     let hasEnoughCash = false;
     // 지정가 주문 확인
