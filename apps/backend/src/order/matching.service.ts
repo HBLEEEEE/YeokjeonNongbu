@@ -78,11 +78,10 @@ export class MatchingService {
         continue;
       }
 
-      // 지정가 매칭
       if (sellOrder.price! > buyOrder.price!) {
-        break; // 매칭 불가
+        buyIndex++; // 매도 주문 중 더 낮은 가격이 있는지 확인
+        continue;
       }
-
       const matchedQuantity = Math.min(sellOrder.unfilledQuantity!, buyOrder.unfilledQuantity!);
 
       sellOrder.unfilledQuantity! -= matchedQuantity;
@@ -158,9 +157,9 @@ export class MatchingService {
     sellOrder: OrderBookDto,
     matchedQuantity: number
   ): Promise<void> {
-    const price = this.determineMatchPrice(buyOrder, sellOrder);
+    const matchedPrice = this.determineMatchPrice(buyOrder, sellOrder);
 
-    // 주문 상태 업데이트
+    // 주문 오더북 상태 업데이트
     await this.orderService.updateOrder(
       sellOrder.orderId,
       sellOrder.unfilledQuantity! > 0 ? OrderStatus.PARTIALLY_FILLED : OrderStatus.COMPLETED,
@@ -181,18 +180,18 @@ export class MatchingService {
     );
 
     // 트랜잭션 저장
-    await this.orderService.saveTransaction(sellOrder, price, matchedQuantity);
-    await this.orderService.saveTransaction(buyOrder, price, matchedQuantity);
+    await this.orderService.saveTransaction(sellOrder, matchedPrice, matchedQuantity);
+    await this.orderService.saveTransaction(buyOrder, matchedPrice, matchedQuantity);
 
     // 캐시 및 작물 데이터 업데이트
     await this.accountService.updateCashByCompletingOrder(
       sellOrder.memberId,
-      price * matchedQuantity,
+      matchedPrice * matchedQuantity,
       OrderType.SELL
     );
     await this.accountService.updateCashByCompletingOrder(
       buyOrder.memberId,
-      price * matchedQuantity,
+      matchedPrice * matchedQuantity,
       OrderType.BUY
     );
     await this.accountService.updateCropByCompletingSellOrder(
@@ -213,7 +212,7 @@ export class MatchingService {
       buyOrder.memberId,
       1,
       buyOrder.cropId,
-      price,
+      matchedPrice,
       matchedQuantity,
       null
     );
@@ -223,7 +222,7 @@ export class MatchingService {
       sellOrder.memberId,
       2,
       sellOrder.cropId,
-      price,
+      matchedPrice,
       matchedQuantity,
       null
     );
@@ -241,7 +240,7 @@ export class MatchingService {
     }
     if (buyOrder.unfilledQuantity! > 0 && buyOrder.tradingType === TradingType.LIMIT) {
       await this.orderBookService.updateOrder(
-        sellOrder.memberId,
+        buyOrder.memberId,
         buyOrder.cropId,
         OrderType.BUY,
         buyOrder.orderId,
@@ -287,10 +286,14 @@ export class MatchingService {
   }
 
   private determineMatchPrice(buyOrder: OrderBookDto, sellOrder: OrderBookDto): number {
+    const currentOrder = buyOrder.time > sellOrder.time ? buyOrder : sellOrder;
+
     if (sellOrder.tradingType === TradingType.MARKET && sellOrder.price) return sellOrder.price;
     if (buyOrder.tradingType === TradingType.MARKET && buyOrder.price) return buyOrder.price;
-    if (sellOrder.price) return sellOrder.price;
-    if (buyOrder.price) return buyOrder.price;
+    if (buyOrder.price! >= sellOrder.price!) {
+      return currentOrder.orderType === OrderType.BUY ? sellOrder.price! : buyOrder.price!;
+    }
+
     throw new Error('체결 가격을 결정할 수 없습니다.');
   }
 }
