@@ -26,7 +26,7 @@ const AlarmModal: React.FC<AlarmModalProps> = ({
 
     const kstOffset = 9 * 60;
     const kstNow = new Date(now.getTime() + kstOffset * 60 * 1000);
-    const kstPre = new Date(pre.getTime());
+    const kstPre = new Date(pre.getTime() + kstOffset * 60 * 1000);
 
     const seconds = Math.floor((kstNow.getTime() - kstPre.getTime()) / 1000);
     let interval = Math.floor(seconds / 31536000);
@@ -59,7 +59,7 @@ const AlarmModal: React.FC<AlarmModalProps> = ({
           <>
             {alarms.length > 0 ? (
               <>
-                <div className="max-h-[260px] overflow-y-auto mt-6">
+                <div className="max-h-[260px] overflow-y-auto overflow-hidden mt-6">
                   {alarms.map((alarm, index) => (
                     <div
                       key={`${alarm.mailId}-${index}`}

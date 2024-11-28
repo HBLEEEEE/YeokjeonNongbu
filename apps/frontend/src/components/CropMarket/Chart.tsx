@@ -11,6 +11,9 @@ interface ChartProps {
 }
 
 const Chart: React.FC<ChartProps> = ({ timeData }) => {
+  const minYValue = Math.min(...timeData.map(data => data.y));
+  const maxYValue = Math.max(...timeData.map(data => data.y));
+
   const series = [
     {
       name: 'Stock Price',
@@ -49,7 +52,9 @@ const Chart: React.FC<ChartProps> = ({ timeData }) => {
     yaxis: {
       title: {
         text: 'Price'
-      }
+      },
+      min: minYValue - 5,
+      max: maxYValue + 10
     },
     xaxis: {
       type: 'datetime'

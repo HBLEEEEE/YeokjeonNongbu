@@ -1,12 +1,12 @@
 import { handleError } from './HandleError';
 import { api } from './Api';
-import { HistoryData, LimitOrder, MarketOrder } from '@/types/Index';
+import { HistoryData, Order } from '@/types/Index';
 
 export const getOrderHistory = async () => {
   try {
     const response = await api.get('order');
 
-    if (response.data.code === 200) {
+    if (response.data.code === 201) {
       const history: HistoryData[] = response.data.data;
 
       return {
@@ -22,11 +22,11 @@ export const getOrderHistory = async () => {
   }
 };
 
-export const postLimitBuyOrder = async (data: LimitOrder) => {
+export const postLimitBuyOrder = async (data: Order) => {
   try {
     const response = await api.post('order/buy/limit', data);
 
-    if (response.data.code === 200) {
+    if (response.data.code === 201) {
       return { success: true, message: response.data.message };
     }
 
@@ -36,11 +36,11 @@ export const postLimitBuyOrder = async (data: LimitOrder) => {
   }
 };
 
-export const postLimitSellOrder = async (data: LimitOrder) => {
+export const postLimitSellOrder = async (data: Order) => {
   try {
     const response = await api.post('order/sell/limit', data);
 
-    if (response.data.code === 200) {
+    if (response.data.code === 201) {
       return { success: true, message: response.data.message };
     }
 
@@ -50,11 +50,11 @@ export const postLimitSellOrder = async (data: LimitOrder) => {
   }
 };
 
-export const postMarketBuyOrder = async (data: MarketOrder) => {
+export const postMarketBuyOrder = async (data: Order) => {
   try {
     const response = await api.post('order/buy/market', data);
 
-    if (response.data.code === 200) {
+    if (response.data.code === 201) {
       return { success: true, message: response.data.message };
     }
 
@@ -64,7 +64,7 @@ export const postMarketBuyOrder = async (data: MarketOrder) => {
   }
 };
 
-export const postMarketSellOrder = async (data: MarketOrder) => {
+export const postMarketSellOrder = async (data: Order) => {
   try {
     const response = await api.post('order/sell/market', data);
 
@@ -78,11 +78,11 @@ export const postMarketSellOrder = async (data: MarketOrder) => {
   }
 };
 
-export const postCancelOrder = async () => {
+export const postCancelOrder = async (data: Order) => {
   try {
-    const response = await api.post('order/cancel');
+    const response = await api.post('order/cancel', data);
 
-    if (response.data.code === 200) {
+    if (response.data.code === 201) {
       return { success: true };
     }
 

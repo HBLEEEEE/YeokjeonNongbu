@@ -1,6 +1,12 @@
 import { CropData } from '@/types/Crop';
 import { useUser } from '../public/UserContext';
 import { useState } from 'react';
+import {
+  postLimitBuyOrder,
+  postLimitSellOrder,
+  postMarketBuyOrder,
+  postMarketSellOrder
+} from '@/services/OrderApi';
 
 interface TradeProps {
   trade: string;
@@ -11,9 +17,22 @@ interface TradeProps {
 }
 
 const Trade: React.FC<TradeProps> = ({ trade, order, currentCrop, crops, setOrderType }) => {
-  const [price, setPrice] = useState<number>(1000);
+  const [price, setPrice] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(0);
   const { availableCash } = useUser();
+
+  const onlyNumber = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const inputElement = e.target as HTMLInputElement;
+    inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
+  };
+
+  const handleOrderType = (type: string) => {
+    setOrderType(type);
+    setQuantity(0);
+    setPrice(0);
+    setTotalAmount(0);
+  };
 
   const handleIncrease = () => {
     setPrice(prevPrice => prevPrice + 1000);
@@ -23,34 +42,88 @@ const Trade: React.FC<TradeProps> = ({ trade, order, currentCrop, crops, setOrde
     setPrice(prevPrice => (prevPrice - 1000 >= 0 ? prevPrice - 1000 : 0));
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPrice(parseInt(e.target.value));
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPrice(Number(e.target.value));
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuantity(parseInt(e.target.value));
+    setQuantity(Number(e.target.value));
   };
 
   const handleMaxQuantity = () => {
-    if (price > 0) {
-      setQuantity(Math.floor(availableCash / price));
+    if (order === '지정가') {
+      if (price > 0) {
+        setQuantity(Math.floor(availableCash / price));
+      }
+    } else {
+      // 현재 보유 작물 수
+      // TODO - 웹 소켓 연결 후 추가하기
     }
+  };
+
+  const handleTotalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTotalAmount(Number(e.target.value));
+  };
+
+  const handleMaxTotalAmount = () => {
+    setTotalAmount(availableCash);
   };
 
   const handleOrder = async () => {
     const crop = crops.find(crop => crop.cropId === currentCrop);
-    const cropId = crop?.cropId;
-    console.log(cropId);
 
-    const tradingType = trade === '매수' ? 'buy' : 'sell';
-    console.log(tradingType);
+    if (!crop) {
+      console.error('Crop not found');
+      return;
+    }
 
-    const orderType = order === '지정가' ? 'limit' : 'market';
-    console.log(orderType);
+    const cropId: number = crop?.cropId;
+    const tradingType: string = trade === '매수' ? 'buy' : 'sell';
+    const orderType: string = order === '지정가' ? 'limit' : 'market';
 
-    console.log(quantity);
+    let orderData;
+    let fetchMethod;
 
-    console.log(price);
+    if (orderType === 'market') {
+      if (tradingType === 'buy') {
+        orderData = {
+          cropId,
+          orderType: tradingType,
+          tradingType: 'market',
+          totalAmount
+        };
+        fetchMethod = postMarketBuyOrder;
+      } else {
+        orderData = {
+          cropId,
+          orderType: tradingType,
+          tradingType: 'market',
+          quantity
+        };
+        fetchMethod = postMarketSellOrder;
+      }
+    } else if (orderType === 'limit') {
+      orderData = {
+        cropId,
+        orderType: tradingType,
+        tradingType: 'limit',
+        quantity,
+        price
+      };
+      fetchMethod = tradingType === 'buy' ? postLimitBuyOrder : postLimitSellOrder;
+    }
+
+    if (!orderData || !fetchMethod) {
+      console.error('Order data or fetch method is undefined');
+      return;
+    }
+
+    try {
+      const response = await fetchMethod(orderData);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -61,7 +134,7 @@ const Trade: React.FC<TradeProps> = ({ trade, order, currentCrop, crops, setOrde
           {['지정가', '시장가'].map(type => (
             <button
               key={type}
-              onClick={() => setOrderType(type)}
+              onClick={() => handleOrderType(type)}
               className={`px-2 py-1 rounded-md text-xs ${
                 order === type ? 'bg-light-pink' : 'bg-gray-100'
               }`}
@@ -80,9 +153,13 @@ const Trade: React.FC<TradeProps> = ({ trade, order, currentCrop, crops, setOrde
               <input
                 type="text"
                 value={price}
-                onChange={handleInputChange}
+                onKeyUp={e => {
+                  onlyNumber(e);
+                }}
+                onChange={handlePriceChange}
                 className="w-24 text-center border rounded-md text-sm px-2 py-1"
               />
+
               <button
                 className="px-2 py-1 text-center bg-gray-200 rounded-md text-xs"
                 onClick={handleDecrease}
@@ -101,11 +178,14 @@ const Trade: React.FC<TradeProps> = ({ trade, order, currentCrop, crops, setOrde
             <span className="font-semibold text-sm">주문 수량</span>
             <div className="flex items-center gap-1">
               <input
-                type="number"
+                type="text"
                 value={quantity}
+                onKeyUp={e => {
+                  onlyNumber(e);
+                }}
                 onChange={handleQuantityChange}
                 placeholder="0"
-                className="w-14 px-1 py-1 border border-gray rounded text-xs text-center"
+                className="w-24 px-1 py-1 border border-gray rounded text-xs text-center"
               />
               <button
                 className="px-2 py-1 bg-gray-200 rounded-md font-semibold text-xs"
@@ -133,14 +213,24 @@ const Trade: React.FC<TradeProps> = ({ trade, order, currentCrop, crops, setOrde
       {order === '시장가' && (
         <>
           <div className="flex items-center justify-between mt-8">
-            <span className="font-semibold text-sm">주문 수량</span>
+            <span className="font-semibold text-sm">
+              {trade === '매수' ? '주문 총액' : '주문 수량'}
+            </span>
             <div className="flex items-center gap-1">
               <input
-                type="number"
+                type="text"
+                value={trade === '매수' ? totalAmount : quantity}
+                onKeyUp={e => {
+                  onlyNumber(e);
+                }}
+                onChange={trade === '매수' ? handleTotalAmountChange : handleQuantityChange}
                 placeholder="0"
-                className="w-14 px-1 py-1 border border-gray rounded text-xs text-center"
+                className="w-24 px-1 py-1 border border-gray rounded text-xs text-center"
               />
-              <button className="px-2 py-1 bg-gray-200 rounded-md font-semibold text-xs">
+              <button
+                className="px-2 py-1 bg-gray-200 rounded-md font-semibold text-xs"
+                onClick={trade === '매수' ? handleMaxTotalAmount : handleMaxQuantity}
+              >
                 최대
               </button>
             </div>

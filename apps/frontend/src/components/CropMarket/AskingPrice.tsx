@@ -1,41 +1,14 @@
-const cropPrices: Record<string, [string, string, number][]> = {
-  당근: [
-    ['팔아요', '₩23,200', 40],
-    ['팔아요', '₩21,200', 50],
-    ['팔아요', '₩20,800', 78],
-    ['팔아요', '₩20,400', 126],
-    ['살게요', '₩20,100', 487],
-    ['살게요', '₩19,700', 598],
-    ['살게요', '₩15,700', 698],
-    ['살게요', '₩14,700', 708]
-  ],
-  사과: [
-    ['팔아요', '₩31,200', 40],
-    ['팔아요', '₩30,800', 70],
-    ['살게요', '₩30,500', 150],
-    ['살게요', '₩30,000', 500]
-  ],
-  수박: [
-    ['팔아요', '₩11,000', 20],
-    ['팔아요', '₩10,800', 30],
-    ['살게요', '₩10,500', 60]
-  ],
-  포도: [
-    ['팔아요', '₩25,000', 45],
-    ['살게요', '₩24,800', 120]
-  ],
-  버섯: [
-    ['팔아요', '₩18,000', 60],
-    ['살게요', '₩17,500', 200]
-  ]
-};
-
 interface AskingPriceProps {
   validCropName: string;
+  marketData: {
+    buyOrders: { price: number; quantity: number }[];
+    sellOrders: { price: number; quantity: number }[];
+    nowPrice: number;
+  };
 }
 
-const AskingPrice: React.FC<AskingPriceProps> = ({ validCropName }) => {
-  if (!validCropName || !cropPrices[validCropName]) {
+const AskingPrice: React.FC<AskingPriceProps> = ({ validCropName, marketData }) => {
+  if (!validCropName) {
     return <div>작물 정보가 없습니다.</div>;
   }
 
@@ -47,17 +20,18 @@ const AskingPrice: React.FC<AskingPriceProps> = ({ validCropName }) => {
         <div className="text-center">수량</div>
       </div>
       <div className="md:h-24 lg:h-26 xl:h-28 overflow-y-auto scrollbar-hidden">
-        {cropPrices[validCropName].map(([type, price, qty], idx) => (
+        {marketData.sellOrders.map((order, idx) => (
           <div key={idx} className="grid grid-cols-[1fr_1fr_1fr] gap-1 py-1 px-1 items-center">
-            <div className="text-center">{type}</div>
-            <div className="text-center">{price}</div>
-            <div
-              className={`font-bold text-center ${
-                type === '팔아요' ? 'text-red-500' : 'text-blue-600'
-              }`}
-            >
-              {qty}
-            </div>
+            <div className="text-center">팔아요</div>
+            <div className="text-center">￦ {order.price}</div>
+            <div className="font-bold text-center text-red-500">{order.quantity}</div>
+          </div>
+        ))}
+        {marketData.buyOrders.map((order, idx) => (
+          <div key={idx} className="grid grid-cols-[1fr_1fr_1fr] gap-1 py-1 px-1 items-center">
+            <div className="text-center">살게요</div>
+            <div className="text-center">￦ {order.price}</div>
+            <div className="font-bold text-center text-blue-600">{order.quantity}</div>
           </div>
         ))}
       </div>
