@@ -41,16 +41,13 @@ export class OrderBookService {
     }
 
     if (tradingType === TradingType.LIMIT) {
+      targetOrder.filledQuantity = filledQuantity;
       targetOrder.unfilledQuantity = Math.max(
         (targetOrder.unfilledQuantity || 0) - filledQuantity,
         0
       );
-      // 미체결 수량이 0인 경우 Redis 삭제
-      if (targetOrder.unfilledQuantity === 0) {
-        await this.removeOrder(memberId, cropId, orderId, orderType, tradingType);
-      } else {
-        await this.addOrder(targetOrder);
-      }
+      await this.removeOrder(memberId, cropId, orderId, orderType, tradingType);
+      await this.addOrder(targetOrder);
     } else if (tradingType === TradingType.MARKET) {
       if (orderType === OrderType.BUY) {
         targetOrder.totalAmount = Math.max(
@@ -60,10 +57,6 @@ export class OrderBookService {
       } else if (orderType === OrderType.SELL) {
         targetOrder.quantity = Math.max((targetOrder.quantity || 0) - filledQuantity, 0);
       }
-    }
-
-    if (tradingType === TradingType.LIMIT && (targetOrder.unfilledQuantity || 0) > 0) {
-      await this.addOrder(targetOrder);
     }
   }
 
