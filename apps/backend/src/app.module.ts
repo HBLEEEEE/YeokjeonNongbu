@@ -9,6 +9,7 @@ import { LottoModule } from './lotto/lotto.module';
 import { RankModule } from './rank/rank.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AccountModule } from './account/account.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { AccountModule } from './account/account.module';
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     RankModule,
-    AccountModule
+    AccountModule,
+    WebsocketModule
   ],
   controllers: [],
   providers: []
