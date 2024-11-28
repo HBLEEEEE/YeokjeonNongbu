@@ -288,12 +288,12 @@ export class MatchingService {
   private determineMatchPrice(buyOrder: OrderBookDto, sellOrder: OrderBookDto): number {
     const currentOrder = buyOrder.time > sellOrder.time ? buyOrder : sellOrder;
 
-    if (sellOrder.tradingType === TradingType.MARKET && sellOrder.price) return sellOrder.price;
-    if (buyOrder.tradingType === TradingType.MARKET && buyOrder.price) return buyOrder.price;
+    if (sellOrder.tradingType === TradingType.MARKET && buyOrder.price) return buyOrder.price;
+    if (buyOrder.tradingType === TradingType.MARKET && sellOrder.price) return sellOrder.price;
     if (buyOrder.price! >= sellOrder.price!) {
       return currentOrder.orderType === OrderType.BUY ? sellOrder.price! : buyOrder.price!;
     }
-
+    console.log(buyOrder, sellOrder);
     throw new Error('체결 가격을 결정할 수 없습니다.');
   }
 }
