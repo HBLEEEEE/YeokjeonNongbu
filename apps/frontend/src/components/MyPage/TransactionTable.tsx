@@ -1,3 +1,4 @@
+import { cropList } from '@/constants/CropConstants';
 import { CropData, Transaction } from '@/types/Index';
 
 interface TransactionTableProps {
@@ -36,7 +37,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ displayedTransactio
           return (
             <tr key={index} className="text-center odd:bg-white even:bg-light-beige">
               <td className="p-2">{transaction.createdAt ? formattedDate : '\u00A0'}</td>
-              <td className="p-2">{cropName}</td>
+              <td className="p-2">{cropList[cropName]}</td>
               <td className="p-2">
                 {transaction.orderType === 'sell'
                   ? '매도'

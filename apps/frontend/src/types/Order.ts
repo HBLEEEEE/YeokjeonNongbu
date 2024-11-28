@@ -1,17 +1,11 @@
-export interface LimitOrder {
+export interface Order {
   cropId: number;
   orderType: string;
   tradingType: string;
-  quantity: number;
-  price: number;
-}
-
-export interface MarketOrder {
-  cropId: number;
-  orderType: string;
-  tradingType: string;
-  totalAmount: number;
-  quantity: number;
+  quantity?: number;
+  price?: number;
+  totalAmount?: number;
+  orderId?: number;
 }
 
 export interface HistoryData {
