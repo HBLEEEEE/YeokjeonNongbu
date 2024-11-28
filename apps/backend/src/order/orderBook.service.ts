@@ -41,13 +41,16 @@ export class OrderBookService {
     }
 
     if (tradingType === TradingType.LIMIT) {
-      targetOrder.filledQuantity = filledQuantity;
+      targetOrder.filledQuantity = targetOrder.filledQuantity + filledQuantity;
       targetOrder.unfilledQuantity = Math.max(
         (targetOrder.unfilledQuantity || 0) - filledQuantity,
         0
       );
       await this.removeOrder(memberId, cropId, orderId, orderType, tradingType);
-      await this.addOrder(targetOrder);
+
+      if (targetOrder.unfilledQuantity! > 0) {
+        await this.addOrder(targetOrder);
+      }
     } else if (tradingType === TradingType.MARKET) {
       if (orderType === OrderType.BUY) {
         targetOrder.totalAmount = Math.max(
@@ -57,6 +60,8 @@ export class OrderBookService {
       } else if (orderType === OrderType.SELL) {
         targetOrder.quantity = Math.max((targetOrder.quantity || 0) - filledQuantity, 0);
       }
+      await this.removeOrder(memberId, cropId, orderId, orderType, tradingType);
+      await this.addOrder(targetOrder);
     }
   }
 
