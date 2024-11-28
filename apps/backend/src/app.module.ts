@@ -9,7 +9,7 @@ import { LottoModule } from './lotto/lotto.module';
 import { RankModule } from './rank/rank.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AccountModule } from './account/account.module';
-import { WebsocketGateway } from './websocket/websocket.gateway';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { WebsocketGateway } from './websocket/websocket.gateway';
     ScheduleModule.forRoot(),
     RankModule,
     AccountModule,
-    WebsocketGateway
+    WebsocketModule
   ],
   controllers: [],
   providers: []
