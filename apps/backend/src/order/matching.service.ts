@@ -97,7 +97,6 @@ export class MatchingService {
     }
 
     // 시장가 주문은 매칭 완료 후 삭제
-    console.log('buyIndex', buyOrders, buyIndex);
     await this.cleanMarketOrders(cropId, buyOrders, sellOrders);
   }
 
@@ -118,6 +117,16 @@ export class MatchingService {
             OrderType.BUY
           );
         }
+
+        // 주문 상태 완료 처리
+        await this.orderService.updateOrder(
+          buyOrder.orderId,
+          OrderStatus.COMPLETED,
+          buyOrder.filledQuantity,
+          buyOrder.unfilledQuantity!,
+          buyOrder.tradingType
+        );
+
         // Redis 주문 제거
         await this.orderBookService.removeOrder(
           buyOrder.memberId,
@@ -141,6 +150,16 @@ export class MatchingService {
             OrderType.SELL
           );
         }
+
+        // 주문 상태 완료 처리
+        await this.orderService.updateOrder(
+          sellOrder.orderId,
+          OrderStatus.COMPLETED,
+          sellOrder.filledQuantity,
+          sellOrder.unfilledQuantity!,
+          sellOrder.tradingType
+        );
+
         // Redis 주문 제거
         await this.orderBookService.removeOrder(
           sellOrder.memberId,
@@ -163,7 +182,9 @@ export class MatchingService {
     // 주문 오더 상태 업데이트
     await this.orderService.updateOrder(
       sellOrder.orderId,
-      sellOrder.unfilledQuantity! > 0 ? OrderStatus.PARTIALLY_FILLED : OrderStatus.COMPLETED,
+      sellOrder.unfilledQuantity! > 0 || sellOrder.filledQuantity != sellOrder.quantity
+        ? OrderStatus.PARTIALLY_FILLED
+        : OrderStatus.COMPLETED,
       sellOrder.filledQuantity,
       sellOrder.unfilledQuantity!,
       sellOrder.tradingType
@@ -192,7 +213,9 @@ export class MatchingService {
     );
     await this.accountService.updateCashByCompletingOrder(
       buyOrder.memberId,
-      matchedPrice * matchedQuantity,
+      buyOrder.tradingType != TradingType.MARKET && buyOrder.price != matchedPrice
+        ? buyOrder.price! * matchedQuantity
+        : matchedPrice * matchedQuantity,
       OrderType.BUY
     );
     await this.accountService.updateCropByCompletingSellOrder(
@@ -287,8 +310,6 @@ export class MatchingService {
   }
 
   private determineMatchPrice(buyOrder: OrderBookDto, sellOrder: OrderBookDto): number {
-    console.log(buyOrder, sellOrder);
-
     const currentOrder = buyOrder.time > sellOrder.time ? buyOrder : sellOrder;
 
     if (sellOrder.tradingType === TradingType.MARKET && buyOrder.price) return buyOrder.price;
