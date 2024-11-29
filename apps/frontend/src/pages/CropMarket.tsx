@@ -51,7 +51,7 @@ const CropMarket: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:8080');
+    const newSocket = io(import.meta.env.VITE_BASE_URL);
 
     newSocket.on('connect', () => {
       console.log('Connected to WebSocket server');
