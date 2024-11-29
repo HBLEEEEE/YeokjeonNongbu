@@ -46,7 +46,7 @@ const Header: React.FC = () => {
   const createEventSource = () => {
     const EventSource = EventSourcePolyfill || window.EventSource;
 
-    const eventSource = new EventSource('http://localhost:8080/api/mail/check', {
+    const eventSource = new EventSource(`${import.meta.env.VITE_BASE_URL}/api/mail/check`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }

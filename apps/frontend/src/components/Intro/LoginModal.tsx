@@ -44,11 +44,11 @@ const LoginModal: React.FC<LoginProps> = ({ setModalStep }) => {
   };
 
   const handleGoogle = async () => {
-    window.location.href = 'http://localhost:8080/api/auth/google';
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/api/auth/google`;
   };
 
   const handleKakao = async () => {
-    window.location.href = 'http://localhost:8080/api/auth/kakao';
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/api/auth/kakao`;
   };
 
   return (
