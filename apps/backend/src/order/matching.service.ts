@@ -69,7 +69,7 @@ export class MatchingService {
         buyOrder.unfilledQuantity! -= availableQuantity;
 
         await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
-        await this.marketService.setCropPrice({ cropId: cropId, price: sellOrder.price! }); // 가격 업데이트
+        await this.marketService.setCropPrice({ cropId: cropId, price: buyOrder.price! }); // 가격 업데이트
 
         if (buyOrder.unfilledQuantity! <= 0) buyIndex++;
         if (sellOrder.quantity! <= 0 || availableQuantity === 0) {
@@ -97,7 +97,8 @@ export class MatchingService {
     }
 
     // 시장가 주문은 매칭 완료 후 삭제
-    await this.cleanMarketOrders(cropId, buyOrders.slice(buyIndex), sellOrders.slice(sellIndex));
+    console.log('buyIndex', buyOrders, buyIndex);
+    await this.cleanMarketOrders(cropId, buyOrders, sellOrders);
   }
 
   private async cleanMarketOrders(
@@ -159,7 +160,7 @@ export class MatchingService {
   ): Promise<void> {
     const matchedPrice = this.determineMatchPrice(buyOrder, sellOrder);
 
-    // 주문 오더북 상태 업데이트
+    // 주문 오더 상태 업데이트
     await this.orderService.updateOrder(
       sellOrder.orderId,
       sellOrder.unfilledQuantity! > 0 ? OrderStatus.PARTIALLY_FILLED : OrderStatus.COMPLETED,
@@ -227,7 +228,7 @@ export class MatchingService {
       null
     );
 
-    // 지정가 거래만 Redis 업데이트
+    // 지정가 거래만 오더북 업데이트
     if (sellOrder.unfilledQuantity! > 0 && sellOrder.tradingType === TradingType.LIMIT) {
       await this.orderBookService.updateOrder(
         sellOrder.memberId,
@@ -286,14 +287,15 @@ export class MatchingService {
   }
 
   private determineMatchPrice(buyOrder: OrderBookDto, sellOrder: OrderBookDto): number {
+    console.log(buyOrder, sellOrder);
+
     const currentOrder = buyOrder.time > sellOrder.time ? buyOrder : sellOrder;
 
-    if (sellOrder.tradingType === TradingType.MARKET && sellOrder.price) return sellOrder.price;
-    if (buyOrder.tradingType === TradingType.MARKET && buyOrder.price) return buyOrder.price;
+    if (sellOrder.tradingType === TradingType.MARKET && buyOrder.price) return buyOrder.price;
+    if (buyOrder.tradingType === TradingType.MARKET && sellOrder.price) return sellOrder.price;
     if (buyOrder.price! >= sellOrder.price!) {
       return currentOrder.orderType === OrderType.BUY ? sellOrder.price! : buyOrder.price!;
     }
-
     throw new Error('체결 가격을 결정할 수 없습니다.');
   }
 }
