@@ -213,7 +213,9 @@ export class MatchingService {
     );
     await this.accountService.updateCashByCompletingOrder(
       buyOrder.memberId,
-      matchedPrice * matchedQuantity,
+      buyOrder.tradingType != TradingType.MARKET && buyOrder.price != matchedPrice
+        ? buyOrder.price! * matchedQuantity
+        : matchedPrice * matchedQuantity,
       OrderType.BUY
     );
     await this.accountService.updateCropByCompletingSellOrder(
