@@ -3,12 +3,14 @@ import { DatabaseService } from 'src/database/database.service';
 import { lottoQueries } from './lotto.queries';
 import * as seedrandom from 'seedrandom';
 import { ConfigService } from '@nestjs/config';
+import { InningUtil } from './model/util.mongo';
 
 @Injectable()
 export class LottoService {
   constructor(
     private readonly databaseService: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly inningUtil: InningUtil
   ) {}
 
   async buyLotto(memberId: number) {
@@ -22,7 +24,7 @@ export class LottoService {
     }
 
     let unsoldData = (await this.databaseService.query(lottoQueries.getRemainTickets)).rows[0];
-    if (unsoldData) {
+    if (!unsoldData) {
       await this.resetLotto();
       unsoldData = await this.getUnsoldTickets();
     }
@@ -41,6 +43,12 @@ export class LottoService {
     const updatedCash = this.calculateNewCash(memberCash, rank);
     await this.updateGameRecords(memberId, rank, unsoldData);
     await this.updateMemberCash(memberId, updatedCash);
+    await this.inningUtil.addLottoLog(
+      unsoldData.inning_id,
+      memberId,
+      1001 - totalTickets,
+      new Date()
+    );
 
     return this.createResponse(rank, updatedCash);
   }
