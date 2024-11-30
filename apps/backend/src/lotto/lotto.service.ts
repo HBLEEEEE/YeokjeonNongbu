@@ -22,7 +22,7 @@ export class LottoService {
     }
 
     let unsoldData = (await this.databaseService.query(lottoQueries.getRemainTickets)).rows[0];
-    if (unsoldData) {
+    if (!unsoldData) {
       await this.resetLotto();
       unsoldData = await this.getUnsoldTickets();
     }
