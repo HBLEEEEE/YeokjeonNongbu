@@ -15,7 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  private clients: Map<string, Socket> = new Map();
+  private clients: Map<string, string> = new Map();
 
   constructor(
     private readonly databaseService: DatabaseService,
@@ -44,7 +44,8 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       client.data.memberId = memberId;
       client.data.nickname = nickname;
 
-      this.clients.set(client.id, client);
+      this.clients.set(memberId, client.id);
+      await this.sendMemberCropsData(client, memberId);
     } catch (error) {
       client.disconnect(true);
       console.log(error);
@@ -53,7 +54,6 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     client.on('join', async data => {
       const { cropId } = data;
       if (cropId) {
-        this.clients.set(client.id, client);
         client.join(String(cropId));
         this.sendCurrentMarketState(client, cropId);
       }
@@ -91,6 +91,17 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     } catch (error) {
       console.log(error);
     }
+  }
+
+  private async sendMemberCropsData(client: Socket, memberId: string) {
+    const query = `
+      SELECT crop_id, available_quantity, pending_quantity, total_quantity
+      FROM member_crops
+      WHERE member_id = $1
+    `;
+
+    const crops = await this.databaseService.query(query, [memberId]);
+    client.emit('crops', crops.rows);
   }
 
   private async handleRedisUpdate(cropId: string) {
@@ -137,8 +148,14 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.server.to(String(cropId)).emit('chart', data);
   }
 
-  async cropDataTransfer(cropId: string, data: any) {
-    this.server.to(String(cropId)).emit('crops', data);
+  async cropDataTransfer(memberId: string, data: any) {
+    const clientId = this.clients.get(memberId);
+    if (clientId) {
+      const client = this.server.sockets.sockets.get(clientId);
+      if (client) {
+        client.emit('crops', data);
+      }
+    }
   }
 
   async sendCurrentMarketState(client: Socket, cropId: string) {
