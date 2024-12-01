@@ -3,7 +3,6 @@ import { RedisClientType } from 'redis';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { OrderType, TradingType } from './enums/orderType';
 import { OrderRepository } from './order.repository';
-import { TransactionDto } from './dto/transaction.dto';
 
 @Injectable()
 export class OrderBookService {
@@ -85,10 +84,6 @@ export class OrderBookService {
     }
   }
 
-  async getTransactionsByMemberId(memberId: number): Promise<TransactionDto[]> {
-    return await this.orderRepository.getTransactionsByMemberId(memberId);
-  }
-
   async getBuyOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {
     const limitOrders = await this.getOrdersFromRedis(cropId, OrderType.BUY, TradingType.LIMIT);
     const marketOrders = await this.getOrdersFromRedis(cropId, OrderType.BUY, TradingType.MARKET);
@@ -107,7 +102,17 @@ export class OrderBookService {
     tradingType: TradingType
   ): Promise<OrderBookDto[]> {
     const orderKey = this.getOrderKey(cropId, orderType, tradingType);
-    const orders = await this.redisClient.zRange(orderKey, 0, -1);
+
+    let orders: string[];
+
+    if (orderType === OrderType.SELL) {
+      orders = await this.redisClient.zRange(orderKey, 0, -1);
+    } else if (orderType === OrderType.BUY) {
+      orders = await this.redisClient.zRange(orderKey, 0, -1, { REV: true });
+    } else {
+      throw new Error('잘못된 주문입니다.');
+    }
+
     return orders.map(order => this.deserializeOrder(order));
   }
 

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TransactionDto } from '../transaction.dto';
 
-export class TransactionResponseDto {
+export class GetTransactionResponseDto {
   @ApiProperty({
     description: '응답 코드',
     example: 200

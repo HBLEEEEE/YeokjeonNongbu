@@ -6,6 +6,8 @@ import DtoTransformer from './utils/dtoTransformer';
 import { OrderStatus, OrderType, TradingType } from './enums/orderType';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { AccountService } from '../account/account.service';
+import { TransactionDto } from './dto/transaction.dto';
+import { PendingOrderDto } from './dto/pendingOrder.dto';
 
 @Injectable()
 export class OrderService {
@@ -16,24 +18,6 @@ export class OrderService {
   ) {}
 
   async saveOrder(orderDto: OrderDto): Promise<number[]> {
-    switch (orderDto.tradingType) {
-      case 'limit':
-        return await this.saveLimitOrder(orderDto);
-      case 'market':
-        return await this.saveMarketOrder(orderDto);
-      default:
-        throw new Error(`Unsupported tradingType: ${orderDto.tradingType}`);
-    }
-  }
-
-  private async saveLimitOrder(orderDto: OrderDto): Promise<number[]> {
-    const [orderId, memberId] = await this.orderRepository.saveOrder(orderDto);
-    await this.saveOrderToOrderBook(orderDto, orderId, memberId);
-
-    return [orderId, memberId];
-  }
-
-  private async saveMarketOrder(orderDto: OrderDto): Promise<number[]> {
     const [orderId, memberId] = await this.orderRepository.saveOrder(orderDto);
     await this.saveOrderToOrderBook(orderDto, orderId, memberId);
     return [orderId, memberId];
@@ -103,5 +87,13 @@ export class OrderService {
       await this.accountService.rollbackPendingCrop(memberId, cropId, order.unfilledQuantity!);
       return;
     }
+  }
+
+  async getTransactionsByMemberId(memberId: number): Promise<TransactionDto[]> {
+    return await this.orderRepository.getTransactionsByMemberId(memberId);
+  }
+
+  async getPendingOrdersByMemberId(memberId: number): Promise<PendingOrderDto[]> {
+    return await this.orderRepository.getPendingOrdersByMemberId(memberId);
   }
 }

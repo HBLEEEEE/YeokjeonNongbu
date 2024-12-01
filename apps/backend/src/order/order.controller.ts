@@ -14,13 +14,14 @@ import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard
 import { MarketOrderDto } from './dto/marketOrder.dto';
 import { User } from '../global/utils/memberData';
 import { CancelOrderDto } from './dto/cancelOrder.dto';
+import { pendingOrdersDecorator } from './decorator/getPendingOrders.decorator';
 
 @Controller('api/order')
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
     private readonly orderBookService: OrderBookService,
-    private readonly machineService: MatchingService,
+    private readonly matchingService: MatchingService,
     private readonly accountService: AccountService
   ) {}
 
@@ -41,7 +42,7 @@ export class OrderController {
       orderDto.orderType
     );
 
-    await this.machineService.matchOrders(limitOrderDto.cropId);
+    await this.matchingService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -62,7 +63,7 @@ export class OrderController {
       orderDto.quantity!
     );
 
-    await this.machineService.matchOrders(limitOrderDto.cropId);
+    await this.matchingService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -83,7 +84,7 @@ export class OrderController {
       orderDto.orderType
     );
 
-    await this.machineService.matchOrders(marketOrderDto.cropId);
+    await this.matchingService.matchOrders(marketOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -104,7 +105,7 @@ export class OrderController {
       orderDto.quantity!
     );
 
-    await this.machineService.matchOrders(marketOrderDto.cropId);
+    await this.matchingService.matchOrders(marketOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -113,8 +114,17 @@ export class OrderController {
   @transactionResponseDecorator()
   async getTransactionsByMemberId(@User() user: { memberId: number }) {
     const { memberId } = user;
-    const transactions = await this.orderBookService.getTransactionsByMemberId(memberId);
+    const transactions = await this.orderService.getTransactionsByMemberId(memberId);
     return successhandler(successMessage.GET_TRANSACTION_SUCCESS, transactions);
+  }
+
+  @Get('pending')
+  @ApiOperation({ summary: '각 회원 진행 주문 내역 조회' })
+  @pendingOrdersDecorator()
+  async getPendingOrdersByMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    const pendingOrders = await this.orderService.getPendingOrdersByMemberId(memberId);
+    return successhandler(successMessage.GET_PENDING_ORDER_SUCCESS, pendingOrders);
   }
 
   @Post('cancel')
