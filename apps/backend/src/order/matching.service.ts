@@ -44,6 +44,7 @@ export class MatchingService {
         buyOrder.filledQuantity += availableQuantity;
         buyOrder.totalAmount! -= matchedAmount;
         sellOrder.unfilledQuantity! -= availableQuantity;
+        sellOrder.filledQuantity += availableQuantity;
 
         await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
         await this.marketService.setCropPrice({ cropId: cropId, price: sellOrder.price! }); // 가격 업데이트
@@ -65,8 +66,8 @@ export class MatchingService {
         const availableQuantity = Math.min(buyOrder.unfilledQuantity!, sellOrder.quantity!);
 
         sellOrder.filledQuantity += availableQuantity;
-        sellOrder.quantity! -= availableQuantity;
         buyOrder.unfilledQuantity! -= availableQuantity;
+        buyOrder.filledQuantity += availableQuantity;
 
         await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
         await this.marketService.setCropPrice({ cropId: cropId, price: buyOrder.price! }); // 가격 업데이트
@@ -78,12 +79,12 @@ export class MatchingService {
         continue;
       }
 
+      // 지정가 거래 처리
       if (sellOrder.price! > buyOrder.price!) {
         buyIndex++; // 매도 주문 중 더 낮은 가격이 있는지 확인
         continue;
       }
       const matchedQuantity = Math.min(sellOrder.unfilledQuantity!, buyOrder.unfilledQuantity!);
-
       sellOrder.unfilledQuantity! -= matchedQuantity;
       buyOrder.unfilledQuantity! -= matchedQuantity;
       sellOrder.filledQuantity += matchedQuantity;
@@ -273,7 +274,7 @@ export class MatchingService {
       );
     }
 
-    if (buyOrder.tradingType == 'limit' && buyOrder.unfilledQuantity! === 0) {
+    if (buyOrder.tradingType == TradingType.LIMIT && buyOrder.unfilledQuantity! === 0) {
       await this.orderBookService.removeOrder(
         buyOrder.memberId,
         buyOrder.cropId,
@@ -283,7 +284,7 @@ export class MatchingService {
       );
     }
 
-    if (buyOrder.tradingType == 'limit' && sellOrder.unfilledQuantity! === 0) {
+    if (buyOrder.tradingType == TradingType.LIMIT && sellOrder.unfilledQuantity! === 0) {
       await this.orderBookService.removeOrder(
         sellOrder.memberId,
         sellOrder.cropId,
