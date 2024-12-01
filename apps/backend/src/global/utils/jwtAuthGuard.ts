@@ -14,7 +14,7 @@ export class JwtAuthGuard {
   async canActivate(context: any) {
     const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
     if (isPublic) {
-      return true; // @Public() 데코레이터가 설정된 경로는 Guard 제외
+      return true;
     }
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization?.split(' ')[1];
