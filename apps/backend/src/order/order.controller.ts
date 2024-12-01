@@ -14,6 +14,7 @@ import { HasSufficientCropGuard } from '../account/guards/hasSufficientCropGuard
 import { MarketOrderDto } from './dto/marketOrder.dto';
 import { User } from '../global/utils/memberData';
 import { CancelOrderDto } from './dto/cancelOrder.dto';
+import { pendingOrdersDecorator } from './decorator/getPendingOrders.decorator';
 
 @Controller('api/order')
 export class OrderController {
@@ -113,8 +114,17 @@ export class OrderController {
   @transactionResponseDecorator()
   async getTransactionsByMemberId(@User() user: { memberId: number }) {
     const { memberId } = user;
-    const transactions = await this.orderBookService.getTransactionsByMemberId(memberId);
+    const transactions = await this.orderService.getTransactionsByMemberId(memberId);
     return successhandler(successMessage.GET_TRANSACTION_SUCCESS, transactions);
+  }
+
+  @Get('pending')
+  @ApiOperation({ summary: '각 회원 진행 주문 내역 조회' })
+  @pendingOrdersDecorator()
+  async getPendingOrdersByMemberId(@User() user: { memberId: number }) {
+    const { memberId } = user;
+    const pendingOrders = await this.orderService.getPendingOrdersByMemberId(memberId);
+    return successhandler(successMessage.GET_PENDING_ORDER_SUCCESS, pendingOrders);
   }
 
   @Post('cancel')

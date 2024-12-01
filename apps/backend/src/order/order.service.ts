@@ -6,6 +6,8 @@ import DtoTransformer from './utils/dtoTransformer';
 import { OrderStatus, OrderType, TradingType } from './enums/orderType';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { AccountService } from '../account/account.service';
+import { TransactionDto } from './dto/transaction.dto';
+import { PendingOrderDto } from './dto/pendingOrder.dto';
 
 @Injectable()
 export class OrderService {
@@ -85,5 +87,13 @@ export class OrderService {
       await this.accountService.rollbackPendingCrop(memberId, cropId, order.unfilledQuantity!);
       return;
     }
+  }
+
+  async getTransactionsByMemberId(memberId: number): Promise<TransactionDto[]> {
+    return await this.orderRepository.getTransactionsByMemberId(memberId);
+  }
+
+  async getPendingOrdersByMemberId(memberId: number): Promise<PendingOrderDto[]> {
+    return await this.orderRepository.getPendingOrdersByMemberId(memberId);
   }
 }
