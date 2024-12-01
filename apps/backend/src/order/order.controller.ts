@@ -20,7 +20,7 @@ export class OrderController {
   constructor(
     private readonly orderService: OrderService,
     private readonly orderBookService: OrderBookService,
-    private readonly machineService: MatchingService,
+    private readonly matchingService: MatchingService,
     private readonly accountService: AccountService
   ) {}
 
@@ -41,7 +41,7 @@ export class OrderController {
       orderDto.orderType
     );
 
-    await this.machineService.matchOrders(limitOrderDto.cropId);
+    await this.matchingService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -62,7 +62,7 @@ export class OrderController {
       orderDto.quantity!
     );
 
-    await this.machineService.matchOrders(limitOrderDto.cropId);
+    await this.matchingService.matchOrders(limitOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -83,7 +83,7 @@ export class OrderController {
       orderDto.orderType
     );
 
-    await this.machineService.matchOrders(marketOrderDto.cropId);
+    await this.matchingService.matchOrders(marketOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 
@@ -104,7 +104,7 @@ export class OrderController {
       orderDto.quantity!
     );
 
-    await this.machineService.matchOrders(marketOrderDto.cropId);
+    await this.matchingService.matchOrders(marketOrderDto.cropId);
     return successhandler(successMessage.CREATE_ORDER_SUCCESS);
   }
 

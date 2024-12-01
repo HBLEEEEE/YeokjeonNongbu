@@ -6,6 +6,16 @@ import { CropPrice } from './dto/cropPrice.dto';
 export class MarketRepository {
   constructor(private readonly databaseService: DatabaseService) {}
 
+  async insertCropPrice(data: { cropId: number; price: number }): Promise<void> {
+    const query = `
+            INSERT INTO crop_prices (crop_id, price, time)
+            VALUES ($1, $2, DEFAULT)
+        `;
+    const values = [data.cropId, data.price];
+
+    await this.databaseService.query(query, values);
+  }
+
   async getAllCropsInfo() {
     const query = `
             SELECT *
@@ -21,10 +31,12 @@ export class MarketRepository {
     }));
   }
 
-  async getAllCropsPrice(): Promise<CropPrice[]> {
+  async getAllCurrentCropsPrice(): Promise<CropPrice[]> {
     const query = `
-            SELECT *
+            SELECT DISTINCT
+            ON (crop_id) crop_id, price, time
             FROM crop_prices
+            ORDER BY crop_id, time DESC
         `;
 
     const result = await this.databaseService.query(query);
@@ -35,22 +47,24 @@ export class MarketRepository {
     }));
   }
 
-  async getCropPrice(cropId: number): Promise<CropPrice | null> {
+  async getCurrentCropPrice(cropId: number): Promise<CropPrice | null> {
     const query = `
-            SELECT *
+            SELECT price, time
             FROM crop_prices
             WHERE crop_id = $1
+            ORDER BY time DESC
+                LIMIT 1
         `;
     const values = [cropId];
 
     const result = await this.databaseService.query(query, values);
-    const data = result.rows[0];
     if (result.rowCount === 0) {
       return null;
     }
 
+    const data = result.rows[0];
     return {
-      cropId: data.crop_id,
+      cropId,
       price: data.price
     };
   }

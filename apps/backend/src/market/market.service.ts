@@ -13,12 +13,16 @@ export class MarketService {
     private readonly marketRepository: MarketRepository
   ) {}
 
-  async setCropPrice(data: CropPrice): Promise<void> {
+  async setCropPriceToRedis(data: CropPrice): Promise<void> {
     await this.redisClient.hSet(this.redisKey, data.cropId.toString(), data.price.toString());
   }
 
+  async saveCropPrice(data: CropPrice): Promise<void> {
+    await this.marketRepository.insertCropPrice(data);
+  }
+
   async getCropPrice(cropId: number): Promise<CropPrice | null> {
-    const price = await this.marketRepository.getCropPrice(cropId);
+    const price = await this.marketRepository.getCurrentCropPrice(cropId);
 
     if (!price) {
       return null;
@@ -27,7 +31,7 @@ export class MarketService {
   }
 
   async getAllCropPrices() {
-    const prices = await this.marketRepository.getAllCropsPrice();
+    const prices = await this.marketRepository.getAllCurrentCropsPrice();
     return prices.map(data => ({
       cropId: data.cropId,
       price: data.price

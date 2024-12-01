@@ -200,7 +200,8 @@ export class MatchingService {
     sellOrder: OrderBookDto
   ): Promise<void> {
     const price = sellOrder.tradingType === TradingType.MARKET ? buyOrder.price! : sellOrder.price!;
-    await this.marketService.setCropPrice({ cropId, price });
+    await this.marketService.saveCropPrice({ cropId, price });
+    await this.marketService.setCropPriceToRedis({ cropId, price });
   }
 
   private async cleanMarketOrders(
@@ -357,7 +358,7 @@ export class MatchingService {
     );
 
     // 지정가 거래만 오더북 업데이트
-    if (sellOrder.unfilledQuantity! > 0 && sellOrder.tradingType === TradingType.LIMIT) {
+    if (sellOrder.tradingType === TradingType.LIMIT && sellOrder.unfilledQuantity! > 0) {
       await this.orderBookService.updateOrder(
         sellOrder.memberId,
         sellOrder.cropId,
@@ -367,7 +368,7 @@ export class MatchingService {
         sellOrder.tradingType
       );
     }
-    if (buyOrder.unfilledQuantity! > 0 && buyOrder.tradingType === TradingType.LIMIT) {
+    if (buyOrder.tradingType === TradingType.LIMIT && buyOrder.unfilledQuantity! > 0) {
       await this.orderBookService.updateOrder(
         buyOrder.memberId,
         buyOrder.cropId,
