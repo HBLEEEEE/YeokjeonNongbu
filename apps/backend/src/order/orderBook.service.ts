@@ -3,7 +3,6 @@ import { RedisClientType } from 'redis';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { OrderType, TradingType } from './enums/orderType';
 import { OrderRepository } from './order.repository';
-import { TransactionDto } from './dto/transaction.dto';
 
 @Injectable()
 export class OrderBookService {
@@ -83,10 +82,6 @@ export class OrderBookService {
     if (targetOrder) {
       await this.redisClient.zRem(orderKey, targetOrder);
     }
-  }
-
-  async getTransactionsByMemberId(memberId: number): Promise<TransactionDto[]> {
-    return await this.orderRepository.getTransactionsByMemberId(memberId);
   }
 
   async getBuyOrdersFromRedis(cropId: number): Promise<OrderBookDto[]> {

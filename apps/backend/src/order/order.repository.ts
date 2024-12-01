@@ -5,6 +5,7 @@ import { OrderStatus, TradingType } from './enums/orderType';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { TransactionDto } from './dto/transaction.dto';
 import { Client } from 'pg';
+import { PendingOrderDto } from './dto/pendingOrder.dto';
 
 @Injectable()
 export class OrderRepository {
@@ -160,6 +161,29 @@ export class OrderRepository {
       totalPrice: data.total_price,
       createdAt: data.created_at,
       amount: data.amount
+    }));
+  }
+
+  async getPendingOrdersByMemberId(memberId: number): Promise<PendingOrderDto[]> {
+    const query = `
+            SELECT *
+            FROM orders
+            WHERE member_id = $1
+              AND status = 'pending'
+        `;
+    const values = [memberId];
+    const result = await this.databaseService.query(query, values);
+
+    return result.rows.map(data => ({
+      orderId: data.order_id,
+      cropId: data.crop_id,
+      orderType: data.order_type,
+      price: data.price,
+      quantity: data.quantity,
+      filledQuantity: data.filled_quantity,
+      unfilledQuantity: data.unfilled_quantity,
+      status: data.status,
+      time: data.time
     }));
   }
 
