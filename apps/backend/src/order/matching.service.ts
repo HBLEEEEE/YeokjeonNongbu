@@ -203,8 +203,10 @@ export class MatchingService {
     );
 
     // 트랜잭션 저장
-    await this.orderService.saveTransaction(sellOrder, matchedPrice, matchedQuantity);
-    await this.orderService.saveTransaction(buyOrder, matchedPrice, matchedQuantity);
+    if (matchedQuantity > 0) {
+      await this.orderService.saveTransaction(sellOrder, matchedPrice, matchedQuantity);
+      await this.orderService.saveTransaction(buyOrder, matchedPrice, matchedQuantity);
+    }
 
     // 캐시 및 작물 데이터 업데이트
     await this.accountService.updateCashByCompletingOrder(
