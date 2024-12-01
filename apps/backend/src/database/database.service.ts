@@ -35,4 +35,15 @@ export class DatabaseService implements OnModuleInit {
   async close() {
     await this.client.end();
   }
+
+  async runInTransaction(callback: (client: Client) => Promise<void>): Promise<void> {
+    try {
+      await this.client.query('BEGIN');
+      await callback(this.client);
+      await this.client.query('COMMIT');
+    } catch (error) {
+      await this.client.query('ROLLBACK');
+      throw error;
+    }
+  }
 }
