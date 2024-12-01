@@ -4,6 +4,7 @@ import { OrderDto } from './dto/order.dto';
 import { OrderStatus, TradingType } from './enums/orderType';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { TransactionDto } from './dto/transaction.dto';
+import { Client } from 'pg';
 
 @Injectable()
 export class OrderRepository {
@@ -198,5 +199,9 @@ export class OrderRepository {
 
     const values = [orderId, memberId];
     await this.databaseService.query(query, values);
+  }
+
+  async runInTransaction(callback: (client: Client) => Promise<void>): Promise<void> {
+    await this.databaseService.runInTransaction(callback);
   }
 }

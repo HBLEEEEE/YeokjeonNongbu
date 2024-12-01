@@ -18,9 +18,24 @@ export class MatchingService {
   ) {}
 
   async matchOrders(cropId: number): Promise<void> {
-    const buyOrders = await this.orderBookService.getBuyOrdersFromRedis(cropId);
-    const sellOrders = await this.orderBookService.getSellOrdersFromRedis(cropId);
+    const [buyOrders, sellOrders] = await this.fetchOrders(cropId);
+    await this.processOrderMatching(cropId, buyOrders, sellOrders);
+    await this.cleanMarketOrders(cropId, buyOrders, sellOrders);
+  }
 
+  private async fetchOrders(cropId: number) {
+    const [buyOrders, sellOrders] = await Promise.all([
+      this.orderBookService.getBuyOrdersFromRedis(cropId),
+      this.orderBookService.getSellOrdersFromRedis(cropId)
+    ]);
+    return [buyOrders, sellOrders];
+  }
+
+  private async processOrderMatching(
+    cropId: number,
+    buyOrders: OrderBookDto[],
+    sellOrders: OrderBookDto[]
+  ): Promise<void> {
     let sellIndex = 0;
     let buyIndex = 0;
 
@@ -28,76 +43,165 @@ export class MatchingService {
       const sellOrder = sellOrders[sellIndex];
       const buyOrder = buyOrders[buyIndex];
 
-      // 시장가 매수 처리
       if (buyOrder.tradingType === TradingType.MARKET) {
-        if (!sellOrder) {
-          buyIndex++; // 매칭 가능한 매도 주문 없음
-          continue;
-        }
-
-        const availableQuantity = Math.min(
-          sellOrder.unfilledQuantity!,
-          Math.floor(buyOrder.totalAmount! / sellOrder.price!)
+        [sellIndex, buyIndex] = await this.handleMarketBuyOrder(
+          cropId,
+          buyOrder,
+          sellOrder,
+          sellIndex,
+          buyIndex
         );
-        const matchedAmount = availableQuantity * sellOrder.price!;
-
-        buyOrder.filledQuantity += availableQuantity;
-        buyOrder.totalAmount! -= matchedAmount;
-        sellOrder.unfilledQuantity! -= availableQuantity;
-
-        await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
-        await this.marketService.setCropPrice({ cropId: cropId, price: sellOrder.price! }); // 가격 업데이트
-
-        if (sellOrder.unfilledQuantity! <= 0) sellIndex++;
-        if (buyOrder.totalAmount! <= 0 || availableQuantity === 0) {
-          buyIndex++;
-        }
         continue;
       }
 
-      // 시장가 매도 처리
       if (sellOrder.tradingType === TradingType.MARKET) {
-        if (!buyOrder) {
-          sellIndex++; // 매칭 가능한 매수 주문 없음
-          continue;
-        }
-
-        const availableQuantity = Math.min(buyOrder.unfilledQuantity!, sellOrder.quantity!);
-
-        sellOrder.filledQuantity += availableQuantity;
-        sellOrder.quantity! -= availableQuantity;
-        buyOrder.unfilledQuantity! -= availableQuantity;
-
-        await this.processOrderMatch(buyOrder, sellOrder, availableQuantity);
-        await this.marketService.setCropPrice({ cropId: cropId, price: buyOrder.price! }); // 가격 업데이트
-
-        if (buyOrder.unfilledQuantity! <= 0) buyIndex++;
-        if (sellOrder.quantity! <= 0 || availableQuantity === 0) {
-          sellIndex++;
-        }
+        [sellIndex, buyIndex] = await this.handleMarketSellOrder(
+          cropId,
+          buyOrder,
+          sellOrder,
+          sellIndex,
+          buyIndex
+        );
         continue;
       }
 
-      if (sellOrder.price! > buyOrder.price!) {
-        buyIndex++; // 매도 주문 중 더 낮은 가격이 있는지 확인
-        continue;
-      }
-      const matchedQuantity = Math.min(sellOrder.unfilledQuantity!, buyOrder.unfilledQuantity!);
+      [sellIndex, buyIndex] = await this.handleLimitOrder(
+        cropId,
+        buyOrder,
+        sellOrder,
+        sellIndex,
+        buyIndex
+      );
+    }
+  }
 
-      sellOrder.unfilledQuantity! -= matchedQuantity;
-      buyOrder.unfilledQuantity! -= matchedQuantity;
-      sellOrder.filledQuantity += matchedQuantity;
-      buyOrder.filledQuantity += matchedQuantity;
-
-      await this.processOrderMatch(buyOrder, sellOrder, matchedQuantity);
-      await this.marketService.setCropPrice({ cropId: cropId, price: sellOrder.price! }); // 가격 업데이트
-
-      if (sellOrder.unfilledQuantity! <= 0) sellIndex++;
-      if (buyOrder.unfilledQuantity! <= 0) buyIndex++;
+  private async handleMarketBuyOrder(
+    cropId: number,
+    buyOrder: OrderBookDto,
+    sellOrder: OrderBookDto,
+    sellIndex: number,
+    buyIndex: number
+  ): Promise<[number, number]> {
+    if (!sellOrder) {
+      return [sellIndex, buyIndex + 1];
     }
 
-    // 시장가 주문은 매칭 완료 후 삭제
-    await this.cleanMarketOrders(cropId, buyOrders, sellOrders);
+    const availableQuantity = this.calculateMarketBuyQuantity(buyOrder, sellOrder);
+    const matchedAmount = availableQuantity * sellOrder.price!;
+
+    await this.updateOrderQuantities(buyOrder, sellOrder, availableQuantity, matchedAmount);
+    await this.processMatchAndUpdatePrice(cropId, buyOrder, sellOrder, availableQuantity);
+
+    return this.updateIndexes(
+      sellOrder.unfilledQuantity! <= 0,
+      buyOrder.totalAmount! <= 0 || availableQuantity === 0,
+      sellIndex,
+      buyIndex
+    );
+  }
+
+  private async handleMarketSellOrder(
+    cropId: number,
+    buyOrder: OrderBookDto,
+    sellOrder: OrderBookDto,
+    sellIndex: number,
+    buyIndex: number
+  ): Promise<[number, number]> {
+    if (!buyOrder) {
+      return [sellIndex + 1, buyIndex];
+    }
+
+    const availableQuantity = Math.min(buyOrder.unfilledQuantity!, sellOrder.quantity!);
+    await this.updateOrderQuantities(buyOrder, sellOrder, availableQuantity);
+    await this.processMatchAndUpdatePrice(cropId, buyOrder, sellOrder, availableQuantity);
+
+    return this.updateIndexes(
+      sellOrder.quantity! <= 0 || availableQuantity === 0,
+      buyOrder.unfilledQuantity! <= 0,
+      sellIndex,
+      buyIndex
+    );
+  }
+
+  private async handleLimitOrder(
+    cropId: number,
+    buyOrder: OrderBookDto,
+    sellOrder: OrderBookDto,
+    sellIndex: number,
+    buyIndex: number
+  ): Promise<[number, number]> {
+    if (sellOrder.price! > buyOrder.price!) {
+      return [sellIndex, buyIndex + 1];
+    }
+
+    const matchedQuantity = Math.min(sellOrder.unfilledQuantity!, buyOrder.unfilledQuantity!);
+    await this.updateOrderQuantities(buyOrder, sellOrder, matchedQuantity);
+    await this.processMatchAndUpdatePrice(cropId, buyOrder, sellOrder, matchedQuantity);
+
+    return this.updateIndexes(
+      sellOrder.unfilledQuantity! <= 0,
+      buyOrder.unfilledQuantity! <= 0,
+      sellIndex,
+      buyIndex
+    );
+  }
+
+  private calculateMarketBuyQuantity(buyOrder: OrderBookDto, sellOrder: OrderBookDto): number {
+    return Math.min(
+      sellOrder.unfilledQuantity!,
+      Math.floor(buyOrder.totalAmount! / sellOrder.price!)
+    );
+  }
+
+  private async updateOrderQuantities(
+    buyOrder: OrderBookDto,
+    sellOrder: OrderBookDto,
+    quantity: number,
+    matchedAmount?: number
+  ): Promise<void> {
+    buyOrder.filledQuantity += quantity;
+    sellOrder.filledQuantity += quantity;
+
+    if (buyOrder.tradingType === TradingType.MARKET) {
+      buyOrder.totalAmount! -= matchedAmount!;
+    } else {
+      buyOrder.unfilledQuantity! -= quantity;
+    }
+
+    if (sellOrder.tradingType === TradingType.MARKET) {
+      sellOrder.quantity! -= quantity;
+    } else {
+      sellOrder.unfilledQuantity! -= quantity;
+    }
+  }
+
+  private updateIndexes(
+    incrementSell: boolean,
+    incrementBuy: boolean,
+    sellIndex: number,
+    buyIndex: number
+  ): [number, number] {
+    return [sellIndex + (incrementSell ? 1 : 0), buyIndex + (incrementBuy ? 1 : 0)];
+  }
+
+  private async processMatchAndUpdatePrice(
+    cropId: number,
+    buyOrder: OrderBookDto,
+    sellOrder: OrderBookDto,
+    quantity: number
+  ): Promise<void> {
+    await this.processOrderMatch(buyOrder, sellOrder, quantity);
+    await this.updateMarketPrice(cropId, buyOrder, sellOrder);
+  }
+
+  private async updateMarketPrice(
+    cropId: number,
+    buyOrder: OrderBookDto,
+    sellOrder: OrderBookDto
+  ): Promise<void> {
+    const price = sellOrder.tradingType === TradingType.MARKET ? buyOrder.price! : sellOrder.price!;
+    await this.marketService.saveCropPrice({ cropId, price });
+    await this.marketService.setCropPriceToRedis({ cropId, price });
   }
 
   private async cleanMarketOrders(
@@ -202,8 +306,10 @@ export class MatchingService {
     );
 
     // 트랜잭션 저장
-    await this.orderService.saveTransaction(sellOrder, matchedPrice, matchedQuantity);
-    await this.orderService.saveTransaction(buyOrder, matchedPrice, matchedQuantity);
+    if (matchedQuantity > 0) {
+      await this.orderService.saveTransaction(sellOrder, matchedPrice, matchedQuantity);
+      await this.orderService.saveTransaction(buyOrder, matchedPrice, matchedQuantity);
+    }
 
     // 캐시 및 작물 데이터 업데이트
     await this.accountService.updateCashByCompletingOrder(
@@ -252,7 +358,7 @@ export class MatchingService {
     );
 
     // 지정가 거래만 오더북 업데이트
-    if (sellOrder.unfilledQuantity! > 0 && sellOrder.tradingType === TradingType.LIMIT) {
+    if (sellOrder.tradingType === TradingType.LIMIT && sellOrder.unfilledQuantity! > 0) {
       await this.orderBookService.updateOrder(
         sellOrder.memberId,
         sellOrder.cropId,
@@ -262,7 +368,7 @@ export class MatchingService {
         sellOrder.tradingType
       );
     }
-    if (buyOrder.unfilledQuantity! > 0 && buyOrder.tradingType === TradingType.LIMIT) {
+    if (buyOrder.tradingType === TradingType.LIMIT && buyOrder.unfilledQuantity! > 0) {
       await this.orderBookService.updateOrder(
         buyOrder.memberId,
         buyOrder.cropId,
@@ -273,7 +379,7 @@ export class MatchingService {
       );
     }
 
-    if (buyOrder.tradingType == 'limit' && buyOrder.unfilledQuantity! === 0) {
+    if (buyOrder.tradingType == TradingType.LIMIT && buyOrder.unfilledQuantity! === 0) {
       await this.orderBookService.removeOrder(
         buyOrder.memberId,
         buyOrder.cropId,
@@ -283,7 +389,7 @@ export class MatchingService {
       );
     }
 
-    if (buyOrder.tradingType == 'limit' && sellOrder.unfilledQuantity! === 0) {
+    if (buyOrder.tradingType == TradingType.LIMIT && sellOrder.unfilledQuantity! === 0) {
       await this.orderBookService.removeOrder(
         sellOrder.memberId,
         sellOrder.cropId,

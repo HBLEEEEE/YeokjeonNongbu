@@ -16,24 +16,6 @@ export class OrderService {
   ) {}
 
   async saveOrder(orderDto: OrderDto): Promise<number[]> {
-    switch (orderDto.tradingType) {
-      case 'limit':
-        return await this.saveLimitOrder(orderDto);
-      case 'market':
-        return await this.saveMarketOrder(orderDto);
-      default:
-        throw new Error(`Unsupported tradingType: ${orderDto.tradingType}`);
-    }
-  }
-
-  private async saveLimitOrder(orderDto: OrderDto): Promise<number[]> {
-    const [orderId, memberId] = await this.orderRepository.saveOrder(orderDto);
-    await this.saveOrderToOrderBook(orderDto, orderId, memberId);
-
-    return [orderId, memberId];
-  }
-
-  private async saveMarketOrder(orderDto: OrderDto): Promise<number[]> {
     const [orderId, memberId] = await this.orderRepository.saveOrder(orderDto);
     await this.saveOrderToOrderBook(orderDto, orderId, memberId);
     return [orderId, memberId];
