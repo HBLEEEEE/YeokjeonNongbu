@@ -7,10 +7,17 @@ import { ChartService } from './chart.service';
 export class ChartContoller {
   constructor(private readonly chartService: ChartService) {}
 
-  @Get(':cropId')
+  @Get('/min/:cropId')
   @ApiOperation({ summary: '차트 데이터 요청 API' })
-  async getChartData(@Param('cropId', ParseIntPipe) cropId: number) {
-    const data = await this.chartService.getCropChartData(cropId);
+  async getMinuteChartData(@Param('cropId', ParseIntPipe) cropId: number) {
+    const data = await this.chartService.getCropChartData(cropId, 'M');
+    return successhandler(successMessage.GET_CROP_CHART_DATA_SUCCESS, data);
+  }
+
+  @Get('/hour/:cropId')
+  @ApiOperation({ summary: '차트 데이터 요청 API' })
+  async getHourChartData(@Param('cropId', ParseIntPipe) cropId: number) {
+    const data = await this.chartService.getCropChartData(cropId, 'H');
     return successhandler(successMessage.GET_CROP_CHART_DATA_SUCCESS, data);
   }
 }
