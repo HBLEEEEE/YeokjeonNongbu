@@ -189,11 +189,11 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
         case 2:
           return '수박';
         case 3:
-          return '포도';
-        case 4:
-          return '버섯';
-        case 5:
           return '사과';
+        case 4:
+          return '포도';
+        case 5:
+          return '버섯';
         default:
           return '';
       }
