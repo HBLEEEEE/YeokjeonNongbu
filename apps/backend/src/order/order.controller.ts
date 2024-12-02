@@ -64,10 +64,10 @@ export class OrderController {
       const { memberId } = user;
       const orderDto = DtoTransformer.mapToOrderDto(limitOrderDto, memberId);
       await this.orderService.saveOrder(orderDto);
-      await this.accountService.updateCashByPlacingOrder(
+      await this.accountService.updateCropByPlacingSellOrder(
         orderDto.memberId,
-        orderDto.quantity! * orderDto.price!,
-        orderDto.orderType
+        orderDto.cropId,
+        orderDto.quantity!
       );
 
       await this.matchingService.matchOrders(limitOrderDto.cropId);
