@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { OrderDto } from './dto/order.dto';
-import { OrderStatus, TradingType } from './enums/orderType';
+import { OrderStatus, toOrderStatus, TradingType } from './enums/orderType';
 import { OrderBookDto } from './dto/orderBook.dto';
 import { TransactionDto } from './dto/transaction.dto';
 import { Client } from 'pg';
@@ -178,6 +178,7 @@ export class OrderRepository {
       orderId: data.order_id,
       cropId: data.crop_id,
       orderType: data.order_type,
+      tradingType: data.trading_type,
       price: data.price,
       quantity: data.quantity,
       filledQuantity: data.filled_quantity,
@@ -227,5 +228,21 @@ export class OrderRepository {
 
   async runInTransaction(callback: (client: Client) => Promise<void>): Promise<void> {
     await this.databaseService.runInTransaction(callback);
+  }
+
+  async getOrderStatus(memberId: number, orderId: number): Promise<OrderStatus> {
+    const query = `
+            SELECT status
+            FROM orders
+            WHERE order_id = $1
+              AND member_id = $2
+        `;
+    const values = [orderId, memberId];
+    const result = await this.databaseService.query(query, values);
+
+    if (result.rows.length === 0) {
+      throw new HttpException('주문이 존재하지 않습니다.', HttpStatus.NOT_FOUND);
+    }
+    return toOrderStatus(result.rows[0]?.status);
   }
 }
