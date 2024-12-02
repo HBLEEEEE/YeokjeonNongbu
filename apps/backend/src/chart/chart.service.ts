@@ -5,10 +5,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Chart } from './model/chart.schema';
 import { Model } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
+// import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 
 @Injectable()
 export class ChartService implements OnModuleInit {
   constructor(
+    // private readonly webSocketGateway: WebsocketGateway,
     private readonly databaseService: DatabaseService,
     @InjectModel(Chart.name) private readonly chartModel: Model<Chart>
   ) {}
