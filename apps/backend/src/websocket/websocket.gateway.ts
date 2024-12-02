@@ -32,7 +32,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   async handleConnection(client: Socket) {
-    const token = client.handshake.auth.authorization?.split(': ')[1];
+    const token = client.handshake.auth.authorization?.split(' ')[1];
     if (!token) {
       client.disconnect(true);
       return;
@@ -101,7 +101,15 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     `;
 
     const crops = await this.databaseService.query(query, [memberId]);
-    client.emit('crops', crops.rows);
+
+    const data = crops.rows.map(crop => ({
+      cropId: crop.crop_id,
+      availableQuantity: crop.available_quantity,
+      pendingQuantity: crop.pending_quantity,
+      totalQuantity: crop.total_quantity
+    }));
+
+    client.emit('crops', data);
   }
 
   private async handleRedisUpdate(cropId: string) {
