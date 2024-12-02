@@ -178,6 +178,7 @@ export class OrderRepository {
       orderId: data.order_id,
       cropId: data.crop_id,
       orderType: data.order_type,
+      tradingType: data.trading_type,
       price: data.price,
       quantity: data.quantity,
       filledQuantity: data.filled_quantity,
