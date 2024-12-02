@@ -16,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     MongooseModule.forFeature([{ name: Chart.name, schema: ChartSchema }])
   ],
   controllers: [ChartContoller],
-  providers: [ChartService, ChartUtil]
+  providers: [ChartService, ChartUtil],
+  exports: [ChartService]
 })
 export class ChartModule {}
