@@ -183,10 +183,7 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
 
   private async getActionParam(action: number, param1: Nullable<number>) {
     if ([1, 2].includes(action)) {
-      const cropId = (await this.databaseService.query(mailQueries.getCropName, [param1])).rows[0]
-        .crop_name;
-
-      switch (cropId) {
+      switch (param1) {
         case 1:
           return '당근';
         case 2:
@@ -197,6 +194,8 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
           return '버섯';
         case 5:
           return '사과';
+        default:
+          return '';
       }
     } else if ([4, 5, 7].includes(action)) {
       const result = await this.databaseService.query(mailQueries.getMemberNickNameByMemberID, [
