@@ -399,7 +399,7 @@ export class MatchingService {
           );
         }
 
-        if (buyOrder.tradingType == TradingType.LIMIT && sellOrder.unfilledQuantity! === 0) {
+        if (sellOrder.tradingType == TradingType.LIMIT && sellOrder.unfilledQuantity! === 0) {
           await this.orderBookService.removeOrder(
             sellOrder.memberId,
             sellOrder.cropId,
