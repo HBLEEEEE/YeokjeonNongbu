@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseModule } from 'src/database/database.module';
@@ -15,7 +15,7 @@ import { WebsocketModule } from 'src/websocket/websocket.module';
     ConfigModule.forRoot(),
     DatabaseModule,
     MongooseModule.forFeature([{ name: Chart.name, schema: ChartSchema }]),
-    WebsocketModule
+    forwardRef(() => WebsocketModule)
   ],
   controllers: [ChartContoller],
   providers: [ChartService, ChartUtil],

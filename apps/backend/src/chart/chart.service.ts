@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { chartQueries } from './chart.query';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,6 +10,7 @@ import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 @Injectable()
 export class ChartService implements OnModuleInit {
   constructor(
+    @Inject(forwardRef(() => WebsocketGateway))
     private readonly webSocketGateway: WebsocketGateway,
     private readonly databaseService: DatabaseService,
     @InjectModel(Chart.name) private readonly chartModel: Model<Chart>
@@ -45,8 +46,9 @@ export class ChartService implements OnModuleInit {
         await chart.save();
       }
 
-      const cropChartData = await this.getCropChartData(cropId, 'M');
-      this.webSocketGateway.chartDataTransfer(cropId, cropChartData);
+      const cropsData = await this.getCropChartData(cropId, 'M');
+      const cropMinChartData = { cropMinData: cropsData };
+      this.webSocketGateway.chartMinDataTransfer(cropId, cropMinChartData);
     }
   }
 
@@ -79,8 +81,9 @@ export class ChartService implements OnModuleInit {
         await chart.save();
       }
 
-      const cropChartData = await this.getCropChartData(cropId, 'H');
-      this.webSocketGateway.chartDataTransfer(cropId, cropChartData);
+      const cropsData = await this.getCropChartData(cropId, 'H');
+      const cropHourChartData = { cropHourData: cropsData };
+      this.webSocketGateway.chartHourDataTransfer(cropId, cropHourChartData);
     }
   }
 

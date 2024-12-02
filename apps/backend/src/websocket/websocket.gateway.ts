@@ -10,6 +10,7 @@ import { Inject } from '@nestjs/common';
 import { RedisClientType } from 'redis';
 import { DatabaseService } from '../database/database.service';
 import { JwtService } from '@nestjs/jwt';
+import { ChartService } from 'src/chart/chart.service';
 
 @WebSocketGateway({ cors: true })
 export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -20,6 +21,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly jwtService: JwtService,
+    private readonly chartService: ChartService,
     @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType
   ) {}
 
@@ -56,6 +58,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       if (cropId) {
         client.join(String(cropId));
         this.sendCurrentMarketState(client, cropId);
+        this.getInitChartData(client, cropId);
       }
     });
   }
@@ -152,8 +155,12 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.server.to(cropId).emit('market-update', data);
   }
 
-  async chartDataTransfer(cropId: string, data: any) {
-    this.server.to(String(cropId)).emit('chart', data);
+  async chartMinDataTransfer(cropId: string, data: any) {
+    this.server.to(String(cropId)).emit('minChart', data);
+  }
+
+  async chartHourDataTransfer(cropId: string, data: any) {
+    this.server.to(String(cropId)).emit('hourChart', data);
   }
 
   async cropDataTransfer(memberId: string, data: any) {
@@ -178,6 +185,17 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       buyOrders: aggregatedBuyOrders,
       sellOrders: aggregatedSellOrders,
       nowPrice: Number(nowPrice)
+    });
+  }
+
+  async getInitChartData(client: Socket, cropId: string) {
+    const cropMinData = await this.chartService.getCropChartData(Number(cropId), 'M');
+    const cropHourData = await this.chartService.getCropChartData(Number(cropId), 'H');
+    client.emit('minChart', {
+      cropMinData
+    });
+    client.emit('hourChart', {
+      cropHourData
     });
   }
 }
