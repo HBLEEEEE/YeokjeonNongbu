@@ -36,6 +36,22 @@ export class DatabaseService implements OnModuleInit {
     await this.client.end();
   }
 
+  async listenToChannel(channel: string, callback: (cropNotice: any) => void): Promise<void> {
+    await this.client.query(`LISTEN ${channel}`);
+    this.client.on('notification', msg => {
+      if (msg.channel === channel) {
+        try {
+          if (msg.payload) {
+            const cropNotice = JSON.parse(msg.payload);
+            callback(cropNotice);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    });
+  }
+
   async runInTransaction(callback: (client: Client) => Promise<void>): Promise<void> {
     try {
       await this.client.query('BEGIN');
