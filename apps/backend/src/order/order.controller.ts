@@ -15,6 +15,7 @@ import { User } from '../global/utils/memberData';
 import { CancelOrderDto } from './dto/cancelOrder.dto';
 import { pendingOrdersDecorator } from './decorator/getPendingOrders.decorator';
 import { OrderStatus } from './enums/orderType';
+import { MarketOrderDto } from './dto/marketOrder.dto';
 
 @Controller('api/order')
 export class OrderController {
@@ -74,6 +75,64 @@ export class OrderController {
     } catch (error) {
       console.error('판매 주문 생성 중 오류:', error);
       throw new HttpException('판매 주문 생성에 실패했습니다.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('buy/market')
+  @UseGuards(HasSufficientCashGuard)
+  @ApiOperation({ summary: '시장가 구매 주문 생성' })
+  @orderResponseDecorator()
+  async createMarketBuyOrder(
+    @User() user: { memberId: number },
+    @Body() marketOrderDto: MarketOrderDto
+  ) {
+    try {
+      const { memberId } = user;
+      const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto, memberId);
+      await this.orderService.saveOrder(orderDto);
+      await this.accountService.updateCashByPlacingOrder(
+        orderDto.memberId,
+        orderDto.totalAmount!,
+        orderDto.orderType
+      );
+
+      await this.matchingService.matchOrders(marketOrderDto.cropId);
+      return successhandler(successMessage.CREATE_ORDER_SUCCESS);
+    } catch (error) {
+      console.error('시장가 구매 주문 생성 중 오류:', error);
+      throw new HttpException(
+        '시장가 구매 주문 생성에 실패했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('sell/market')
+  @UseGuards(HasSufficientCropGuard)
+  @ApiOperation({ summary: '시장가 판매 주문 생성' })
+  @orderResponseDecorator()
+  async createMarketSellOrder(
+    @User() user: { memberId: number },
+    @Body() marketOrderDto: MarketOrderDto
+  ) {
+    try {
+      const { memberId } = user;
+      const orderDto = DtoTransformer.mapToOrderDto(marketOrderDto, memberId);
+      await this.orderService.saveOrder(orderDto);
+      await this.accountService.updateCropByPlacingSellOrder(
+        orderDto.memberId,
+        orderDto.cropId,
+        orderDto.quantity!
+      );
+
+      await this.matchingService.matchOrders(marketOrderDto.cropId);
+      return successhandler(successMessage.CREATE_ORDER_SUCCESS);
+    } catch (error) {
+      console.error('시장가 판매 주문 생성 중 오류:', error);
+      throw new HttpException(
+        '시장가 판매 주문 생성에 실패했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 

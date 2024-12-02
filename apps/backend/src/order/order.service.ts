@@ -100,4 +100,8 @@ export class OrderService {
   async getOrderStatus(memberId: number, orderId: number): Promise<OrderStatus> {
     return await this.orderRepository.getOrderStatus(memberId, orderId);
   }
+
+  async runInTransaction(callback: () => Promise<void>): Promise<void> {
+    await this.orderRepository.runInTransaction(callback);
+  }
 }

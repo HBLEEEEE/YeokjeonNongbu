@@ -8,6 +8,5 @@ export class MarketOrderDto extends BaseOrderDto {
   totalAmount: number;
 
   @ApiProperty({ description: '주문 수량', example: 100 })
-  @IsInt({ message: '수량은 정수여야 합니다.' })
   quantity: number | null;
 }

@@ -209,71 +209,74 @@ export class MatchingService {
     remainingBuyOrders: OrderBookDto[],
     remainingSellOrders: OrderBookDto[]
   ): Promise<void> {
-    // 시장가 매수 주문 정리
-    for (const buyOrder of remainingBuyOrders) {
-      if (buyOrder.tradingType === TradingType.MARKET) {
-        // 매칭되지 않은 금액 롤백
-        if (buyOrder.totalAmount! > 0) {
-          await this.handlePendingRollback(
-            cropId,
-            buyOrder.memberId,
-            buyOrder.totalAmount!,
-            OrderType.BUY
-          );
+    await this.orderService.runInTransaction(async () => {
+      try {
+        // 시장가 매수 주문 정리
+        for (const buyOrder of remainingBuyOrders) {
+          if (buyOrder.tradingType === TradingType.MARKET) {
+            if (buyOrder.totalAmount! > 0) {
+              await this.handlePendingRollback(
+                cropId,
+                buyOrder.memberId,
+                buyOrder.totalAmount!,
+                OrderType.BUY
+              );
+            }
+
+            await this.orderService.updateOrder(
+              buyOrder.orderId,
+              OrderStatus.COMPLETED,
+              buyOrder.filledQuantity,
+              buyOrder.unfilledQuantity!,
+              buyOrder.tradingType
+            );
+
+            // Redis 주문 제거
+            await this.orderBookService.removeOrder(
+              buyOrder.memberId,
+              cropId,
+              buyOrder.orderId,
+              OrderType.BUY,
+              TradingType.MARKET
+            );
+          }
         }
 
-        // 주문 상태 완료 처리
-        await this.orderService.updateOrder(
-          buyOrder.orderId,
-          OrderStatus.COMPLETED,
-          buyOrder.filledQuantity,
-          buyOrder.unfilledQuantity!,
-          buyOrder.tradingType
-        );
+        // 시장가 매도 주문 정리
+        for (const sellOrder of remainingSellOrders) {
+          if (sellOrder.tradingType === TradingType.MARKET) {
+            if (sellOrder.quantity! > 0) {
+              await this.handlePendingRollback(
+                cropId,
+                sellOrder.memberId,
+                sellOrder.quantity!,
+                OrderType.SELL
+              );
+            }
 
-        // Redis 주문 제거
-        await this.orderBookService.removeOrder(
-          buyOrder.memberId,
-          cropId,
-          buyOrder.orderId,
-          OrderType.BUY,
-          TradingType.MARKET
-        );
-      }
-    }
+            await this.orderService.updateOrder(
+              sellOrder.orderId,
+              OrderStatus.COMPLETED,
+              sellOrder.filledQuantity,
+              sellOrder.unfilledQuantity!,
+              sellOrder.tradingType
+            );
 
-    // 시장가 매도 주문 정리
-    for (const sellOrder of remainingSellOrders) {
-      if (sellOrder.tradingType === TradingType.MARKET) {
-        // 매칭되지 않은 수량 롤백
-        if (sellOrder.quantity! > 0) {
-          await this.handlePendingRollback(
-            cropId,
-            sellOrder.memberId,
-            sellOrder.quantity!,
-            OrderType.SELL
-          );
+            // Redis 주문 제거
+            await this.orderBookService.removeOrder(
+              sellOrder.memberId,
+              cropId,
+              sellOrder.orderId,
+              OrderType.SELL,
+              TradingType.MARKET
+            );
+          }
         }
-
-        // 주문 상태 완료 처리
-        await this.orderService.updateOrder(
-          sellOrder.orderId,
-          OrderStatus.COMPLETED,
-          sellOrder.filledQuantity,
-          sellOrder.unfilledQuantity!,
-          sellOrder.tradingType
-        );
-
-        // Redis 주문 제거
-        await this.orderBookService.removeOrder(
-          sellOrder.memberId,
-          cropId,
-          sellOrder.orderId,
-          OrderType.SELL,
-          TradingType.MARKET
-        );
+      } catch (error) {
+        console.error('주문 정리 중 오류:', error);
+        throw new Error('주문 정리 중 오류가 발생했습니다.');
       }
-    }
+    });
   }
 
   private async processOrderMatch(
