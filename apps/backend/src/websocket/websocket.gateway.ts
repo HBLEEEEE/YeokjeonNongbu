@@ -10,6 +10,7 @@ import { Inject } from '@nestjs/common';
 import { RedisClientType } from 'redis';
 import { DatabaseService } from '../database/database.service';
 import { JwtService } from '@nestjs/jwt';
+import { ChartService } from 'src/chart/chart.service';
 
 @WebSocketGateway({ cors: true })
 export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -20,6 +21,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly jwtService: JwtService,
+    private readonly chartService: ChartService,
     @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType
   ) {}
 
@@ -32,7 +34,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   async handleConnection(client: Socket) {
-    const token = client.handshake.auth.authorization?.split(': ')[1];
+    const token = client.handshake.auth.authorization?.split(' ')[1];
     if (!token) {
       client.disconnect(true);
       return;
@@ -56,6 +58,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       if (cropId) {
         client.join(String(cropId));
         this.sendCurrentMarketState(client, cropId);
+        this.getInitChartData(client, cropId);
       }
     });
   }
@@ -101,7 +104,15 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     `;
 
     const crops = await this.databaseService.query(query, [memberId]);
-    client.emit('crops', crops.rows);
+
+    const data = crops.rows.map(crop => ({
+      cropId: crop.crop_id,
+      availableQuantity: crop.available_quantity,
+      pendingQuantity: crop.pending_quantity,
+      totalQuantity: crop.total_quantity
+    }));
+
+    client.emit('crops', data);
   }
 
   private async handleRedisUpdate(cropId: string) {
@@ -144,8 +155,12 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.server.to(cropId).emit('market-update', data);
   }
 
-  async chartDataTransfer(cropId: string, data: any) {
-    this.server.to(String(cropId)).emit('chart', data);
+  async chartMinDataTransfer(cropId: string, data: any) {
+    this.server.to(String(cropId)).emit('minChart', data);
+  }
+
+  async chartHourDataTransfer(cropId: string, data: any) {
+    this.server.to(String(cropId)).emit('hourChart', data);
   }
 
   async cropDataTransfer(memberId: string, data: any) {
@@ -170,6 +185,17 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       buyOrders: aggregatedBuyOrders,
       sellOrders: aggregatedSellOrders,
       nowPrice: Number(nowPrice)
+    });
+  }
+
+  async getInitChartData(client: Socket, cropId: string) {
+    const cropMinData = await this.chartService.getCropChartData(Number(cropId), 'M');
+    const cropHourData = await this.chartService.getCropChartData(Number(cropId), 'H');
+    client.emit('minChart', {
+      cropMinData
+    });
+    client.emit('hourChart', {
+      cropHourData
     });
   }
 }
