@@ -16,6 +16,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       })
     })
   ],
-  providers: [WebsocketGateway]
+  providers: [WebsocketGateway],
+  exports: [WebsocketGateway]
 })
 export class WebsocketModule {}

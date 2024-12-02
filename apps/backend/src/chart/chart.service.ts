@@ -5,12 +5,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Chart } from './model/chart.schema';
 import { Model } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
-// import { WebsocketGateway } from 'src/websocket/websocket.gateway';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 
 @Injectable()
 export class ChartService implements OnModuleInit {
   constructor(
-    // private readonly webSocketGateway: WebsocketGateway,
+    private readonly webSocketGateway: WebsocketGateway,
     private readonly databaseService: DatabaseService,
     @InjectModel(Chart.name) private readonly chartModel: Model<Chart>
   ) {}
@@ -44,6 +44,9 @@ export class ChartService implements OnModuleInit {
         const chart = new this.chartModel({ cropData, mColumn, name });
         await chart.save();
       }
+
+      const cropChartData = await this.getCropChartData(cropId, 'M');
+      this.webSocketGateway.chartDataTransfer(cropId, cropChartData);
     }
   }
 
@@ -75,6 +78,9 @@ export class ChartService implements OnModuleInit {
         const chart = new this.chartModel({ cropData, hColumn, name });
         await chart.save();
       }
+
+      const cropChartData = await this.getCropChartData(cropId, 'H');
+      this.webSocketGateway.chartDataTransfer(cropId, cropChartData);
     }
   }
 

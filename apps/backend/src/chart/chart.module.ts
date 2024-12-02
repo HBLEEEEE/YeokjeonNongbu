@@ -7,13 +7,15 @@ import { ChartContoller } from './chart.controller';
 import { ChartService } from './chart.service';
 import { ChartUtil } from './model/chart.mongo';
 import { ScheduleModule } from '@nestjs/schedule';
+import { WebsocketModule } from 'src/websocket/websocket.module';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     DatabaseModule,
-    MongooseModule.forFeature([{ name: Chart.name, schema: ChartSchema }])
+    MongooseModule.forFeature([{ name: Chart.name, schema: ChartSchema }]),
+    WebsocketModule
   ],
   controllers: [ChartContoller],
   providers: [ChartService, ChartUtil],
