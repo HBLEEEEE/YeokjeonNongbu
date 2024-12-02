@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { OrderBookService } from './orderBook.service';
 import DtoTransformer from './utils/dtoTransformer';
@@ -6,7 +6,7 @@ import { LimitOrderDto } from './dto/limitOrder.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { MatchingService } from './matching.service';
 import { successhandler, successMessage } from '../global/successhandler';
-import { cancelOrderResponseDecorator, orderResponseDecorator } from './decorator/order.decorator';
+import { orderResponseDecorator } from './decorator/order.decorator';
 import { transactionResponseDecorator } from './decorator/getTransactions.decorator';
 import { HasSufficientCashGuard } from '../account/guards/hasSufficientCashGuard';
 import { AccountService } from '../account/account.service';
@@ -15,6 +15,7 @@ import { MarketOrderDto } from './dto/marketOrder.dto';
 import { User } from '../global/utils/memberData';
 import { CancelOrderDto } from './dto/cancelOrder.dto';
 import { pendingOrdersDecorator } from './decorator/getPendingOrders.decorator';
+import { OrderStatus } from './enums/orderType';
 
 @Controller('api/order')
 export class OrderController {
@@ -129,13 +130,43 @@ export class OrderController {
 
   @Post('cancel')
   @ApiOperation({ summary: '주문 취소' })
-  @cancelOrderResponseDecorator()
+  @pendingOrdersDecorator()
   async cancelOrder(@User() user: { memberId: number }, @Body() cancelOrderDto: CancelOrderDto) {
     const { memberId } = user;
     const { cropId, orderId, orderType, tradingType } = cancelOrderDto;
 
-    await this.orderBookService.removeOrder(memberId, cropId, orderId, orderType, tradingType);
-    await this.orderService.cancelOrder(memberId, orderId, cropId, orderType);
-    return successhandler(successMessage.DELETE_ORDER_SUCCESS);
+    try {
+      const orderStatus = await this.orderService.getOrderStatus(memberId, orderId);
+      if (orderStatus === OrderStatus.CANCELED || orderStatus === OrderStatus.COMPLETED) {
+        const pendingOrders = await this.orderService.getPendingOrdersByMemberId(memberId);
+        throw new HttpException(
+          {
+            message: '이미 취소되었거나 완료된 주문입니다.',
+            data: pendingOrders
+          },
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      await this.orderBookService.removeOrder(memberId, cropId, orderId, orderType, tradingType);
+      await this.orderService.cancelOrder(memberId, orderId, cropId, orderType);
+      const pendingOrders = await this.orderService.getPendingOrdersByMemberId(memberId);
+
+      return {
+        code: 200,
+        message: successMessage.DELETE_ORDER_SUCCESS,
+        data: pendingOrders
+      };
+    } catch (error) {
+      if (error instanceof HttpException && error.getStatus() === HttpStatus.NOT_FOUND) {
+        const pendingOrders = await this.orderService.getPendingOrdersByMemberId(memberId);
+        return {
+          code: HttpStatus.NOT_FOUND,
+          message: '주문이 존재하지 않습니다.',
+          data: pendingOrders
+        };
+      }
+      throw error;
+    }
   }
 }

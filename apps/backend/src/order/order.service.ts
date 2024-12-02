@@ -96,4 +96,8 @@ export class OrderService {
   async getPendingOrdersByMemberId(memberId: number): Promise<PendingOrderDto[]> {
     return await this.orderRepository.getPendingOrdersByMemberId(memberId);
   }
+
+  async getOrderStatus(memberId: number, orderId: number): Promise<OrderStatus> {
+    return await this.orderRepository.getOrderStatus(memberId, orderId);
+  }
 }
