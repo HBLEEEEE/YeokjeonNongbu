@@ -183,8 +183,21 @@ export class MailService implements OnModuleInit, OnModuleDestroy {
 
   private async getActionParam(action: number, param1: Nullable<number>) {
     if ([1, 2].includes(action)) {
-      const result = await this.databaseService.query(mailQueries.getCropName, [param1]);
-      return result.rows[0]?.crop_name || '';
+      const cropId = (await this.databaseService.query(mailQueries.getCropName, [param1])).rows[0]
+        .crop_name;
+
+      switch (cropId) {
+        case 1:
+          return '당근';
+        case 2:
+          return '수박';
+        case 3:
+          return '포도';
+        case 4:
+          return '버섯';
+        case 5:
+          return '사과';
+      }
     } else if ([4, 5, 7].includes(action)) {
       const result = await this.databaseService.query(mailQueries.getMemberNickNameByMemberID, [
         param1
