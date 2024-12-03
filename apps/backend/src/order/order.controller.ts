@@ -87,7 +87,10 @@ export class OrderController {
     @Body() marketOrderDto: MarketOrderDto
   ) {
     if (!(await this.orderBookService.isMarketOrderAvailable(marketOrderDto))) {
-      throw new HttpException('매도 주문이 없습니다.', HttpStatus.BAD_REQUEST);
+      return {
+        code: HttpStatus.BAD_REQUEST,
+        message: '매도 주문이 없습니다.'
+      };
     }
 
     try {
@@ -119,7 +122,10 @@ export class OrderController {
     @Body() marketOrderDto: MarketOrderDto
   ) {
     if (!(await this.orderBookService.isMarketOrderAvailable(marketOrderDto))) {
-      throw new HttpException('매수 주문이 없습니다.', HttpStatus.BAD_REQUEST);
+      return {
+        code: HttpStatus.BAD_REQUEST,
+        message: '매수 주문이 없습니다.'
+      };
     }
 
     try {
