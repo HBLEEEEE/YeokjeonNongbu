@@ -107,7 +107,7 @@ const CropMarket: React.FC = () => {
 
   return (
     <main className="flex flex-row justify-center items-center min-h-screen select-none pt-16 gap-4">
-      <div className="flex flex-col items-start z-[10] gap-4 w-full lg:w-[60%] max-w-[1300px]">
+      <div className="flex flex-col items-start z-[10] gap-4 w-[60%] max-w-[1300px]">
         <div className="w-full flex flex-col justify-start gap-2">
           <CropSelector
             currentCrop={curCrop}
@@ -116,10 +116,10 @@ const CropMarket: React.FC = () => {
             handleIntervalChange={handleIntervalChange}
             cropNameList={cropNameList}
           />
-          <hr className="w-full bg-black h-[1px]" />
+          <hr className="w-full border-none bg-black h-[1px]" />
         </div>
         <section className="w-full items-center bg-light-gray border-4 border-light-pink rounded-2xl p-4">
-          <div className="h-56 flex justify-center items-center w-full sm:h-64 md:h-36 lg:h-64 xl:h-64 2xl:h-72">
+          <div className="flex justify-center items-center w-full sm:h-36 md:h-36 lg:h-64 xl:h-64 2xl:h-72">
             <Chart timeData={timeData} />
           </div>
         </section>
@@ -139,7 +139,7 @@ const CropMarket: React.FC = () => {
         </section>
       </div>
       <div className="flex flex-col items-center z-[10]">
-        <TradeSection cropNameList={cropNameList} currentCrop={curCrop} />
+        <TradeSection cropNameList={cropNameList} currentCrop={curCrop} ownCrop={ownCrop} />
         <img src="/icon.png" className="w-56 h-56" />
       </div>
     </main>

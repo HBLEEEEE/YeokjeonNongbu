@@ -72,7 +72,7 @@ export const postMarketBuyOrder = async (data: Order) => {
 
     if (response.data.code === 201) {
       return { success: true, message: response.data.message };
-    } else if(response.data.code === 400) {
+    } else if (response.data.code === 400) {
       return { success: true, message: response.data.message };
     }
 
@@ -88,7 +88,7 @@ export const postMarketSellOrder = async (data: Order) => {
 
     if (response.data.code === 201) {
       return { success: true, message: response.data.message };
-    } else if(response.data.code === 400) {
+    } else if (response.data.code === 400) {
       return { success: true, message: response.data.message };
     }
 

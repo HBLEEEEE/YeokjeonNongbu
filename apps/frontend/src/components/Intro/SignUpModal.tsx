@@ -80,7 +80,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
-        if(step === 1) handleSign1();
+        if (step === 1) handleSign1();
         else handleSign2();
       }
     };
