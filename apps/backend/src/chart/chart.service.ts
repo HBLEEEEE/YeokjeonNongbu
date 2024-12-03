@@ -114,8 +114,7 @@ export class ChartService implements OnModuleInit {
       cropData = `H${cropId}`;
       name = `H${cropId} name`;
       const hChart = new this.chartModel({ cropData, column, name });
-      const res = await hChart.save();
-      console.log(res);
+      await hChart.save();
     }
   }
 
@@ -199,14 +198,24 @@ export class ChartService implements OnModuleInit {
 
     while (currentTime <= endTime) {
       const transactionsForMinute = transactions.filter(transaction => {
-        const transactionTime = new Date(transaction.created_at);
-        return (
-          transactionTime.getUTCFullYear() === currentTime.getUTCFullYear() &&
-          transactionTime.getUTCMonth() === currentTime.getUTCMonth() &&
-          transactionTime.getUTCDate() === currentTime.getUTCDate() &&
-          transactionTime.getUTCHours() === currentTime.getUTCHours() &&
-          transactionTime.getUTCMinutes() === currentTime.getUTCMinutes()
-        );
+        if (factor === 1) {
+          const transactionTime = new Date(transaction.created_at);
+          return (
+            transactionTime.getUTCFullYear() === currentTime.getUTCFullYear() &&
+            transactionTime.getUTCMonth() === currentTime.getUTCMonth() &&
+            transactionTime.getUTCDate() === currentTime.getUTCDate() &&
+            transactionTime.getUTCHours() === currentTime.getUTCHours() &&
+            transactionTime.getUTCMinutes() === currentTime.getUTCMinutes()
+          );
+        } else {
+          const transactionTime = new Date(transaction.created_at);
+          return (
+            transactionTime.getUTCFullYear() === currentTime.getUTCFullYear() &&
+            transactionTime.getUTCMonth() === currentTime.getUTCMonth() &&
+            transactionTime.getUTCDate() === currentTime.getUTCDate() &&
+            transactionTime.getUTCHours() === currentTime.getUTCHours()
+          );
+        }
       });
       // 해당 1분에 transaction이 없으면 y = 500
 
