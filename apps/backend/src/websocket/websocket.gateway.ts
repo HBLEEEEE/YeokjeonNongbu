@@ -66,7 +66,6 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   handleDisconnect(client: Socket) {
     this.clients.delete(client.id);
-    console.log(`Client disconnected: ${client.id}`);
   }
 
   async initializePubSub() {

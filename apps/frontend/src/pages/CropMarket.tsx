@@ -57,7 +57,6 @@ const CropMarket: React.FC = () => {
     });
 
     newSocket.on('connect', () => {
-      console.log('connect!');
       setLoading(false);
       setTimeout(() => {
         newSocket.emit('join', { cropId: curCrop });
