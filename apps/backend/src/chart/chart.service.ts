@@ -18,7 +18,6 @@ export class ChartService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_MINUTE) // 매 분 실행
   async handleEveryMinute() {
-    console.log('분단위 췍!');
     const cropIds = (await this.databaseService.query(chartQueries.getCrops, [])).rows;
     for (const cd of cropIds) {
       const cropId = cd.crop_id;
@@ -54,7 +53,6 @@ export class ChartService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_HOUR) // 매 시간 실행
   async handleEveryHour() {
-    console.log('시간단위 췍!');
     const cropIds = (await this.databaseService.query(chartQueries.getCrops, [])).rows;
     for (const cd of cropIds) {
       const cropId = cd.crop_id;
@@ -90,10 +88,8 @@ export class ChartService implements OnModuleInit {
   async onModuleInit() {
     const isExist = await this.chartModel.findOne();
     if (!isExist) {
-      console.log('차트 데이터를 초기 생성합니다.');
       await this.checkSituation();
     } else {
-      console.log('이미 있당게요.');
       await this.checkSituationFrom();
     }
   }
