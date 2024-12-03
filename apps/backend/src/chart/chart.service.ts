@@ -114,8 +114,7 @@ export class ChartService implements OnModuleInit {
       cropData = `H${cropId}`;
       name = `H${cropId} name`;
       const hChart = new this.chartModel({ cropData, column, name });
-      const res = await hChart.save();
-      console.log(res);
+      await hChart.save();
     }
   }
 
