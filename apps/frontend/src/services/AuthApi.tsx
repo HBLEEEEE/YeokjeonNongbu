@@ -10,6 +10,7 @@ export const login = async (data: Login) => {
       const { accessToken, refreshToken, nickname } = response.data.data;
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('nickname', nickname);
 
       return {
         success: true,
@@ -58,21 +59,21 @@ export const logout = async () => {
 
 export const getIntroduce = async () => {
   try {
-    const response = await api.get('auth/introduce');
+      const response = await api.get('auth/introduce');
 
-    if (response.data.code === 200) {
-      const { introduce } = response.data.data;
+      if (response.data.code === 200) {
+          const { introduce } = response.data.data;
 
-      return {
-        success: true,
-        message: response.data.message,
-        introduce
-      };
-    }
+          return {
+              success: true,
+              message: response.data.message,
+              introduce
+          };
+      }
 
-    return { success: false, message: '알 수 없는 오류가 발생했습니다.' };
+      return { success: false, message: '알 수 없는 오류가 발생했습니다.' };
   } catch (error) {
-    return handleError(error, '데이터 로딩 중 오류가 발생했습니다.');
+      return handleError(error, '데이터 로딩 중 오류가 발생했습니다.');
   }
 };
 
