@@ -1,8 +1,7 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
 import { signUp, login } from '@/services/AuthApi';
-import { useUser } from '@/components/public/UserContext';
 import { AlertContext } from '@/components/public/AlertContext';
 
 interface SignUpModalProps {
@@ -17,7 +16,6 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
   const [pwCheck, setPwCheck] = useState<string>('');
   const [id, setId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const { setNickname } = useUser();
   const { alert } = useContext(AlertContext);
 
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -65,7 +63,6 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
       try {
         const loginResponse = await login({ email, password });
         if (loginResponse.success) {
-          setNickname(loginResponse.nickname);
           navigate('/main');
         } else {
           await alert(loginResponse.message || '로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
@@ -79,6 +76,21 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
       setError(signUpResponse.message || '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        if(step === 1) handleSign1();
+        else handleSign2();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleSign1, handleSign2]);
 
   return (
     <div className="flex flex-col items-center select-none">
