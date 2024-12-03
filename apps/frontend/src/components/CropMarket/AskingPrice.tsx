@@ -28,7 +28,10 @@ const AskingPrice: React.FC<AskingPriceProps> = ({ validCropName, marketData }) 
 
   const sellOrdersToDisplay = [
     ...new Array(Math.max(0, maxItems - marketData.sellOrders.length)).fill(emptyOrder),
-    ...marketData.sellOrders.sort((a, b) => b.price - a.price).slice(0, maxItems)
+    ...marketData.sellOrders
+      .sort((a, b) => a.price - b.price)
+      .slice(0, maxItems)
+      .reverse()
   ];
 
   const buyOrdersToDisplay = [
