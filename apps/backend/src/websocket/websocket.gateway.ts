@@ -82,7 +82,14 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
                 WHERE member_id = $1
             `;
         const crops = await this.databaseService.query(query, [memberId]);
-        this.cropDataTransfer(memberId, crops.rows);
+        const data = crops.rows.map(crop => ({
+          cropId: crop.crop_id,
+          availableQuantity: crop.available_quantity,
+          pendingQuantity: crop.pending_quantity,
+          totalQuantity: crop.total_quantity
+        }));
+
+        this.cropDataTransfer(memberId, data);
       });
 
       await subscriber.pSubscribe('__keyspace@0__:orderBook:*', async (_, message) => {

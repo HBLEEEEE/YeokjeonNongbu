@@ -10,6 +10,7 @@ export const login = async (data: Login) => {
       const { accessToken, refreshToken, nickname } = response.data.data;
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('nickname', nickname);
 
       return {
         success: true,

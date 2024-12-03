@@ -46,8 +46,10 @@ api.interceptors.response.use(
     pendingRequests.delete(requestKey);
 
     if (error.response && error.response.status === 401) {
+      console.log(error);
       localStorage.clear();
       alert('액세스 토큰이 만료되었습니다. 로그아웃되었습니다.');
+      window.location.href = '/';
     }
 
     return Promise.reject(error);
