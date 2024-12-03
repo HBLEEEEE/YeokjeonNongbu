@@ -23,6 +23,7 @@ export class ChartService implements OnModuleInit {
       const cropId = cd.crop_id;
 
       const cropData = `M${cropId}`;
+      const name = `M${cropId} name`;
       const minuteLastChart = await this.chartModel
         .findOne({ cropData })
         .sort({ 'column.x': -1 })
@@ -35,13 +36,13 @@ export class ChartService implements OnModuleInit {
           mLastTime?.toISOString()
         ])
       ).rows;
-      const mColumn = await this.makeRawData(mTransactions, 1, mLastTime, mLastValue);
+      const column = await this.makeRawData(mTransactions, 1, mLastTime, mLastValue);
       const existingMinuteChart = await this.chartModel.findOne({ cropData });
       if (existingMinuteChart) {
-        existingMinuteChart.column.push(...mColumn!);
+        existingMinuteChart.column.push(...column!);
         await existingMinuteChart.save();
       } else {
-        const chart = new this.chartModel({ cropData, mColumn, name });
+        const chart = new this.chartModel({ cropData, column, name });
         await chart.save();
       }
 
@@ -57,6 +58,7 @@ export class ChartService implements OnModuleInit {
     for (const cd of cropIds) {
       const cropId = cd.crop_id;
       const cropData = `H${cropId}`;
+      const name = `H${cropId} name`;
       const hourLastChart = await this.chartModel
         .findOne({ cropData })
         .sort({ 'column.x': -1 })
@@ -69,13 +71,13 @@ export class ChartService implements OnModuleInit {
           hLastTime?.toISOString()
         ])
       ).rows;
-      const hColumn = await this.makeRawData(hTransactions, 60, hLastTime, hLastValue);
+      const column = await this.makeRawData(hTransactions, 60, hLastTime, hLastValue);
       const existingHourChart = await this.chartModel.findOne({ cropData });
       if (existingHourChart) {
-        existingHourChart.column.push(...hColumn!);
+        existingHourChart.column.push(...column!);
         await existingHourChart.save();
       } else {
-        const chart = new this.chartModel({ cropData, hColumn, name });
+        const chart = new this.chartModel({ cropData, column, name });
         await chart.save();
       }
 
@@ -101,15 +103,19 @@ export class ChartService implements OnModuleInit {
       const transactions = (
         await this.databaseService.query(chartQueries.getAllTransactionsData, [cropId])
       ).rows;
-      const mColumn = await this.makeRawData(transactions);
+      let column = await this.makeRawData(transactions);
       let cropData = `M${cropId}`;
-      const mChart = new this.chartModel({ cropData, mColumn, name });
+      let name = `M${cropId} name`;
+      const mChart = new this.chartModel({ cropData, column, name });
       await mChart.save();
 
-      const hColumn = await this.makeRawData(transactions, 60);
+      column = [];
+      column = await this.makeRawData(transactions, 60);
       cropData = `H${cropId}`;
-      const hChart = new this.chartModel({ cropData, hColumn, name });
-      await hChart.save();
+      name = `H${cropId} name`;
+      const hChart = new this.chartModel({ cropData, column, name });
+      const res = await hChart.save();
+      console.log(res);
     }
   }
 
@@ -119,6 +125,7 @@ export class ChartService implements OnModuleInit {
       const cropId = cd.crop_id;
 
       let cropData = `M${cropId}`;
+      let name = `M${cropId} name`;
       const minuteLastChart = await this.chartModel
         .findOne({ cropData })
         .sort({ 'column.x': -1 })
@@ -131,17 +138,18 @@ export class ChartService implements OnModuleInit {
           mLastTime?.toISOString()
         ])
       ).rows;
-      const mColumn = await this.makeRawData(mTransactions, 1, mLastTime, mLastValue);
+      let column = await this.makeRawData(mTransactions, 1, mLastTime, mLastValue);
       const existingMinuteChart = await this.chartModel.findOne({ cropData });
       if (existingMinuteChart) {
-        existingMinuteChart.column.push(...mColumn!);
+        existingMinuteChart.column.push(...column!);
         await existingMinuteChart.save();
       } else {
-        const chart = new this.chartModel({ cropData, mColumn, name });
+        const chart = new this.chartModel({ cropData, column, name });
         await chart.save();
       }
-
+      column = [];
       cropData = `H${cropId}`;
+      name = `H${cropId} name`;
       const hourLastChart = await this.chartModel
         .findOne({ cropData })
         .sort({ 'column.x': -1 })
@@ -154,13 +162,13 @@ export class ChartService implements OnModuleInit {
           hLastTime?.toISOString()
         ])
       ).rows;
-      const hColumn = await this.makeRawData(hTransactions, 60, hLastTime, hLastValue);
+      column = await this.makeRawData(hTransactions, 60, hLastTime, hLastValue);
       const existingHourChart = await this.chartModel.findOne({ cropData });
       if (existingHourChart) {
-        existingHourChart.column.push(...hColumn!);
+        existingHourChart.column.push(...column!);
         await existingHourChart.save();
       } else {
-        const chart = new this.chartModel({ cropData, hColumn, name });
+        const chart = new this.chartModel({ cropData, column, name });
         await chart.save();
       }
     }
