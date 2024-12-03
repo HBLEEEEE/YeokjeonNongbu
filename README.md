@@ -16,8 +16,7 @@
 
 <p align="center">
     <a href="https://ambitious-cafe-d87.notion.site/YeokjeonNongbu-128cec1cf54c8008946fcb4b2004f5c7?pvs=4">
-        <img src="https://img.shields.io/badge/역전농부 팀 노션-000000?&logo=notion&logoColor=white" alt="Notion" style="vertical-align: middle;" />
-    </a>
+        <img src="https://img.shields.io/badge/역전농부 팀 노션-000000?&logo=notion&logoColor=white" alt="Notion" style="vertical-align: middle;" /></a>
     &nbsp; | &nbsp; 
     <a href="https://github.com/boostcampwm-2024/web13-YeokjeonNongbu/wiki">
         <img src="https://img.shields.io/badge/역전농부 Wiki-181717?&logo=github&logoColor=white" alt="Wiki" style="vertical-align: middle;" />
