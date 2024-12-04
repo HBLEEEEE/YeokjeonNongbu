@@ -44,6 +44,8 @@ export const postLimitBuyOrder = async (data: Order) => {
 
     if (response.data.code === 201) {
       return { success: true, message: response.data.message };
+    } else if (response.data.code === 403) {
+      return { sucess: false, message: response.data.message };
     }
 
     return { success: false, message: '알 수 없는 오류가 발생했습니다.' };
@@ -58,6 +60,8 @@ export const postLimitSellOrder = async (data: Order) => {
 
     if (response.data.code === 201) {
       return { success: true, message: response.data.message };
+    } else if (response.data.code === 403) {
+      return { sucess: false, message: response.data.message };
     }
 
     return { success: false, message: '알 수 없는 오류가 발생했습니다.' };
@@ -72,7 +76,7 @@ export const postMarketBuyOrder = async (data: Order) => {
 
     if (response.data.code === 201) {
       return { success: true, message: response.data.message };
-    } else if (response.data.code === 400) {
+    } else if (response.data.code === 400 || response.data.code === 403) {
       return { success: true, message: response.data.message };
     }
 
@@ -88,7 +92,7 @@ export const postMarketSellOrder = async (data: Order) => {
 
     if (response.data.code === 201) {
       return { success: true, message: response.data.message };
-    } else if (response.data.code === 400) {
+    } else if (response.data.code === 400 || response.data.code === 403) {
       return { success: true, message: response.data.message };
     }
 
