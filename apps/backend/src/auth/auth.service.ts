@@ -107,7 +107,7 @@ export class AuthService {
 
   private async generateTokens(memberId: number, nickname: string) {
     const payload = { memberId, nickname };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '24h' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     return { accessToken, refreshToken };
   }
