@@ -1,7 +1,7 @@
 import { useState, useRef, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ModalStep } from '@/constants/ModalConstants';
-import { signUp, login } from '@/services/AuthApi';
+import { signUp, login, dupAccount } from '@/services/AuthApi';
 import { AlertContext } from '@/components/public/AlertContext';
 
 interface SignUpModalProps {
@@ -23,7 +23,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
   const pwCheckInputRef = useRef<HTMLInputElement>(null);
   const idInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSign1 = () => {
+  const handleSign1 = async () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!email || !emailRegex.test(email)) {
       setError('유효한 이메일을 입력해주세요.');
@@ -43,8 +43,17 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ step, setModalStep }) => {
       return;
     }
 
-    setError(null);
-    setModalStep(ModalStep.SignUpStep2);
+    try {
+      const dupCheck = await dupAccount(email);
+      if (dupCheck.success) {
+        setError(null);
+        setModalStep(ModalStep.SignUpStep2);
+      } else {
+        setError(dupCheck.message);
+      }
+    } catch {
+      setError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleSign2 = async () => {
