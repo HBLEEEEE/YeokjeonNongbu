@@ -14,7 +14,7 @@ const Main: React.FC = () => {
       <nav className="flex justify-center mt-8">
         <ul className="flex list-none gap-24">
           <li>
-            <Link to="/cropmarket" className="flex flex-col items-center">
+            <Link to="/cropmarket/1" className="flex flex-col items-center">
               <div className="bg-cropmarket bg-no-repeat bg-contain w-[90px] h-[90px]" />
               <p className="text-base font-bold text-light-gray text-shadow">작물시장</p>
             </Link>

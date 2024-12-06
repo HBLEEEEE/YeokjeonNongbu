@@ -79,7 +79,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/cropmarket"
+                  path="/cropmarket/:cropId"
                   element={
                     <Layout path="/cropmarket">
                       <PrivateRoute element={<CropMarket />} />

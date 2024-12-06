@@ -122,7 +122,7 @@ const Header: React.FC = () => {
           <p>{nickname}</p>
         </section>
 
-        {location.pathname !== '/cropmarket' && (
+        {!location.pathname.includes('/cropmarket') && (
           <section className="flex items-center justify-center bg-light-beige text-lg font-semibold border-4 border-light-pink rounded-2xl p-3 mx-4 min-w-[200px] max-w-[400px]">
             <p>￦ {totalAssets.toLocaleString()}</p>
           </section>
