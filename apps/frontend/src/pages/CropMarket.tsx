@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import CropSelector from '@/components/CropMarket/CropSelector';
 import AskingPrice from '@/components/CropMarket/AskingPrice';
@@ -12,8 +13,9 @@ import { cropList } from '@/constants/CropConstants';
 import Spinner from '@/assets/public/spin.gif';
 
 const CropMarket: React.FC = () => {
+  const { cropId } = useParams<{ cropId: string }>();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
-  const [curCrop, setCurCrop] = useState<number>(1);
   const [cropNameList, setCropNameList] = useState<CropData[]>([]);
   const [ownCrop, setOwnCrop] = useState<OwnCropData[]>([]);
   const [nowPrice, setNowPrice] = useState([]);
@@ -30,6 +32,8 @@ const CropMarket: React.FC = () => {
     sellOrders: [],
     nowPrice: 0
   });
+
+  const curCrop = parseInt(cropId || '1', 10);
 
   useEffect(() => {
     const fetchCrops = async () => {
@@ -50,6 +54,8 @@ const CropMarket: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
+
     const newSocket = io(import.meta.env.VITE_BASE_URL, {
       auth: {
         authorization: `Bearer ${localStorage.getItem('accessToken')}`
@@ -108,6 +114,10 @@ const CropMarket: React.FC = () => {
   const cropName = cropNameList.find(c => c.cropId === curCrop)?.cropName ?? '';
   const validCropName = cropName && cropList[cropName];
 
+  const handleCropChange = (cropId: number) => {
+    navigate(`/cropmarket/${cropId}`);
+  };
+
   return (
     <main className="flex flex-row justify-center items-center min-h-screen select-none pt-16 gap-4">
       {loading ? (
@@ -120,7 +130,7 @@ const CropMarket: React.FC = () => {
             <div className="w-full flex flex-col justify-start gap-2">
               <CropSelector
                 currentCrop={curCrop}
-                onSelect={setCurCrop}
+                onSelect={handleCropChange}
                 activeInterval={activeInterval}
                 handleIntervalChange={handleIntervalChange}
                 cropNameList={cropNameList}
